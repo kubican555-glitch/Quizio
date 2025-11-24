@@ -1,0 +1,40 @@
+﻿321;Co je to kompresor?;D;Hnací pístový stroj sloužící pro dopravu kapalin;Hnaný pístový stroj sloužící pro dopravu kapalin;Hnací pístový stroj sloužící pro dopravu plynů;Hnaný pístový stroj sloužící pro dopravu plynů
+322;Následující informace popisují fázi komprese u pístového kompresoru. Která informace NENÍ pravdivá?;D;Píst se pohybuje z dolní úvratě do horní.;Sací i výtlačný ventil je uzavřený.;V pracovním prostoru vzniká přetlak.;Zvětšuje se pracovní prostor.
+323;Následující informace popisují fázi expanze u pístového kompresoru. Která informace NENÍ pravdivá?;C;Píst se pohybuje z dolní úvratě do horní.;Sací i výtlačný ventil je uzavřený.;Fáze probíhá teoreticky podle adiabatického děje.;Zvětšuje se pracovní prostor.
+324;Následující informace popisují fázi výtlaku u pístového kompresoru. Která informace NENÍ pravdivá?;B;Píst se pohybuje z dolní úvratě do horní.;Sací i výtlačný ventil je otevřený.;Fáze probíhá teoreticky podle izobarického děje.;Zmenšuje se pracovní prostor.
+325;Následující informace popisují fázi sání u pístového kompresoru. Která informace NENÍ pravdivá?;C;Píst se pohybuje z horní úvratě do dolní.;Výtlačný ventil je uzavřený.;Fáze probíhá teoreticky podle izochorického děje.;Zvětšuje se pracovní prostor.
+326;"Co se rozumí pojmem ""kompresní poměr""?";A;Podíl počátečního a konečného objemu plynu při jeho stlačování;Podíl počátečního a konečného tlaku plynu při jeho stlačování;Podíl počáteční a konečné teploty plynu při jeho stlačování;Podíl počáteční a konečné hustoty plynu při jeho stlačování
+327;Čeho NELZE dosáhnout pomocí vícestupňové komprese?;A;Nižší teploty plynu na konci komprese;Vyšší objemové účinnosti kompresoru;Ušetření potřebné práce pro stlačování;Vysokého sacího tlaku do prvního stupně
+328;Co je řazeno mezi jednotlivými stupni při vícestupňové kompresi?;A;Chladič;Dmychadlo;Vývěva;Expandér
+329;Při vícestupňové kompresi: Jaké parametry bude mít plyn na vstupu do druhého stupně oproti výstupu z prvního stupně?;B;Bude mít stejnou teplotu, tlak i objem;Bude mít stejný objem, ale nižší teplotu a tlak;Bude mít nižší tlak, teplotu i objem;Bude mít vyšší tlak, teplotu i objem
+330;Jak se nazývají ventily, které jsou nejčastěji používány u pístových kompresorů?;B;Membránové ventily;Destičkové ventily;Sedlové ventily;Talířové ventily
+331;Kterým z těchto zařízení NELZE regulovat činnost kompresoru, resp. tlak a průtok plynu na výtlaku?;D;Vzdušníkem;Pojistným ventilem;Samotným kompresorem;Zpětným ventilem
+332;Jak se nazývá zařízení, kterým se mění velikost škodlivého pracovního prostoru pístového kompresoru?;D;Reduktor;Reflektor;Reaktor;Restriktor
+333;Kterou z těchto činností NELZE regulovat činnost pístového kompresoru?;D;Vhodným ovládáním sacího ventilu;Změnou otáček kompresoru;Přepouštěním vytlačovaného plynu do sání;Chlazením klikového mechanismu
+334;Jakou funkci NEMÁ přívod oleje ke klikovému mechanismu pístového kompresoru?;D;Mazání kompresoru;Chlazení kompresoru;Odvod odrolených částí materiálů;Regulace chodu kompresoru
+335;"Jak se jmenuje ""kompresor s rotačním pohybem pístu"", který se často používá k přeplňování spalovacích motorů?";A;Rootsovo dmychadlo;Vodokružná vývěva;Spirálový kompresor;Kompresor s krouživým pohybem pístu
+336;Na obrázku je teoretický pracovní p-V diagram pístového kompresoru. Jak se nazývá fáze, která nastává z bodu 2 do bodu 3?;B;Adiabatická komprese;Izochorická komprese;Adiabatická expanze;Izochorická expanze
+337;Na obrázku je (tlustou černou čarou nakreslený) skutečný pracovní p-V diagram pístového kompresoru. Co se děje během červeně zakroužkované fáze?;D;Pracovní médium je v pracovním prostoru kompresoru a je stlačováno;Pracovní médium je v pracovním prostoru kompresoru a expanduje;Pracovní médium se dostává z pracovního prostoru kompresoru;Pracovní médium se dostává do pracovního prostoru kompresoru
+338;Jak se jmenuje přístroj ke stlačování plynu na obrázku?;D;Pístový turbokompresor;Spirálový kompresor;Vodokružná vývěva;Rootsovo dmychadlo
+339;Na obrázku je typický pístový kompresor. Jak se nazývá červená součást, která je jeho součástí?;C;Reaktor;Vývěva;Vzdušník;Boiler
+340;Jak by se dala nejlépe pojmenovat součást související s pístovými kompresory na obrázku?;B;Píst kompresoru;Destičkový ventil;Reduktor tlaku;Hlava válce
+341;Co je to zážehový spalovací motor?;A;Tepelný hnací pístový stroj;Tepelný hnaný pístový stroj;Tepelný hnací lopatkový stroj;Tepelný hnaný lopatkový stroj
+342;Jak se nazývá zážehový spalovací motor, jehož píst koná rotační pohyb?;B;Stirlingův motor;Wankelův motor;Vznětový motor;Krokový motor
+343;Během kolika otáček klikové hřídele proběhne jeden pracovní cyklus dvoudobého zážehového spalovacího motoru?;A;Během 1 otáčky klikové hřídele;Během 2 otáček klikové hřídele;Během 3 otáček klikové hřídele;Během 4 otáček klikové hřídele
+344;"Jak se jinak nazývá uspořádání válců ""boxer"" spalovacího motoru?";D;Řadové uspořádání;Vidlicové uspořádání;Hvězdicové uspořádání;Uspořádání s protiběžnými písty
+345;Následující informace popisují fázi zážehu u čtyřdobého zážehového spalovacího motoru. Která informace NENÍ pravdivá?;A;K zážehu dochází samovznícením;K zážehu dochází, když je píst před horní úvratí;Zažehává se směs vzduchu s benzínem;Po zážehu prudce vzrůstá tlak ve válci
+346;Jaká z následujících podmínek NEPLATÍ pro vytvoření ideálního (teoretického) pracovního diagramu zážehového spalovacího motoru?;A;Dochází k výměně obsahu válce;Přívod a odvod tepla nastává za konstantních podmínek;Termodynamické děje probíhají dle dějů ideálního plynu;Klikový mechanismus pracuje bez tření
+347;Jaké je přibližně účinnost čtyřdobého zážehového spalovacího motoru?;B;0,1;0,3;0,5;0,7
+348;"Který z těchto parametrů NENÍ nutné měřit při určování ""měrné spotřeby paliva"" spalovacího motoru?";A;Hmotnost spotřebovaného paliva;Výkon spalovacího motoru;Doba běhu (práce) spalovacího motoru;Hustotu dodávaného paliva
+349;Jak se nazývá mechanismus, který ovládá činnost ventilů spalovacího motoru?;A;Rozvodový mechanismus;Klikový mechanismus;Kulisový mechanismus;Šroubový mechanismus
+350;Ve kterém technickém detailu z uvedených není podstatný rozdíl mezi dvoudobým a čtyřdobým zážehovým spalovacím motorem?;D;V rozvodovém mechanismu;V pracovním prostoru;V pracovním cyklu;Ve způsobu zapalování
+351;Co NEPATŘÍ mezi nevýhody dvoudobých zážehových spalovacích motorů (oproti čtyřdobým zážehovým)?;A;Nižší výkon;Nižší účinnost;Vyšší spotřeba paliva;Vyšší emise
+352;Jakou veličinu vyjadřuje plocha (obsah) ohraničená skutečným pracovním diagramem dvoudobého zážehového motoru?;B;Užitečnou práci motoru;Maximální výkon motoru;Skutečnou účinnost motoru;Měrnou spotřebu paliva
+353;Pokud se palivo (benzín) dostává do sacího potrubí před škrtící klapkou pomocí přetlaku, pak hovoříme o;B;karburátoru;jednobodovém nepřímém vstřikování;vícebodovém nepřímém vstřikování;přímém vstřikování
+354;Která součást z uvedených NENÍ součástí ventilového rozvodu OHC?;A;Rozvodová tyč;Vratná pružina;Vahadlo;Vačková hřídel
+355;Během které fáze pracovního cyklu čtyřdobého zážehového spalovacího motoru koná motor práci?;A;Během expanze;Během sání;Během komprese;Během výfuku
+356;Na obrázku je ideální pracovní p-V diagram zážehového motoru. Jak se nazývá fáze, která nastává z bodu 4 do bodu 1?;A;Izochorický odvod tepla;Adiabatická komprese;Adiabatická expanze;Izochorický přívod tepla
+357;Na obrázku je skutečný pracovní p-V diagram dvoudobého zážehového motoru. Ve kterém z červeně označených bodů dochází k zážehu (vytvoření jiskry svíčkou)?;C;D;A;B;C
+358;Jak se nazývá motor (uspořádání motoru), pokud jsou písty umístěny tak, jak je vidět na obrázku?;A;Boxer;Hvězdicový;Vidlicový;Wankelův
+359;Jak se nazývá celek na obrázku?;A;Karburátor;Vahadlo;Setrvačník;Ojnice
+360;Kterou písmennou zkratkou by se dal nejlépe označit rozvodový mechanismus motoru na obrázku?;D;DOHC;SV;OHV;SOHC
