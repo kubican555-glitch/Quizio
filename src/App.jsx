@@ -263,8 +263,7 @@ export default function App() {
         if (mode === "random" && showResult) nextRandomQuestion();
         else if (mode === "random" && !showResult) confirmRandomAnswer();
         else {
-          const max = mode === "training" ? maxSeenIndex : questionSet.length - 1;
-          const newIdx = Math.min(currentIndex + 1, max);
+          const newIdx = currentIndex + 1;
           moveToQuestion(newIdx);
         }
       }
