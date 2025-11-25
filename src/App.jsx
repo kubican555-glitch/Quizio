@@ -177,13 +177,6 @@ export default function App() {
     if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [currentIndex]);
 
-  // auto scroll card into view for all modes
-  useEffect(() => {
-    if (!mode || !cardRef.current) return;
-    if (cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [currentIndex, showResult, mode]);
 
   // auto focus selected answer for keyboard nav
   useEffect(() => {
