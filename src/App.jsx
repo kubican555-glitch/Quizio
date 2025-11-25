@@ -412,6 +412,11 @@ export default function App() {
       copy[currentIndex] = q;
       return copy;
     });
+
+    // In training mode, allow user to navigate to next question after answering
+    if (mode === "training" && currentIndex === maxSeenIndex && maxSeenIndex < questionSet.length - 1) {
+      setMaxSeenIndex(maxSeenIndex + 1);
+    }
   };
 
   const clearAnswer = () => {
