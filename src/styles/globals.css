@@ -15,6 +15,11 @@ body {
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
   color: #f1f5f9;
   -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
