@@ -270,26 +270,21 @@ body {
 }
 
 .timer {
-  font-size: 1.8rem;
-  font-weight: 900;
+  font-size: 1.3rem;
+  font-weight: 800;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
   border: 2px solid rgba(59, 130, 246, 0.5);
   color: #60a5fa;
-  letter-spacing: 1px;
-  padding: 1.5rem 1.2rem;
-  border-radius: 18px;
+  padding: 0.9rem 1.8rem;
+  border-radius: 14px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
   transition: all 0.3s ease;
-}
-
-.timer::before {
-  content: '⏱';
-  margin-right: 0.6rem;
-  font-size: 1.5rem;
-  display: inline-block;
-  animation: pulse 2s infinite;
 }
 
 .timerWarning { 
