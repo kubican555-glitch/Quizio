@@ -318,22 +318,24 @@ export default function App() {
   const confirmRandomAnswer = () => {
     if (finished || mode !== "random" || selectedAnswer === null) return;
 
+    const currentQ = questionSet[currentIndex];
+    if (!currentQ) return;
+
     setQuestionSet((prev) => {
       const copy = [...prev];
       const q = { ...copy[currentIndex] };
       q.userAnswer = selectedAnswer;
       copy[currentIndex] = q;
-
-      setShowResult(true);
-      setScore((s) => {
-        let correct = s.correct;
-        let total = s.total;
-        if (selectedAnswer === q.correctIndex) correct += 1;
-        total += 1;
-        return { correct, total };
-      });
-
       return copy;
+    });
+
+    setShowResult(true);
+    setScore((s) => {
+      let correct = s.correct;
+      let total = s.total;
+      if (selectedAnswer === currentQ.correctIndex) correct += 1;
+      total += 1;
+      return { correct, total };
     });
   };
 
