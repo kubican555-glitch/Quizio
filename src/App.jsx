@@ -235,6 +235,7 @@ export default function App() {
       }
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
         if (mode === "random" && showResult) nextRandomQuestion();
+        else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
         else {
           const max = mode === "training" ? maxSeenIndex : questionSet.length - 1;
           setCurrentIndex((i) => Math.min(i + 1, max));
@@ -243,6 +244,7 @@ export default function App() {
 
       if (e.key === " ") {
         if (mode === "random" && showResult) nextRandomQuestion();
+        else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
         else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
       }
 
@@ -250,7 +252,7 @@ export default function App() {
         if (showConfirmSubmit) submitTest();
         else if (showConfirmExit) confirmExit();
         else if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult) confirmRandomAnswer();
+        else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
       }
 
       if (e.key === "Backspace") {
