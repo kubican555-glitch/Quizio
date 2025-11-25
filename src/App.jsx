@@ -184,12 +184,19 @@ export default function App() {
     if (mode !== "mock" || finished) return;
     const t = setInterval(() => {
       setTimeLeft((x) => {
-        if (x <= 1) { submitTest(); setFinished(true); return 0; }
+        if (x <= 1) return 0;
         return x - 1;
       });
     }, 1000);
     return () => clearInterval(t);
   }, [mode, finished]);
+
+  // auto-submit when time runs out
+  useEffect(() => {
+    if (mode === "mock" && timeLeft === 0 && !finished) {
+      submitTest();
+    }
+  }, [mode, timeLeft, finished]);
 
   // Keyboard handling (centralized)
   useEffect(() => {
