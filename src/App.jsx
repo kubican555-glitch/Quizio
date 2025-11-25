@@ -177,13 +177,14 @@ export default function App() {
     return () => window.removeEventListener("resize", setVH);
   }, []);
 
-  // update maxSeenIndex in training mode when viewing a new question
+  // update maxSeenIndex in training mode when user navigates to new question
   useEffect(() => {
     if (mode !== "training") return;
     if (currentIndex > maxSeenIndex) {
+      // Only increase maxSeenIndex when user navigates forward, not when answer is selected
       setMaxSeenIndex(currentIndex);
     }
-  }, [currentIndex, maxSeenIndex, mode]);
+  }, [currentIndex, mode]);
 
   // auto scroll card into view for mock/random modes only (not training - user controls scroll)
   useEffect(() => {
@@ -409,11 +410,6 @@ export default function App() {
       const q = { ...copy[currentIndex] };
       q.userAnswer = idx;
       copy[currentIndex] = q;
-
-      if (mode === "training") {
-        if (currentIndex === maxSeenIndex) setMaxSeenIndex((m) => Math.min(m + 1, copy.length - 1));
-      }
-
       return copy;
     });
   };

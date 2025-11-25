@@ -194,6 +194,13 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.2);
   box-shadow: 0 15px 60px rgba(0,0,0,0.5);
   margin-bottom: 2rem;
+  overflow: hidden;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* === OTÁZKA + OBRÁZEK === */
