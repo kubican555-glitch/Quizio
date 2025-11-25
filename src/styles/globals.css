@@ -10,7 +10,8 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: inherit;
+  background: transparent;
+  padding-top: env(safe-area-inset-top);
 }
 
 html {
@@ -20,6 +21,10 @@ html {
   padding: 0;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a3155 100%);
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 body {
@@ -29,13 +34,11 @@ body {
   min-height: 100dvh;
   min-height: 100vh;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a3155 100%);
-  background-attachment: fixed;
-  background-size: cover;
-  background-repeat: no-repeat;
+  background: transparent;
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
   color: #f1f5f9;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 /* === ANIMACE === */
@@ -72,8 +75,7 @@ body {
   max-width: 960px;
   width: 100%;
   margin: 0 auto;
-  padding: 1rem;
-  padding-top: max(1rem, env(safe-area-inset-top, 0px));
+  padding: 0 1rem 1rem 1rem;
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   min-height: 100dvh;
   box-sizing: border-box;
