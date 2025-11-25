@@ -61,7 +61,7 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
   };
 
   return (
-    <div className="navigatorWrapper">
+    <div className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""}`}>
       <div className="compactNavigator">
         {questionSet.map((_, i) => {
           if (mode === "training" && i > maxSeenIndex) return null;
@@ -185,12 +185,11 @@ export default function App() {
     }
   }, [currentIndex, maxSeenIndex, mode]);
 
-  // auto scroll card into view for all modes - smooth
+  // auto scroll card into view for mock/random modes only (not training - user controls scroll)
   useEffect(() => {
-    if (!cardRef.current) return;
-    const scrollBlock = mode === "training" ? "center" : "start";
-    cardRef.current.scrollIntoView({ behavior: "smooth", block: scrollBlock });
-  }, [currentIndex, showResult, mode]);
+    if (!cardRef.current || mode === "training") return;
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [currentIndex, mode]);
 
   // auto focus selected answer for keyboard nav
   useEffect(() => {

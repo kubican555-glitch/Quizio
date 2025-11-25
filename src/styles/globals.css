@@ -282,6 +282,9 @@ body {
   padding: 0.5rem 0;
   scroll-behavior: smooth; /* ← KLÍČOVÉ PRO HLADKÉ POSOUVÁNÍ */
 }
+.navigatorWrapper.noAutoScroll {
+  scroll-behavior: auto; /* Vypneme smooth scroll v tréninkovém režimu */
+}
 .navigatorWrapper::-webkit-scrollbar { display: none; }
 .navigatorWrapper:active { cursor: grabbing; }
 
