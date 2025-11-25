@@ -56,13 +56,11 @@ function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, on
 
 function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIndex }) {
   const wrapperRef = React.useRef(null);
-  const [isDragging, setIsDragging] = React.useState(false);
-  const [startX, setStartX] = React.useState(0);
-  const [scrollLeft, setScrollLeft] = React.useState(0);
+  const dragStateRef = React.useRef({ isDragging: false, startX: 0, scrollLeft: 0, moved: 0 });
 
   // Auto-scroll na aktuální otázku
   React.useEffect(() => {
-    if (!wrapperRef.current || isDragging) return;
+    if (!wrapperRef.current) return;
     
     const wrapper = wrapperRef.current;
     const buttons = wrapper.querySelectorAll('.navNumber');
@@ -72,9 +70,7 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
       const buttonLeft = currentButton.offsetLeft;
       const buttonWidth = currentButton.offsetWidth;
       const wrapperWidth = wrapper.clientWidth;
-      const wrapperScrollLeft = wrapper.scrollLeft;
       
-      // Střed = scrollLeft + wrapperWidth / 2
       const targetScroll = buttonLeft + buttonWidth / 2 - wrapperWidth / 2;
       
       wrapper.scrollTo({
@@ -82,49 +78,60 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
         behavior: 'smooth'
       });
     }
-  }, [currentIndex, isDragging]);
+  }, [currentIndex]);
 
   const handleMouseDown = (e) => {
     if (!wrapperRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - wrapperRef.current.offsetLeft);
-    setScrollLeft(wrapperRef.current.scrollLeft);
+    dragStateRef.current.isDragging = true;
+    dragStateRef.current.startX = e.pageX;
+    dragStateRef.current.scrollLeft = wrapperRef.current.scrollLeft;
+    dragStateRef.current.moved = 0;
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging || !wrapperRef.current) return;
-    const x = e.pageX - wrapperRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    wrapperRef.current.scrollLeft = scrollLeft - walk;
+    if (!dragStateRef.current.isDragging || !wrapperRef.current) return;
+    const diff = e.pageX - dragStateRef.current.startX;
+    dragStateRef.current.moved = Math.abs(diff);
+    wrapperRef.current.scrollLeft = dragStateRef.current.scrollLeft - diff;
   };
 
-  const handleMouseUp = () => setIsDragging(false);
-  const handleMouseLeave = () => setIsDragging(false);
+  const handleMouseUp = () => {
+    dragStateRef.current.isDragging = false;
+  };
 
   const handleTouchStart = (e) => {
     if (!wrapperRef.current) return;
-    setIsDragging(true);
-    setStartX(e.touches[0].pageX - wrapperRef.current.offsetLeft);
-    setScrollLeft(wrapperRef.current.scrollLeft);
+    dragStateRef.current.isDragging = true;
+    dragStateRef.current.startX = e.touches[0].pageX;
+    dragStateRef.current.scrollLeft = wrapperRef.current.scrollLeft;
+    dragStateRef.current.moved = 0;
   };
 
   const handleTouchMove = (e) => {
-    if (!isDragging || !wrapperRef.current) return;
-    const x = e.touches[0].pageX - wrapperRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    wrapperRef.current.scrollLeft = scrollLeft - walk;
+    if (!dragStateRef.current.isDragging || !wrapperRef.current) return;
+    const diff = e.touches[0].pageX - dragStateRef.current.startX;
+    dragStateRef.current.moved = Math.abs(diff);
+    wrapperRef.current.scrollLeft = dragStateRef.current.scrollLeft - diff;
   };
 
-  const handleTouchEnd = () => setIsDragging(false);
+  const handleTouchEnd = () => {
+    dragStateRef.current.isDragging = false;
+  };
+
+  const handleButtonClick = (i) => {
+    if (dragStateRef.current.moved < 5) {
+      setCurrentIndex(i);
+    }
+  };
 
   return (
     <div
       ref={wrapperRef}
-      className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""} ${isDragging ? "dragging" : ""}`}
+      className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""} ${dragStateRef.current.isDragging ? "dragging" : ""}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={handleMouseUp}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
@@ -137,10 +144,7 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
             <button
               key={i}
               className={`navNumber ${currentIndex === i ? "current" : ""} ${isAnswered ? "answered" : ""}`}
-              onClick={(e) => {
-                if (!isDragging) setCurrentIndex(i);
-              }}
-              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleButtonClick(i)}
               aria-label={`Otázka ${i + 1}`}
             >
               {i + 1}
