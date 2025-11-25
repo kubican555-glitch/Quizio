@@ -180,8 +180,22 @@ export default function App() {
   // auto scroll card into view for flashcards
   useEffect(() => {
     if (mode !== "random" || !cardRef.current) return;
-    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      if (cardRef.current) {
+        cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 0);
   }, [currentIndex, showResult, mode]);
+
+  // auto focus selected answer for keyboard nav
+  useEffect(() => {
+    if (mode !== "random" || selectedAnswer === null) return;
+    const refs = optionRefsForCurrent.current?.[currentQuestion._localIndex] || [];
+    if (refs[selectedAnswer]) {
+      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
+      refs[selectedAnswer].focus();
+    }
+  }, [selectedAnswer, currentIndex, mode]);
 
   // training timer
   useEffect(() => {
