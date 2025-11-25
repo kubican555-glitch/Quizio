@@ -55,24 +55,17 @@ function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, on
 }
 
 function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIndex }) {
-  const handleNavigate = (i) => {
-    if (mode === "training" && i > maxSeenIndex) return;
-    setCurrentIndex(i);
-  };
-
   return (
     <div className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""}`}>
       <div className="compactNavigator">
         {questionSet.map((_, i) => {
           if (mode === "training" && i > maxSeenIndex) return null;
           const isAnswered = questionSet[i]?.userAnswer !== undefined;
-          const isDisabled = mode === "training" && i > maxSeenIndex;
           return (
             <button
               key={i}
               className={`navNumber ${currentIndex === i ? "current" : ""} ${isAnswered ? "answered" : ""}`}
-              onClick={() => handleNavigate(i)}
-              disabled={isDisabled}
+              onClick={() => setCurrentIndex(i)}
               aria-label={`Otázka ${i + 1}`}
             >
               {i + 1}
@@ -431,10 +424,15 @@ export default function App() {
   };
 
   const moveToQuestion = (newIdx) => {
-    if (mode === "training" && newIdx > maxSeenIndex && newIdx > currentIndex) {
-      setMaxSeenIndex(newIdx);
+    // Bounds check
+    const maxQuestion = questionSet.length - 1;
+    const boundedIdx = Math.max(0, Math.min(newIdx, maxQuestion));
+    
+    // In training mode, increase maxSeenIndex when moving forward
+    if (mode === "training" && boundedIdx > maxSeenIndex && boundedIdx > currentIndex) {
+      setMaxSeenIndex(boundedIdx);
     }
-    setCurrentIndex(newIdx);
+    setCurrentIndex(boundedIdx);
   };
 
   const nextRandomQuestion = () => {
@@ -573,9 +571,9 @@ export default function App() {
                     moveToQuestion(newIdx);
                   }} disabled={currentIndex === 0}>Předchozí</button>
                   <button className="navButton" onClick={() => {
-                    const newIdx = Math.min((mode === "training" ? maxSeenIndex : questionSet.length - 1), currentIndex + 1);
+                    const newIdx = currentIndex + 1;
                     moveToQuestion(newIdx);
-                  }} disabled={currentIndex === (mode === "training" ? maxSeenIndex : questionSet.length - 1) || (mode === "training" && currentIndex === questionSet.length - 1)}>Další</button>
+                  }} disabled={currentIndex === questionSet.length - 1}>Další</button>
                 </div>
 
                 <div className="navigatorWrapper" ref={scrollRef}>
