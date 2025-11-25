@@ -173,7 +173,8 @@ export default function App() {
   // auto scroll card into view for all modes - smooth
   useEffect(() => {
     if (!cardRef.current) return;
-    cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    const scrollBlock = mode === "training" ? "center" : "start";
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: scrollBlock });
   }, [currentIndex, showResult, mode]);
 
   // auto focus selected answer for keyboard nav
