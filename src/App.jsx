@@ -211,19 +211,19 @@ export default function App() {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
 
       if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
-        if (mode === "random") {
+        if (mode === "random" && !showResult) {
           const newIdx = selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts;
           selectRandomAnswer(newIdx);
-        } else {
+        } else if (mode !== "random") {
           const newIdx = curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts;
           handleAnswer(newIdx);
         }
       }
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") {
-        if (mode === "random") {
+        if (mode === "random" && !showResult) {
           const newIdx = selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts;
           selectRandomAnswer(newIdx);
-        } else {
+        } else if (mode !== "random") {
           const newIdx = curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts;
           handleAnswer(newIdx);
         }
