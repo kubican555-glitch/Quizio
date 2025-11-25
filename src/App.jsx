@@ -238,6 +238,7 @@ export default function App() {
         if (showConfirmSubmit) submitTest();
         else if (showConfirmExit) confirmExit();
         else if (mode === "random" && showResult) nextRandomQuestion();
+        else if (mode === "random" && !showResult && curQ.userAnswer !== undefined) handleAnswer(curQ.userAnswer);
       }
 
       if (e.key === "Backspace") {
