@@ -235,7 +235,7 @@ export default function App() {
       }
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
         if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
+        else if (mode === "random" && !showResult) confirmRandomAnswer();
         else {
           const max = mode === "training" ? maxSeenIndex : questionSet.length - 1;
           setCurrentIndex((i) => Math.min(i + 1, max));
@@ -244,7 +244,7 @@ export default function App() {
 
       if (e.key === " ") {
         if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
+        else if (mode === "random" && !showResult) confirmRandomAnswer();
         else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
       }
 
@@ -252,7 +252,7 @@ export default function App() {
         if (showConfirmSubmit) submitTest();
         else if (showConfirmExit) confirmExit();
         else if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
+        else if (mode === "random" && !showResult) confirmRandomAnswer();
       }
 
       if (e.key === "Backspace") {
@@ -318,27 +318,31 @@ export default function App() {
   };
 
   const confirmRandomAnswer = () => {
-    if (finished || mode !== "random" || selectedAnswer === null) return;
+    if (finished || mode !== "random") return;
 
     const currentQ = questionSet[currentIndex];
     if (!currentQ) return;
 
+    const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
+
     setQuestionSet((prev) => {
       const copy = [...prev];
       const q = { ...copy[currentIndex] };
-      q.userAnswer = selectedAnswer;
+      q.userAnswer = answerToSave;
       copy[currentIndex] = q;
       return copy;
     });
 
     setShowResult(true);
-    setScore((s) => {
-      let correct = s.correct;
-      let total = s.total;
-      if (selectedAnswer === currentQ.correctIndex) correct += 1;
-      total += 1;
-      return { correct, total };
-    });
+    if (selectedAnswer !== null) {
+      setScore((s) => {
+        let correct = s.correct;
+        let total = s.total;
+        if (selectedAnswer === currentQ.correctIndex) correct += 1;
+        total += 1;
+        return { correct, total };
+      });
+    }
   };
 
   const handleAnswer = (idx) => {
@@ -486,7 +490,7 @@ export default function App() {
           <>
             <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => mode === "random" ? selectRandomAnswer(i) : handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={false} />
 
-            {mode === "random" && !showResult && selectedAnswer !== null && (
+            {mode === "random" && !showResult && (
               <div className="actionButtons right">
                 <button className="navButton primary" onClick={confirmRandomAnswer}>Potvrdit</button>
               </div>
