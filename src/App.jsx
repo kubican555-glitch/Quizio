@@ -80,7 +80,7 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
 function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled }) {
   return (
     <div>
-      <div className="questionHeader slideIn">
+      <div className="questionHeader">
         <h2 className="questionText">
           {mode === "random" && `#${currentQuestion.number} `}
           {currentQuestion.question}
