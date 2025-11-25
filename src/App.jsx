@@ -180,11 +180,9 @@ export default function App() {
   // auto scroll card into view for all modes
   useEffect(() => {
     if (!mode || !cardRef.current) return;
-    setTimeout(() => {
-      if (cardRef.current) {
-        cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }, 50);
+    if (cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }, [currentIndex, showResult, mode]);
 
   // auto focus selected answer for keyboard nav
@@ -192,12 +190,10 @@ export default function App() {
     if (mode !== "random" || selectedAnswer === null) return;
     const refs = optionRefsForCurrent.current?.[currentQuestion._localIndex] || [];
     if (refs[selectedAnswer]) {
-      setTimeout(() => {
-        if (refs[selectedAnswer]) {
-          refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
-          refs[selectedAnswer].focus();
-        }
-      }, 100);
+      if (refs[selectedAnswer]) {
+        refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        refs[selectedAnswer].focus();
+      }
     }
   }, [selectedAnswer, currentIndex, mode]);
 
