@@ -115,7 +115,9 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
               }}
               className="optionButton"
               style={style}
-              onClick={() => onSelect(i)}
+              onClick={() => {
+                if (!disabled) onSelect(i);
+              }}
               disabled={disabled}
             >
               {opt}
@@ -313,7 +315,7 @@ export default function App() {
   /* ---------- Answer logic ---------- */
 
   const selectRandomAnswer = (idx) => {
-    if (finished || mode !== "random") return;
+    if (finished || mode !== "random" || showResult) return;
     setSelectedAnswer(idx);
   };
 
