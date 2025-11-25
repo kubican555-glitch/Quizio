@@ -170,7 +170,11 @@ export default function App() {
     return () => window.removeEventListener("resize", setVH);
   }, []);
 
-
+  // auto scroll card into view for all modes - smooth
+  useEffect(() => {
+    if (!cardRef.current) return;
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [currentIndex, showResult, mode]);
 
   // auto focus selected answer for keyboard nav
   useEffect(() => {
