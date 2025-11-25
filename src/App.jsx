@@ -170,12 +170,6 @@ export default function App() {
     return () => window.removeEventListener("resize", setVH);
   }, []);
 
-  // auto scroll navigator to current
-  useEffect(() => {
-    if (!scrollRef.current) return;
-    const activeBtn = scrollRef.current.querySelector(".navNumber.current");
-    if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-  }, [currentIndex]);
 
 
   // auto focus selected answer for keyboard nav
