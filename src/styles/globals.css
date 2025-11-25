@@ -270,15 +270,43 @@ body {
 }
 
 .timer {
-  font-size: 1.6rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
-  border: 2px solid rgba(59, 130, 246, 0.4);
+  font-size: 1.8rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+  border: 2px solid rgba(59, 130, 246, 0.5);
   color: #60a5fa;
+  letter-spacing: 1px;
+  padding: 1.5rem 1.2rem;
+  border-radius: 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  transition: all 0.3s ease;
 }
 
-.timerWarning { color: #fb923c !important; animation: pulse 1.8s infinite; }
-.timerDanger { color: #ef4444 !important; animation: blink 1s infinite; }
+.timer::before {
+  content: '⏱';
+  margin-right: 0.6rem;
+  font-size: 1.5rem;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.timerWarning { 
+  color: #fbbf24 !important; 
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 146, 60, 0.05) 100%) !important;
+  box-shadow: 0 0 25px rgba(251, 191, 36, 0.3) !important;
+  animation: pulse 1.5s infinite;
+}
+
+.timerDanger { 
+  color: #ff6b6b !important; 
+  border-color: rgba(239, 68, 68, 0.6) !important;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%) !important;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important;
+  animation: blink 0.8s infinite;
+}
 
 @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
 @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
