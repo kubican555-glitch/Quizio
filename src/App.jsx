@@ -1,189 +1,422 @@
-import { useState, useEffect } from "react";
+// App.jsx
+import React, { useState, useEffect, useRef } from "react";
 import { QUESTIONS } from "./questions";
 
-// --- Inline fallback obrázek (1x1 px průhledný PNG) ---
-const fallbackImg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
-
-// --- Vite: bezpečné načtení všech obrázků z /src/images ---
-const images = import.meta.glob('./images/*.png', { eager: true, as: 'url' });
+// Načtení obrázků (vite)
+const images = import.meta.glob("./images/*.png", { eager: true, as: "url" });
 const IMAGES = {};
 for (const path in images) {
   const fileName = path.match(/\/(\d+)\.png$/)?.[1];
   if (fileName) IMAGES[fileName] = images[path];
 }
 
+/* ---------- Small components ---------- */
+
+function ConfirmModal({ title, message, onCancel, onConfirm, confirmText = "Ano, pokračovat", cancelText = "Zrušit" }) {
+  return (
+    <div className="modalOverlay" onClick={onCancel}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h3>{title}</h3>
+        <p>{message}</p>
+        <div className="modalButtons">
+          <button className="navButton" onClick={onCancel}>{cancelText}</button>
+          <button className="navButton primary" onClick={onConfirm}>{confirmText}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, onBack }) {
+  const list = mode === "training" ? questionSet.slice(0, maxSeenIndex + 1) : questionSet;
+  return (
+    <div className="resultScreen fadeIn">
+      <h2>{mode === "mock" ? "Test dokončen!" : "Vyhodnocení tréninku"}</h2>
+      <p className="bigScore">{score.correct} / {score.total}</p>
+      <p className="bigPercent">{score.total === 0 ? 0 : Math.round((score.correct / score.total) * 100)} % správně</p>
+      {mode === "training" && <p className="timeSpent">Čas: {formatTime(trainingTime)}</p>}
+
+      <div className="reviewList">
+        {list.map((q, i) => (
+          <div key={i} className={`reviewQuestion ${q.userAnswer === q.correctIndex ? "correct" : q.userAnswer !== undefined ? "wrong" : "unanswered"}`}>
+            <strong>{i + 1}. {q.question}</strong>
+            {IMAGES[q.number] && <img src={IMAGES[q.number]} alt="" className="questionImage small" onClick={() => window.open(IMAGES[q.number], "_blank")} />}
+            <div><strong>Správná odpověď:</strong> {q.options[q.correctIndex]}</div>
+            {q.userAnswer !== undefined && (
+              <div><strong>Tvá odpověď:</strong> {q.options[q.userAnswer]} {q.userAnswer === q.correctIndex ? "(správně)" : "(špatně)"}</div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <button className="navButton primary" style={{ marginTop: "2rem" }} onClick={onBack}>Zpět do menu</button>
+    </div>
+  );
+}
+
+function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIndex }) {
+  return (
+    <div className="navigatorWrapper">
+      <div className="compactNavigator">
+        {questionSet.map((_, i) => {
+          if (mode === "training" && i > maxSeenIndex) return null;
+          const isAnswered = questionSet[i]?.userAnswer !== undefined;
+          return (
+            <button
+              key={i}
+              className={`navNumber ${currentIndex === i ? "current" : ""} ${isAnswered ? "answered" : ""}`}
+              onClick={() => setCurrentIndex(i)}
+              aria-label={`Otázka ${i + 1}`}
+            >
+              {i + 1}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled }) {
+  return (
+    <div>
+      <div className="questionHeader slideIn">
+        <h2 className="questionText">
+          {mode === "random" && `#${currentQuestion.number} `}
+          {currentQuestion.question}
+        </h2>
+        {IMAGES[currentQuestion.number] && (
+          <div className="imageWrapper">
+            <img src={IMAGES[currentQuestion.number]} alt="Otázka" className="questionImage" onClick={() => window.open(IMAGES[currentQuestion.number], "_blank")} />
+            <div className="fullscreenHint">Klikni pro zvětšení</div>
+          </div>
+        )}
+      </div>
+
+      <div className="options">
+        {currentQuestion.options.map((opt, i) => {
+          let style = {};
+          if (mode === "random" && showResult) {
+            if (i === currentQuestion.correctIndex) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e", color: "#ecfdf5" };
+            if (selectedAnswer === i && i !== currentQuestion.correctIndex) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444", color: "#fee2e2" };
+          } else if ((mode === "mock" || mode === "training") && currentQuestion.userAnswer === i) {
+            style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
+          }
+
+          return (
+            <button
+              key={i}
+              ref={(el) => {
+                if (!optionRefsForCurrent.current) optionRefsForCurrent.current = {};
+                if (!optionRefsForCurrent.current[currentQuestion._localIndex]) optionRefsForCurrent.current[currentQuestion._localIndex] = [];
+                optionRefsForCurrent.current[currentQuestion._localIndex][i] = el;
+              }}
+              className="optionButton"
+              style={style}
+              onClick={() => onSelect(i)}
+              disabled={disabled}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Utilities ---------- */
+
+function formatTime(s) {
+  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+}
+
+/* ---------- Main App (refactored) ---------- */
+
 export default function App() {
-  const [mode, setMode] = useState(null);
+  const [mode, setMode] = useState(null); // null | random | mock | training | review
   const [questionSet, setQuestionSet] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
   const [timeLeft, setTimeLeft] = useState(0);
   const [finished, setFinished] = useState(false);
-  const [fade, setFade] = useState(true);
   const [maxSeenIndex, setMaxSeenIndex] = useState(0);
+  const [trainingTime, setTrainingTime] = useState(0);
+  const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+  const [showConfirmExit, setShowConfirmExit] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState(null);
 
+  // refs: per-question refs so keyboard selection always maps to the current question
+  const optionRefsForCurrent = useRef({});
+  const scrollRef = useRef(null);
+
+  // attach stable _localIndex to QUESTIONS once (non-invasive)
   useEffect(() => {
-    let timer;
-    if (mode === 'mock' && !finished) {
-      timer = setInterval(() => {
-        setTimeLeft(t => {
-          if (t <= 1) {
-            clearInterval(timer);
-            submitMockTest();
-            return 0;
-          }
-          return t - 1;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(timer);
+    QUESTIONS.forEach((q, i) => { q._localIndex = i; });
+  }, []);
+
+  // mobile vh fix
+  useEffect(() => {
+    const setVH = () => document.documentElement.style.setProperty("--vh", `${window.innerHeight}px`);
+    setVH();
+    window.addEventListener("resize", setVH);
+    return () => window.removeEventListener("resize", setVH);
+  }, []);
+
+  // auto scroll navigator to current
+  useEffect(() => {
+    if (!scrollRef.current) return;
+    const activeBtn = scrollRef.current.querySelector(".navNumber.current");
+    if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+  }, [currentIndex]);
+
+  // training timer
+  useEffect(() => {
+    if (mode !== "training" || finished) return;
+    const t = setInterval(() => setTrainingTime((x) => x + 1), 1000);
+    return () => clearInterval(t);
   }, [mode, finished]);
 
-  const changeQuestion = (idx) => {
-    setFade(false);
-    setTimeout(() => {
-      goToQuestion(idx);
-      setFade(true);
-      if (idx > maxSeenIndex) setMaxSeenIndex(idx);
-    }, 100);
-  };
+  // mock timer
+  useEffect(() => {
+    if (mode !== "mock" || finished) return;
+    const t = setInterval(() => {
+      setTimeLeft((x) => {
+        if (x <= 1) { submitTest(); setFinished(true); return 0; }
+        return x - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [mode, finished]);
+
+  // Keyboard handling (centralized)
+  useEffect(() => {
+    if (!mode || mode === "review") return;
+
+    const onKey = (e) => {
+      const curQ = questionSet[currentIndex] || { options: [] };
+      const opts = curQ.options.length;
+
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
+
+      if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
+        if (mode === "random" && showResult) return;
+        const newIdx = curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts;
+        handleAnswer(newIdx);
+      }
+      if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") {
+        if (mode === "random" && showResult) return;
+        const newIdx = curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts;
+        handleAnswer(newIdx);
+      }
+
+      if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
+        if (mode === "random" && showResult) nextRandomQuestion();
+        else setCurrentIndex((i) => Math.max(0, i - 1));
+      }
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
+        if (mode === "random" && showResult) nextRandomQuestion();
+        else {
+          const max = mode === "training" ? maxSeenIndex : questionSet.length - 1;
+          setCurrentIndex((i) => Math.min(i + 1, max));
+        }
+      }
+
+      if (e.key === " ") {
+        if (mode === "random" && showResult) nextRandomQuestion();
+        else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
+      }
+
+      if (e.key === "Enter") {
+        if (showConfirmSubmit) submitTest();
+        else if (showConfirmExit) confirmExit();
+        else if (mode === "random" && showResult) nextRandomQuestion();
+      }
+
+      if (e.key === "Backspace") {
+        if (curQ.userAnswer !== undefined) clearAnswer();
+        else tryReturnToMenu();
+      }
+
+      if (e.key === "Escape") {
+        if (fullscreenImage) setFullscreenImage(null);
+        else if (showConfirmSubmit) setShowConfirmSubmit(false);
+        else if (showConfirmExit) setShowConfirmExit(false);
+        else if (mode === "random" && showResult) clearAnswer();
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mode, questionSet, currentIndex, showResult, showConfirmSubmit, showConfirmExit, fullscreenImage, maxSeenIndex, finished]);
+
+  /* ---------- Mode starters ---------- */
 
   const startRandomMode = () => {
-    const prepared = [...QUESTIONS].sort(() => Math.random() - 0.5)
-      .map(q => ({ ...q, options: [...q.options] }));
-    setQuestionSet(prepared);
+    const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, options: [...q.options], userAnswer: undefined, _localIndex: idx }));
+    setQuestionSet(shuffled);
+    setMode("random");
     setCurrentIndex(0);
-    setScore(0);
-    setMode('random');
-    setShowResult(false);
-    setSelectedAnswer(null);
+    setScore({ correct: 0, total: 0 });
     setFinished(false);
-    setFade(true);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    optionRefsForCurrent.current = {};
   };
 
   const startMockTest = () => {
-    const prepared = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0,40)
-      .map(q => ({ ...q, options: [...q.options], userAnswer: undefined }));
-    setQuestionSet(prepared);
+    const sel = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 40).map((q, idx) => ({ ...q, options: [...q.options], userAnswer: undefined, _localIndex: idx }));
+    setQuestionSet(sel);
+    setTimeLeft(1800);
+    setMode("mock");
     setCurrentIndex(0);
-    setScore(0);
-    setMode('mock');
-    setShowResult(false);
-    setSelectedAnswer(null);
-    setTimeLeft(1800); // 30 minut
+    setMaxSeenIndex(0);
     setFinished(false);
-    setFade(true);
+    optionRefsForCurrent.current = {};
   };
 
   const startTrainingMode = () => {
-    const prepared = QUESTIONS.map(q => ({ ...q, options: [...q.options], userAnswer: undefined }));
-    setQuestionSet(prepared);
+    const all = QUESTIONS.map((q, idx) => ({ ...q, options: [...q.options], userAnswer: undefined, _localIndex: idx }));
+    setQuestionSet(all);
+    setMode("training");
     setCurrentIndex(0);
-    setScore(0);
-    setMode('training');
-    setShowResult(false);
-    setSelectedAnswer(null);
-    setFinished(false);
     setMaxSeenIndex(0);
-    setFade(true);
+    setTrainingTime(0);
+    setFinished(false);
+    optionRefsForCurrent.current = {};
   };
 
-  const startReviewMode = () => {
-    const prepared = QUESTIONS.map(q => ({ ...q, options: [...q.options] }));
-    setQuestionSet(prepared);
-    setMode('review');
+  const startReviewMode = () => setMode("review");
+
+  /* ---------- Answer logic ---------- */
+
+  const handleAnswer = (idx) => {
+    if (finished || mode === "review") return;
+
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      const q = { ...copy[currentIndex] };
+      const wasAnswered = q.userAnswer !== undefined;
+      q.userAnswer = idx;
+      copy[currentIndex] = q;
+
+      if (mode === "random") {
+        setSelectedAnswer(idx);
+        setShowResult(true);
+        setScore((s) => {
+          let correct = s.correct;
+          let total = s.total;
+          if (!wasAnswered) {
+            if (idx === q.correctIndex) correct += 1;
+            total += 1;
+          }
+          return { correct, total };
+        });
+      } else if (mode === "training") {
+        if (currentIndex === maxSeenIndex) setMaxSeenIndex((m) => Math.min(m + 1, copy.length - 1));
+      }
+
+      return copy;
+    });
+  };
+
+  const clearAnswer = () => {
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      if (!copy[currentIndex]) return prev;
+      copy[currentIndex] = { ...copy[currentIndex], userAnswer: undefined };
+      return copy;
+    });
     setSelectedAnswer(null);
-    setFade(true);
-  };
-
-  const handleAnswer = (index) => {
-    if (mode === 'random' && !showResult) {
-      setSelectedAnswer(index);
-    } else if (mode === 'mock' || mode === 'training') {
-      const newSet = [...questionSet];
-      newSet[currentIndex].userAnswer = index;
-      setQuestionSet(newSet);
-      setSelectedAnswer(index);
-    }
-  };
-
-  const submitRandomAnswer = () => {
-    if (selectedAnswer !== null) {
-      setShowResult(true);
-      if (selectedAnswer === currentQuestion.correctIndex) setScore(s => s + 1);
-    }
-  };
-
-  const goToQuestion = (idx) => {
-    setCurrentIndex(idx);
-    setSelectedAnswer(questionSet[idx]?.userAnswer ?? null);
     setShowResult(false);
+    // we intentionally do not auto-decrement score to avoid complexity; user can retake.
   };
 
-  const submitMockTest = () => {
-    let calculatedScore = 0;
-    questionSet.forEach(q => {
-      if (q.userAnswer === q.correctIndex) calculatedScore++;
-    });
-    setScore(calculatedScore);
+  const nextRandomQuestion = () => {
+    if (!questionSet.length) return;
+    let nextIdx;
+    let attempts = 0;
+    do {
+      nextIdx = Math.floor(Math.random() * questionSet.length);
+      attempts++;
+    } while (nextIdx === currentIndex && questionSet.length > 1 && attempts < 10);
+
+    setCurrentIndex(nextIdx);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    // focus first option of the new question so keyboard works immediately
+    setTimeout(() => {
+      const refs = optionRefsForCurrent.current?.[questionSet[nextIdx]._localIndex] || [];
+      if (refs[0]) refs[0].focus();
+    }, 50);
+  };
+
+  /* ---------- Submit / exit ---------- */
+
+  const confirmSubmit = () => setShowConfirmSubmit(true);
+  const cancelSubmit = () => setShowConfirmSubmit(false);
+
+  const submitTest = () => {
+    const questionsToEval = mode === "training" ? questionSet.slice(0, maxSeenIndex + 1) : questionSet;
+    const correct = questionsToEval.filter((q) => q.userAnswer === q.correctIndex).length;
+    setScore({ correct, total: questionsToEval.length });
     setFinished(true);
+    setShowConfirmSubmit(false);
   };
 
-  const submitTraining = () => {
-    let calculatedScore = 0;
-    questionSet.forEach(q => {
-      if (q.userAnswer === q.correctIndex) calculatedScore++;
-    });
-    setScore(calculatedScore);
-    setFinished(true);
+  const tryReturnToMenu = () => {
+    if ((mode === "mock" || mode === "training") && !finished) setShowConfirmExit(true);
+    else resetToMenu();
   };
 
-  const returnToMenu = () => {
+  const confirmExit = () => { resetToMenu(); setShowConfirmExit(false); };
+
+  const resetToMenu = () => {
     setMode(null);
     setQuestionSet([]);
     setCurrentIndex(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setScore(0);
     setFinished(false);
+    setFullscreenImage(null);
+    optionRefsForCurrent.current = {};
+    setScore({ correct: 0, total: 0 });
+    setShowResult(false);
+    setSelectedAnswer(null);
     setMaxSeenIndex(0);
   };
 
-  const currentQuestion = questionSet[currentIndex] || { question:'', options:[], correctIndex:0, number:0 };
-  const getQuestionImage = (question) => IMAGES[question.number] || fallbackImg;
-
-  const isTraining = mode === 'training';
-  const isMock = mode === 'mock';
-  const isRandom = mode === 'random';
+  /* ---------- Render ---------- */
 
   if (!mode) {
     return (
-      <div className="container">
-        <h1 className="title">Uzavřené otázky SPS - Procvičení</h1>
-        <div className="menu">
-          <button className="menuButton" onClick={startRandomMode}>Náhodný výběr otázek</button>
-          <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 minut)</button>
-          <button className="menuButton" onClick={startTrainingMode}>Tréninkový mód</button>
-          <button className="menuButton" onClick={startReviewMode}>Prohlížení všech otázek</button>
+      <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
+        <h1 className="title">SPS – Uzavřené otázky</h1>
+        <div className="menuColumn">
+          <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
+          <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
+          <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
+          <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
+        </div>
+        <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
+          Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />
+          Mezerník – další/odevzdání • Backspace – odznačit / menu • Enter – potvrzení • Esc – zrušit
         </div>
       </div>
     );
   }
 
-  if (mode === 'review') {
+  if (mode === "review") {
     return (
-      <div className="container">
+      <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
         <h1 className="title">Prohlížení všech otázek</h1>
-        <button className="menuBackButton" onClick={returnToMenu}>↩ Návrat do menu</button>
-        <div className="reviewList">
-          {questionSet.map(q => (
-            <div key={q.number} className="reviewQuestion">
-              <strong>{q.number}. {q.question}</strong>
-              <img src={getQuestionImage(q)} alt="" className="questionImage"/>
-              <div>Možnosti: {q.options.join(', ')}</div>
-              <div>Správná odpověď: {q.options[q.correctIndex]}</div>
+        <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
+        <div className="reviewGrid">
+          {QUESTIONS.map((q) => (
+            <div key={q.number} className="reviewCard">
+              <div className="reviewHeader"><strong>#{q.number}.</strong> {q.question}</div>
+              {IMAGES[q.number] && <img src={IMAGES[q.number]} alt="" className="reviewImage" onClick={() => window.open(IMAGES[q.number], "_blank")} />}
+              <div className="reviewAnswer"><strong>Správná:</strong> <span className="correctText">{q.options[q.correctIndex]}</span></div>
             </div>
           ))}
         </div>
@@ -191,142 +424,72 @@ export default function App() {
     );
   }
 
+  const currentQuestion = questionSet[currentIndex] || { question: "", options: [], correctIndex: 0, number: 0, _localIndex: currentIndex };
+
   return (
-    <div className="container">
-      <h1 className="title">Uzavřené otázky SPS - Procvičení</h1>
-      <button className="menuBackButton" onClick={returnToMenu}>↩ Návrat do menu</button>
-
-      {(isMock || (isTraining && !finished)) && (
-        <div className="timer">
-          {isMock ? `Čas: ${Math.floor(timeLeft/60)}:${String(timeLeft%60).padStart(2,'0')}` : 'Tréninkový mód - neomezený čas'}
+    <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
+      <div className="topBarRight">
+        <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
+        <div className="topControls">
+          {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>Čas: {formatTime(timeLeft)}</div>}
+          {mode === "training" && !finished && <div className="timer" style={{ color: "#a3a3a3" }}>Čas: {formatTime(trainingTime)}</div>}
+          {(mode === "mock" || mode === "training") && !finished && <button className="submitTopButton" onClick={confirmSubmit}>{mode === "training" ? "Vyhodnotit" : "Odevzdat"}</button>}
         </div>
-      )}
+      </div>
 
-      <div className="progress">Otázka {currentIndex + 1} / {questionSet.length}</div>
+      <h1 className="title">{mode === "random" ? "Flashcards" : mode === "mock" ? "Test nanečisto" : "Tréninkový režim"}</h1>
 
-      <div className={`card ${fade ? 'fadeIn' : 'fadeOut'}`}>
+      <div className="progress">
+        {mode === "random"
+          ? `Zodpovězeno: ${questionSet.filter(q => q.userAnswer !== undefined).length} | Správně: ${score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0} %`
+          : `Otázka ${currentIndex + 1} / ${mode === "training" ? maxSeenIndex + 1 : questionSet.length}`}
+      </div>
+
+      <div className="card">
         {!finished ? (
           <>
-            <div className="questionHeader">
-              <h2 className="questionText">
-                {isRandom ? `#${currentQuestion.number} ` : ''}{currentQuestion.question}
-              </h2>
-              <img src={getQuestionImage(currentQuestion)} alt="" className="questionImage"/>
-            </div>
+            <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={mode === "random" && showResult} />
 
-            <div className="options" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {currentQuestion.options.map((opt, idx) => {
-                let style = {};
-                if (isRandom && showResult) {
-                  if (idx === currentQuestion.correctIndex) {
-                    style = { 
-                      background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(22, 163, 74, 0.3) 100%)',
-                      borderColor: 'rgba(34, 197, 94, 0.6)',
-                      color: '#86efac'
-                    };
-                  }
-                  if (selectedAnswer === idx && idx !== currentQuestion.correctIndex) {
-                    style = { 
-                      background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(220, 38, 38, 0.3) 100%)',
-                      borderColor: 'rgba(239, 68, 68, 0.6)',
-                      color: '#fca5a5'
-                    };
-                  }
-                } else if (selectedAnswer === idx) {
-                  style = { 
-                    background: 'rgba(59, 130, 246, 0.3)',
-                    borderColor: 'rgba(59, 130, 246, 0.6)',
-                    color: '#93c5fd'
-                  };
-                }
-                return (
-                  <button
-                    key={idx}
-                    className="optionButton"
-                    style={style}
-                    onClick={() => handleAnswer(idx)}
-                  >
-                    {opt}
-                  </button>
-                )
-              })}
-            </div>
-
-            {isRandom && !showResult && (
-              <div className="actionButtons">
-                <button className="navButton" onClick={submitRandomAnswer}>Odeslat odpověď</button>
+            {mode === "random" && showResult && (
+              <div className="actionButtons right">
+                <button className="navButton primary" onClick={nextRandomQuestion}>Další otázka</button>
               </div>
             )}
 
-            {isRandom && showResult && currentIndex < questionSet.length - 1 && (
-              <div className="actionButtons">
-                <button className="navButton" onClick={() => changeQuestion(currentIndex+1)}>Další otázka →</button>
-              </div>
-            )}
-
-            {(isMock || isTraining) && (
+            {(mode === "mock" || mode === "training") && (
               <>
                 <div className="actionButtons spaced">
-                  <button
-                    className="navButton"
-                    onClick={() => changeQuestion(Math.max(0, currentIndex-1))}
-                    disabled={currentIndex === 0}
-                  >
-                    ← Předchozí
-                  </button>
-                  <button
-                    className="navButton"
-                    onClick={() => {
-                      if (currentIndex < questionSet.length - 1) {
-                        changeQuestion(currentIndex + 1);
-                      } else {
-                        isMock ? submitMockTest() : submitTraining();
-                      }
-                    }}
-                  >
-                    {currentIndex < questionSet.length - 1 ? 'Další →' : 'Odevzdat test'}
-                  </button>
+                  <button className="navButton" onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}>Předchozí</button>
+                  <button className="navButton" onClick={() => setCurrentIndex(Math.min((mode === "training" ? maxSeenIndex : questionSet.length - 1), currentIndex + 1))} disabled={currentIndex === (mode === "training" ? maxSeenIndex : questionSet.length - 1)}>Další</button>
                 </div>
 
-                <div className="questionNavigator">
-                  {(isMock ? questionSet : questionSet.slice(0, maxSeenIndex+1)).map((q, idx) => (
-                    <button
-                      key={idx}
-                      className={`navNumber ${currentIndex===idx?'current':''} ${q.userAnswer!==undefined?'answered':''}`}
-                      onClick={() => changeQuestion(idx)}
-                    >
-                      {idx + 1}
-                    </button>
-                  ))}
+                <div className="navigatorWrapper" ref={scrollRef}>
+                  <Navigator questionSet={questionSet} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} mode={mode} maxSeenIndex={maxSeenIndex} />
                 </div>
               </>
             )}
           </>
         ) : (
-          <div>
-            <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: '#60a5fa' }}>✅ Test dokončen!</h2>
-            <p style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem', color: '#86efac' }}>
-              Skóre: {score} / {questionSet.length}
-            </p>
-            <p style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem', color: '#cbd5e1' }}>
-              Procenta: {Math.round(score/questionSet.length*100)}%
-            </p>
-            <div className="reviewList">
-              {questionSet.map((q, idx) => (
-                <div
-                  key={idx}
-                  className={`reviewQuestion ${q.userAnswer === q.correctIndex ? 'correct' : 'wrong'}`}
-                >
-                  <strong>Otázka {idx + 1}: {q.question}</strong>
-                  <img src={getQuestionImage(q)} alt="" className="questionImage"/>
-                  <div>Správná odpověď: {q.options[q.correctIndex]}</div>
-                  <div>Vaše odpověď: {q.userAnswer!==undefined ? q.options[q.userAnswer] : 'nezodpovězeno'}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ResultScreen mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} onBack={resetToMenu} />
         )}
       </div>
+
+      {/* Fullscreen obrázek */}
+      {fullscreenImage && (
+        <div className="fullscreenOverlay" onClick={() => setFullscreenImage(null)}>
+          <img src={fullscreenImage} alt="Fullscreen" className="fullscreenImage" />
+          <button className="closeFullscreen" onClick={() => setFullscreenImage(null)}>×</button>
+        </div>
+      )}
+
+      {/* Dialogy */}
+      {showConfirmSubmit && (
+        <ConfirmModal title={`Opravdu chceš ${mode === "mock" ? "odevzdat test" : "vyhodnotit otázky"}?`} message={`Tato akce je nevratná.`} onCancel={cancelSubmit} onConfirm={submitTest} />
+      )}
+
+      {showConfirmExit && (
+        <ConfirmModal title={`Opravdu chceš opustit test?`} message={`Všechen pokrok bude ztracen.`} onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Opustit" cancelText="Zůstat" />
+      )}
     </div>
   );
 }
