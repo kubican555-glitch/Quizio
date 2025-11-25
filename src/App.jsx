@@ -99,6 +99,8 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
           if (mode === "random" && showResult) {
             if (i === currentQuestion.correctIndex) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e", color: "#ecfdf5" };
             if (selectedAnswer === i && i !== currentQuestion.correctIndex) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444", color: "#fee2e2" };
+          } else if (mode === "random" && !showResult && selectedAnswer === i) {
+            style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
           } else if ((mode === "mock" || mode === "training") && currentQuestion.userAnswer === i) {
             style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
           }
@@ -209,12 +211,22 @@ export default function App() {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
 
       if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
-        const newIdx = curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts;
-        handleAnswer(newIdx);
+        if (mode === "random") {
+          const newIdx = selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts;
+          selectRandomAnswer(newIdx);
+        } else {
+          const newIdx = curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts;
+          handleAnswer(newIdx);
+        }
       }
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") {
-        const newIdx = curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts;
-        handleAnswer(newIdx);
+        if (mode === "random") {
+          const newIdx = selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts;
+          selectRandomAnswer(newIdx);
+        } else {
+          const newIdx = curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts;
+          handleAnswer(newIdx);
+        }
       }
 
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
@@ -238,7 +250,7 @@ export default function App() {
         if (showConfirmSubmit) submitTest();
         else if (showConfirmExit) confirmExit();
         else if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult && curQ.userAnswer !== undefined) handleAnswer(curQ.userAnswer);
+        else if (mode === "random" && !showResult) confirmRandomAnswer();
       }
 
       if (e.key === "Backspace") {
@@ -256,7 +268,7 @@ export default function App() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mode, questionSet, currentIndex, showResult, showConfirmSubmit, showConfirmExit, fullscreenImage, maxSeenIndex, finished]);
+  }, [mode, questionSet, currentIndex, showResult, showConfirmSubmit, showConfirmExit, fullscreenImage, maxSeenIndex, finished, selectedAnswer]);
 
   /* ---------- Mode starters ---------- */
 
@@ -298,27 +310,43 @@ export default function App() {
 
   /* ---------- Answer logic ---------- */
 
+  const selectRandomAnswer = (idx) => {
+    if (finished || mode !== "random") return;
+    setSelectedAnswer(idx);
+  };
+
+  const confirmRandomAnswer = () => {
+    if (finished || mode !== "random" || selectedAnswer === null) return;
+
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      const q = { ...copy[currentIndex] };
+      q.userAnswer = selectedAnswer;
+      copy[currentIndex] = q;
+
+      setShowResult(true);
+      setScore((s) => {
+        let correct = s.correct;
+        let total = s.total;
+        if (selectedAnswer === q.correctIndex) correct += 1;
+        total += 1;
+        return { correct, total };
+      });
+
+      return copy;
+    });
+  };
+
   const handleAnswer = (idx) => {
     if (finished || mode === "review") return;
 
     setQuestionSet((prev) => {
       const copy = [...prev];
       const q = { ...copy[currentIndex] };
-      const wasAnswered = q.userAnswer !== undefined;
       q.userAnswer = idx;
       copy[currentIndex] = q;
 
-      if (mode === "random") {
-        setSelectedAnswer(idx);
-        setShowResult(true);
-        setScore((s) => {
-          let correct = s.correct;
-          let total = s.total;
-          if (idx === q.correctIndex) correct += 1;
-          total += 1;
-          return { correct, total };
-        });
-      } else if (mode === "training") {
+      if (mode === "training") {
         if (currentIndex === maxSeenIndex) setMaxSeenIndex((m) => Math.min(m + 1, copy.length - 1));
       }
 
@@ -452,7 +480,7 @@ export default function App() {
       <div className="card">
         {!finished ? (
           <>
-            <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={false} />
+            <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => mode === "random" ? selectRandomAnswer(i) : handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={false} />
 
             {mode === "random" && showResult && (
               <div className="actionButtons right">
