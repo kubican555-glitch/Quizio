@@ -392,6 +392,7 @@ body {
   display: flex;
   gap: 1.2rem;
   margin-top: 2.5rem;
+  margin-bottom: 0.6rem;
   flex-wrap: wrap;
 }
 .actionButtons.spaced { justify-content: space-between; }
@@ -405,7 +406,7 @@ body {
   cursor: grab;
   user-select: none;
   scrollbar-width: none;
-  margin-top: 2rem;
+  margin-top: 0.4rem;
   margin-bottom: 1rem;
   padding: 0.6rem 0;
   scroll-behavior: smooth;
