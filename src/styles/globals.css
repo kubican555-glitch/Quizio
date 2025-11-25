@@ -373,6 +373,62 @@ body {
   flex-direction: column;
 }
 
+/* === REVIEW GRID === */
+.reviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.reviewCard {
+  background: rgba(30, 41, 59, 0.7);
+  border: 2px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.25s ease;
+}
+
+.reviewCard:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(59, 130, 246, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.2);
+}
+
+.reviewHeader {
+  color: #60a5fa;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+.reviewImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 1rem 0;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.reviewImage:hover {
+  transform: scale(1.02);
+}
+
+.reviewAnswer {
+  color: #cbd5e1;
+  margin-top: 0.75rem;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.correctText {
+  color: #86efac;
+  font-weight: 600;
+}
+
 /* === MOBILNÍ OPTIMALIZACE === */
 @media (max-width: 480px) {
   .container { padding: 0.8rem; }
@@ -381,4 +437,5 @@ body {
   .submitTopButton, .navButton { width: 100%; }
   .actionButtons.spaced { flex-direction: column; }
   .optionButton { min-height: 72px; padding: 1.4rem; }
+  .reviewGrid { grid-template-columns: 1fr; }
 }

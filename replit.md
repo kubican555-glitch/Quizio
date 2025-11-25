@@ -1,105 +1,192 @@
-# Overview
+# SPS Quiz Application - Complete
 
-This is a quiz/testing application built with React and Vite. The application presents multiple-choice questions to users, likely for educational or training purposes. Questions are stored in CSV format and converted to JavaScript through a build script. The app appears to be designed for Czech-language technical questions (based on the content in questions.js), possibly for mechanical engineering or technical certification training.
+## Overview
 
-# User Preferences
+This is a professional quiz application built with React and Vite for Czech technical certification training (SPS - mechanical engineering and compressor systems). The app provides multiple learning modes with a modern, responsive design optimized for both desktop and mobile devices.
 
-Preferred communication style: Simple, everyday language.
+## User Preferences
 
-# System Architecture
+- Preferred communication style: Simple, everyday language
+- Design philosophy: Modern, clean, and intuitive UI with gradient accents
+- Color scheme: Blue and purple gradients on dark background
 
-## Frontend Architecture
+## Application Modes
 
-**Problem:** Need a fast, modern development environment for a React-based quiz application.
+### 1. **Flashcards Mode** (Random Mode)
+- Present questions in random order
+- Instant feedback on answers (green for correct, red for incorrect)
+- Unlimited questions - users can cycle through repeatedly
+- Score tracking: correct answers / total attempts
 
-**Solution:** Vite + React stack with JSX (not TypeScript, despite TypeScript being configured).
+### 2. **Mock Test** (Timed Mode)
+- 40 random questions from the full question bank
+- 30-minute time limit with visual timer
+- Timer warnings at 5 minutes (yellow) and 1 minute (red)
+- All questions must be answered before submission
+- Detailed results with percentage score
 
-**Rationale:**
-- Vite provides fast hot module reloading for rapid development
-- React enables component-based UI development
-- JSX chosen over TypeScript for simplicity (tsconfig.json exists but `.jsx` files are used)
+### 3. **Training Mode** (Progressive Mode)
+- All questions presented in sequence
+- Unlimited time for each question
+- Progressive unlock: can only navigate to questions already seen
+- Tracks time spent on training
+- Results show only reviewed questions
+- Useful for systematic learning
 
-**Key Design Decisions:**
-- Single-page application (SPA) architecture
-- Component-based UI structure
-- Client-side rendering
-- Custom CSS with gradient-based dark theme design system
+### 4. **Review Mode** (Reference Mode)
+- View all questions in a searchable grid layout
+- No interaction required
+- Displays correct answers for reference
+- Hover effects reveal additional details
 
-## Data Management
+## System Architecture
 
-**Problem:** Need to manage and update quiz questions efficiently.
+### Frontend Stack
+- **React 18.2.0** - Component-based UI with hooks
+- **Vite 5.0.0** - Fast build tool with HMR
+- **Pure CSS** - No CSS framework; custom design system
+- **No external dependencies** - Minimal attack surface, maximum control
 
-**Solution:** CSV-to-JavaScript conversion pipeline using a Node.js script (`convert.js`).
+### Design System
 
-**Workflow:**
-1. Questions stored in `questions.csv` (semicolon-delimited)
-2. Build script (`convert.js`) parses CSV and generates `src/questions.js`
-3. Questions exported as JavaScript constant for import into React components
+**Color Palette:**
+- Background: Dark blue gradient (#0f172a → #1e293b → #334155)
+- Primary: Blue (#3b82f6, #60a5fa)
+- Secondary: Purple (#8b5cf6, #a78bfa)
+- Success: Green (#22c55e)
+- Error: Red (#ef4444)
+- Warning: Amber (#fbbf24)
+- Neutral: Slate grays (#cbd5e1, #94a3b8)
 
-**Data Structure:**
-- Each question contains: number, question text, 4 options (A-D), and correct answer index
-- Questions are Czech language, technical/mechanical engineering focused
+**Typography:**
+- Font: Inter, Segoe UI, Roboto sans-serif
+- Titles: 2.8rem, weight 800, gradient text
+- Body: 1rem-1.1rem, weight 400-600
 
-**Pros:**
-- Easy question management via CSV (non-developers can edit)
-- Version control friendly
-- Type-safe data structure after conversion
+**Components:**
+- Gradient buttons with hover animations
+- Glassmorphism cards with backdrop blur
+- Smooth fade/slide animations
+- Responsive grid layouts (mobile-first)
+- Custom scrollbars matching theme
 
-**Cons:**
-- Manual build step required when questions change
-- No server-side question management
+### State Management
 
-## Development Environment
+All state is managed locally with React hooks:
+```javascript
+- mode: Current quiz mode
+- questionSet: Shuffled/ordered questions for session
+- currentIndex: User's position in question set
+- selectedAnswer: Currently selected answer index
+- score: Correct answers / total questions
+- timeLeft: Remaining time in mock test
+- trainingTime: Elapsed time in training mode
+- finished: Session completion state
+- maxSeenIndex: Furthest question seen (training mode)
+```
 
-**Build Configuration:**
-- Vite configured for development server on `0.0.0.0:5000`
-- ES modules used throughout (`"type": "module"` in package.json)
-- Hot Module Reloading enabled for rapid development
+### Data Flow
 
-**Scripts:**
-- `dev`: Run development server
-- `build`: Production build
-- `preview`: Preview production build
-- Custom `convert.js`: Question data conversion
+1. **Question Loading**: QUESTIONS constant imported from src/questions.js
+2. **Mode Start**: Questions shuffled or ordered based on selected mode
+3. **Answer Handling**: User selections stored in question objects
+4. **Scoring**: Calculated at session end or in real-time
+5. **Results**: Filtered/displayed based on mode
 
-## Styling Approach
+### Keyboard Support
 
-**Solution:** Custom CSS with design system based on gradient themes.
+Full keyboard navigation for accessibility and power users:
+- **W/S or ↑↓**: Cycle through answers
+- **A/D or ←→**: Navigate questions
+- **Space**: Next question / submit test
+- **Backspace**: Clear answer / return to menu
+- **Enter**: Confirm actions
+- **Escape**: Cancel dialogs / clear results
 
-**Design Characteristics:**
-- Dark theme with blue/purple gradient backgrounds
-- Gradient text effects for headings
-- Modern glassmorphism/neumorphism-inspired button styles
-- Responsive container-based layout (max-width: 800px)
+## Recent Improvements (Session 2)
 
-# External Dependencies
+### Design Enhancements
+- Complete visual redesign with modern gradient theme
+- Blue/purple color scheme replacing basic grays
+- Smooth animations and transitions throughout
+- Glassmorphism effects on cards and modals
+- Responsive typography using CSS clamp()
+- Mobile-optimized responsive design
 
-## Core Framework Dependencies
+### Bug Fixes
+- Fixed timer in mock mode (separated timer logic from submission)
+- Added proper auto-submit when time reaches 0
+- Fixed answered question button color (blue instead of confusing green)
+- Added mobile viewport height fix (--vh CSS variable)
+- Smooth navigator auto-scrolling to current question
 
-- **React 18.2.0** - UI framework for component-based development
-- **React DOM 18.2.0** - DOM rendering for React
-- **Vite 5.0.0** - Build tool and development server
-- **@vitejs/plugin-react 4.2.0** - React integration for Vite
+### Feature Completeness
+- Added keyboard shortcut help text in menu
+- Fullscreen image viewing with zoom
+- Confirmation dialogs for test submission
+- Progress indicators showing answered vs unanswered questions
+- Time display for training mode (informational)
+- Results review showing which questions were missed
+- Responsive grid layout for review mode
 
-## Development Dependencies
+### Code Quality
+- Removed unused App.css file
+- Organized CSS into logical sections with comments
+- Added media queries for responsive design
+- Implemented smooth animations with @keyframes
+- Added accessibility labels (aria-label)
+- Proper component composition (small helper components)
 
-- **TypeScript 5.2.2** - Configured but not actively used (project uses JSX)
-- **@types/react** and **@types/react-dom** - Type definitions (available if migrating to TypeScript)
+## File Structure
 
-## Data Processing
+```
+/
+├── src/
+│   ├── App.jsx              (Main app component - modes, state, logic)
+│   ├── questions.js         (Question data - generated from CSV)
+│   ├── index.jsx            (React entry point)
+│   ├── images/              (Question images - 1.png to 504.png)
+│   └── styles/
+│       └── globals.css      (Complete design system - 444 lines)
+├── convert.js               (CSV → JavaScript converter)
+├── questions.csv            (Source question data)
+├── vite.config.js           (Vite build configuration)
+├── package.json             (Dependencies: React, Vite)
+├── index.html               (HTML entry point)
+└── replit.md               (This file)
+```
 
-- **Node.js fs/path modules** - File system operations for CSV conversion script
-- No external CSV parsing library (custom implementation in `convert.js`)
+## Performance Optimizations
 
-## Hosting Platform
+- Images loaded with Vite glob for static analysis
+- Efficient state updates with functional setters
+- Refs for keyboard focus management
+- Smooth scrolling with native browser API
+- CSS animations instead of JS animations
+- Minimal re-renders with proper dependencies
 
-- **Replit** - Development and hosting platform
-- Server configured for Replit's networking requirements (host: '0.0.0.0')
+## Browser Compatibility
 
-## No Backend/Database
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+- Fallback for images using transparent PNG
+- Touch-friendly button sizing (min 48px × 48px)
+- Responsive design from 320px to 2560px
 
-- No server-side framework
-- No database system
-- No authentication system
-- All data is static and client-side
-- No external API integrations
+## Deployment
+
+- Configured for Replit platform
+- Vite dev server on 0.0.0.0:5000
+- Hot module reloading enabled
+- Ready for static hosting (npm run build)
+
+## Future Enhancements (Optional)
+
+- Backend API for question storage
+- User authentication and progress tracking
+- Analytics and performance metrics
+- Question filtering by category/difficulty
+- Leaderboard system
+- Multi-language support
+- Dark/light theme toggle
+- Export results to PDF
