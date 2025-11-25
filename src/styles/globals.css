@@ -294,6 +294,13 @@ body {
 }
 .navigatorWrapper::-webkit-scrollbar { display: none; }
 .navigatorWrapper:active { cursor: grabbing; }
+.navigatorWrapper.dragging {
+  cursor: grabbing !important;
+  scroll-behavior: auto !important;
+}
+.navigatorWrapper.dragging .navNumber {
+  pointer-events: none;
+}
 
 .compactNavigator {
   display: flex;

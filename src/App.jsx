@@ -55,8 +55,56 @@ function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, on
 }
 
 function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIndex }) {
+  const wrapperRef = React.useRef(null);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [startX, setStartX] = React.useState(0);
+  const [scrollLeft, setScrollLeft] = React.useState(0);
+
+  const handleMouseDown = (e) => {
+    if (!wrapperRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - wrapperRef.current.offsetLeft);
+    setScrollLeft(wrapperRef.current.scrollLeft);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || !wrapperRef.current) return;
+    const x = e.pageX - wrapperRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    wrapperRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseLeave = () => setIsDragging(false);
+
+  const handleTouchStart = (e) => {
+    if (!wrapperRef.current) return;
+    setIsDragging(true);
+    setStartX(e.touches[0].pageX - wrapperRef.current.offsetLeft);
+    setScrollLeft(wrapperRef.current.scrollLeft);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || !wrapperRef.current) return;
+    const x = e.touches[0].pageX - wrapperRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    wrapperRef.current.scrollLeft = scrollLeft - walk;
+  };
+
+  const handleTouchEnd = () => setIsDragging(false);
+
   return (
-    <div className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""}`}>
+    <div
+      ref={wrapperRef}
+      className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""} ${isDragging ? "dragging" : ""}`}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="compactNavigator">
         {questionSet.map((_, i) => {
           if (mode === "training" && i > maxSeenIndex) return null;
@@ -65,7 +113,10 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
             <button
               key={i}
               className={`navNumber ${currentIndex === i ? "current" : ""} ${isAnswered ? "answered" : ""}`}
-              onClick={() => setCurrentIndex(i)}
+              onClick={(e) => {
+                if (!isDragging) setCurrentIndex(i);
+              }}
+              onMouseDown={(e) => e.preventDefault()}
               aria-label={`Otázka ${i + 1}`}
             >
               {i + 1}
