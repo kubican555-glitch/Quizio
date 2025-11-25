@@ -484,6 +484,12 @@ export default function App() {
           <>
             <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => mode === "random" ? selectRandomAnswer(i) : handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={false} />
 
+            {mode === "random" && !showResult && selectedAnswer !== null && (
+              <div className="actionButtons right">
+                <button className="navButton primary" onClick={confirmRandomAnswer}>Potvrdit</button>
+              </div>
+            )}
+
             {mode === "random" && showResult && (
               <div className="actionButtons right">
                 <button className="navButton" onClick={nextRandomQuestion}>Další otázka</button>
