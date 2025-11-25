@@ -155,6 +155,7 @@ export default function App() {
   // refs: per-question refs so keyboard selection always maps to the current question
   const optionRefsForCurrent = useRef({});
   const scrollRef = useRef(null);
+  const cardRef = useRef(null);
 
   // attach stable _localIndex to QUESTIONS once (non-invasive)
   useEffect(() => {
@@ -175,6 +176,12 @@ export default function App() {
     const activeBtn = scrollRef.current.querySelector(".navNumber.current");
     if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [currentIndex]);
+
+  // auto scroll card into view for flashcards
+  useEffect(() => {
+    if (mode !== "random" || !cardRef.current) return;
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [currentIndex, showResult, mode]);
 
   // training timer
   useEffect(() => {
@@ -514,7 +521,7 @@ export default function App() {
           : `Otázka ${currentIndex + 1} / ${mode === "training" ? maxSeenIndex + 1 : questionSet.length}`}
       </div>
 
-      <div className="card">
+      <div className="card" ref={cardRef}>
         {!finished ? (
           <>
             <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => mode === "random" ? clickRandomAnswer(i) : handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={mode === "random" && showResult} />
