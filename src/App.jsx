@@ -261,14 +261,18 @@ export default function App() {
 
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
         if (mode === "random" && showResult) nextRandomQuestion();
-        else setCurrentIndex((i) => Math.max(0, i - 1));
+        else {
+          const newIdx = Math.max(0, currentIndex - 1);
+          moveToQuestion(newIdx);
+        }
       }
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
         if (mode === "random" && showResult) nextRandomQuestion();
         else if (mode === "random" && !showResult) confirmRandomAnswer();
         else {
           const max = mode === "training" ? maxSeenIndex : questionSet.length - 1;
-          setCurrentIndex((i) => Math.min(i + 1, max));
+          const newIdx = Math.min(currentIndex + 1, max);
+          moveToQuestion(newIdx);
         }
       }
 
@@ -412,11 +416,6 @@ export default function App() {
       copy[currentIndex] = q;
       return copy;
     });
-
-    // In training mode, allow user to navigate to next question after answering
-    if (mode === "training" && currentIndex === maxSeenIndex && maxSeenIndex < questionSet.length - 1) {
-      setMaxSeenIndex(maxSeenIndex + 1);
-    }
   };
 
   const clearAnswer = () => {
@@ -429,6 +428,13 @@ export default function App() {
     setSelectedAnswer(null);
     setShowResult(false);
     // we intentionally do not auto-decrement score to avoid complexity; user can retake.
+  };
+
+  const moveToQuestion = (newIdx) => {
+    if (mode === "training" && newIdx > maxSeenIndex && newIdx > currentIndex) {
+      setMaxSeenIndex(newIdx);
+    }
+    setCurrentIndex(newIdx);
   };
 
   const nextRandomQuestion = () => {
@@ -562,12 +568,18 @@ export default function App() {
             {(mode === "mock" || mode === "training") && (
               <>
                 <div className="actionButtons spaced">
-                  <button className="navButton" onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}>Předchozí</button>
-                  <button className="navButton" onClick={() => setCurrentIndex(Math.min((mode === "training" ? maxSeenIndex : questionSet.length - 1), currentIndex + 1))} disabled={currentIndex === (mode === "training" ? maxSeenIndex : questionSet.length - 1)}>Další</button>
+                  <button className="navButton" onClick={() => {
+                    const newIdx = Math.max(0, currentIndex - 1);
+                    moveToQuestion(newIdx);
+                  }} disabled={currentIndex === 0}>Předchozí</button>
+                  <button className="navButton" onClick={() => {
+                    const newIdx = Math.min((mode === "training" ? maxSeenIndex : questionSet.length - 1), currentIndex + 1);
+                    moveToQuestion(newIdx);
+                  }} disabled={currentIndex === (mode === "training" ? maxSeenIndex : questionSet.length - 1) || (mode === "training" && currentIndex === questionSet.length - 1)}>Další</button>
                 </div>
 
                 <div className="navigatorWrapper" ref={scrollRef}>
-                  <Navigator questionSet={questionSet} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} mode={mode} maxSeenIndex={maxSeenIndex} />
+                  <Navigator questionSet={questionSet} currentIndex={currentIndex} setCurrentIndex={moveToQuestion} mode={mode} maxSeenIndex={maxSeenIndex} />
                 </div>
               </>
             )}
