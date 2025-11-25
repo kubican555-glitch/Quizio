@@ -333,6 +333,7 @@ export default function App() {
       return copy;
     });
 
+    setSelectedAnswer(idx);
     setShowResult(true);
     setScore((s) => {
       let correct = s.correct;
@@ -368,6 +369,8 @@ export default function App() {
         total += 1;
         return { correct, total };
       });
+    } else {
+      setSelectedAnswer(-1);
     }
   };
 
