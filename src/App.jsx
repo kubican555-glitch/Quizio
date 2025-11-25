@@ -60,6 +60,30 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
   const [startX, setStartX] = React.useState(0);
   const [scrollLeft, setScrollLeft] = React.useState(0);
 
+  // Auto-scroll na aktuální otázku
+  React.useEffect(() => {
+    if (!wrapperRef.current || isDragging) return;
+    
+    const wrapper = wrapperRef.current;
+    const buttons = wrapper.querySelectorAll('.navNumber');
+    const currentButton = buttons[currentIndex];
+    
+    if (currentButton) {
+      const buttonLeft = currentButton.offsetLeft;
+      const buttonWidth = currentButton.offsetWidth;
+      const wrapperWidth = wrapper.clientWidth;
+      const wrapperScrollLeft = wrapper.scrollLeft;
+      
+      // Střed = scrollLeft + wrapperWidth / 2
+      const targetScroll = buttonLeft + buttonWidth / 2 - wrapperWidth / 2;
+      
+      wrapper.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentIndex, isDragging]);
+
   const handleMouseDown = (e) => {
     if (!wrapperRef.current) return;
     setIsDragging(true);
