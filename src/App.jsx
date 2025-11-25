@@ -209,12 +209,10 @@ export default function App() {
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
 
       if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
-        if (mode === "random" && showResult) return;
         const newIdx = curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts;
         handleAnswer(newIdx);
       }
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") {
-        if (mode === "random" && showResult) return;
         const newIdx = curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts;
         handleAnswer(newIdx);
       }
@@ -315,10 +313,8 @@ export default function App() {
         setScore((s) => {
           let correct = s.correct;
           let total = s.total;
-          if (!wasAnswered) {
-            if (idx === q.correctIndex) correct += 1;
-            total += 1;
-          }
+          if (idx === q.correctIndex) correct += 1;
+          total += 1;
           return { correct, total };
         });
       } else if (mode === "training") {
@@ -438,8 +434,8 @@ export default function App() {
       <div className="topBarRight">
         <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
         <div className="topControls">
-          {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>Čas: {formatTime(timeLeft)}</div>}
-          {mode === "training" && !finished && <div className="timer" style={{ color: "#a3a3a3" }}>Čas: {formatTime(trainingTime)}</div>}
+          {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
+          {mode === "training" && !finished && <div className="timer" style={{ color: "#a3a3a3" }}>{formatTime(trainingTime)}</div>}
           {(mode === "mock" || mode === "training") && !finished && <button className="submitTopButton" onClick={confirmSubmit}>{mode === "training" ? "Vyhodnotit" : "Odevzdat"}</button>}
         </div>
       </div>
@@ -455,11 +451,11 @@ export default function App() {
       <div className="card">
         {!finished ? (
           <>
-            <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={mode === "random" && showResult} />
+            <QuestionCard currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => handleAnswer(i)} optionRefsForCurrent={optionRefsForCurrent} disabled={false} />
 
             {mode === "random" && showResult && (
               <div className="actionButtons right">
-                <button className="navButton primary" onClick={nextRandomQuestion}>Další otázka</button>
+                <button className="navButton" onClick={nextRandomQuestion}>Další otázka</button>
               </div>
             )}
 

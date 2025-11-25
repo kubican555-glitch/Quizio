@@ -140,6 +140,14 @@ body {
   background: #dc2626;
   animation: pulseBtn 0.3s ease;
 }
+.navButton {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+}
+.navButton:active { 
+  animation: pulseBtn 0.3s ease;
+}
 .navButton.primary {
   background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
