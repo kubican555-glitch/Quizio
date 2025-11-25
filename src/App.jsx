@@ -177,9 +177,9 @@ export default function App() {
     if (activeBtn) activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [currentIndex]);
 
-  // auto scroll card into view for flashcards
+  // auto scroll card into view for all modes
   useEffect(() => {
-    if (mode !== "random" || !cardRef.current) return;
+    if (!mode || !cardRef.current) return;
     setTimeout(() => {
       if (cardRef.current) {
         cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
