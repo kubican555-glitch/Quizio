@@ -55,17 +55,24 @@ function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, on
 }
 
 function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIndex }) {
+  const handleNavigate = (i) => {
+    if (mode === "training" && i > maxSeenIndex) return;
+    setCurrentIndex(i);
+  };
+
   return (
     <div className="navigatorWrapper">
       <div className="compactNavigator">
         {questionSet.map((_, i) => {
           if (mode === "training" && i > maxSeenIndex) return null;
           const isAnswered = questionSet[i]?.userAnswer !== undefined;
+          const isDisabled = mode === "training" && i > maxSeenIndex;
           return (
             <button
               key={i}
               className={`navNumber ${currentIndex === i ? "current" : ""} ${isAnswered ? "answered" : ""}`}
-              onClick={() => setCurrentIndex(i)}
+              onClick={() => handleNavigate(i)}
+              disabled={isDisabled}
               aria-label={`Otázka ${i + 1}`}
             >
               {i + 1}
@@ -169,6 +176,14 @@ export default function App() {
     window.addEventListener("resize", setVH);
     return () => window.removeEventListener("resize", setVH);
   }, []);
+
+  // update maxSeenIndex in training mode when viewing a new question
+  useEffect(() => {
+    if (mode !== "training") return;
+    if (currentIndex > maxSeenIndex) {
+      setMaxSeenIndex(currentIndex);
+    }
+  }, [currentIndex, maxSeenIndex, mode]);
 
   // auto scroll card into view for all modes - smooth
   useEffect(() => {
