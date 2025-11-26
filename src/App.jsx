@@ -220,8 +220,8 @@ function formatTime(s) {
 /* ---------- Main App (refactored with subject selection) ---------- */
 
 export default function App() {
-  // subject selection: "DEFAULT" (QUESTIONS), "SPS", "STT", "CUSTOM"
-  const [subject, setSubject] = useState("SPS"); // default to SPS
+  // subject selection: "DEFAULT" (QUESTIONS), "SPS", "STT", "CUSTOM", null = not selected
+  const [subject, setSubject] = useState(null); // start with no subject selected
   const [customQuestions, setCustomQuestions] = useState(null); // array or null
   const [activeQuestionsCache, setActiveQuestionsCache] = useState(null); // cached active questions
 
@@ -653,23 +653,32 @@ export default function App() {
   /* ---------- Render ---------- */
 
   if (!mode) {
+    // Show subject selector if no subject selected yet
+    if (!subject) {
+      return (
+        <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <SubjectSelector onSelectSubject={(subj) => setSubject(subj.toUpperCase())} onUploadFile={handleFileUpload} />
+        </div>
+      );
+    }
+
+    // Show mode menu after subject is selected
+    const subjectLabel = subject === "SPS" ? "SPS – Uzavřené otázky" : subject === "STT" ? "STT – Uzavřené otázky" : "Vlastní – Uzavřené otázky";
+    
     return (
       <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <SubjectSelector onSelectSubject={(subj) => setSubject(subj.toUpperCase())} onUploadFile={handleFileUpload} />
+        <h1 className="title">{subjectLabel}</h1>
+        <div className="menuColumn">
+          <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
+          <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
+          <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
+          <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
+        </div>
+        <button className="menuBackButton" onClick={() => setSubject(null)} style={{ marginTop: "2rem" }}>Změnit předmět</button>
 
-        <div style={{ width: "100%", maxWidth: "600px", marginTop: "2rem" }}>
-          <h1 className="title">SPS – Uzavřené otázky</h1>
-          <div className="menuColumn">
-            <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
-            <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
-            <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
-            <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
-          </div>
-
-          <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
-            Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />
-            Mezerník – další/odevzdání • Backspace – odznačit / menu • Enter – potvrzení • Esc – zrušit
-          </div>
+        <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
+          Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />
+          Mezerník – další/odevzdání • Backspace – odznačit / menu • Enter – potvrzení • Esc – zrušit
         </div>
       </div>
     );
