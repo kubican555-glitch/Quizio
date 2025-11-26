@@ -160,6 +160,10 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
 }
 
 function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled }) {
+  if (!currentQuestion || !currentQuestion.options) {
+    return <div>Načítání otázky...</div>;
+  }
+
   return (
     <div>
       <div className="questionHeader">
@@ -176,7 +180,7 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
       </div>
 
       <div className="options">
-        {currentQuestion.options.map((opt, i) => {
+        {(currentQuestion.options || []).map((opt, i) => {
           let style = {};
           if (mode === "random" && showResult) {
             if (i === currentQuestion.correctIndex) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e", color: "#ecfdf5" };
@@ -674,7 +678,7 @@ export default function App() {
         } else {
           setMenuSelection((prev) => (prev + 1) % 4);
         }
-      } else if (e.key === "Enter") {
+      } else if (key === "d" || e.key === "ArrowRight" || e.key === "Enter") {
         e.preventDefault();
         if (!subject) {
           if (menuSelection === 0) setSubject("SPS");
@@ -689,7 +693,7 @@ export default function App() {
           else if (menuSelection === 2) startTrainingMode();
           else if (menuSelection === 3) startReviewMode();
         }
-      } else if (e.key === "Backspace") {
+      } else if (key === "a" || e.key === "ArrowLeft" || e.key === "Backspace") {
         e.preventDefault();
         if (subject) setSubject(null);
       }
