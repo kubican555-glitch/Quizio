@@ -296,15 +296,25 @@ export default function App() {
     cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [currentIndex, mode]);
 
-  // auto focus selected answer for keyboard nav
+  // auto focus selected answer for keyboard nav and center on screen
   useEffect(() => {
     if (mode !== "random" || selectedAnswer === null) return;
     const refs = optionRefsForCurrent.current?.[questionSet[currentIndex]?._localIndex] || [];
     if (refs[selectedAnswer]) {
-      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
+      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "center" });
       refs[selectedAnswer].focus();
     }
   }, [selectedAnswer, currentIndex, mode, questionSet]);
+
+  // auto center question card when navigating between questions
+  useEffect(() => {
+    if (!mode || mode === "review") return;
+    if (cardRef.current) {
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+    }
+  }, [currentIndex, mode]);
 
   // training timer
   useEffect(() => {
