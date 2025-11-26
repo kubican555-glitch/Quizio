@@ -778,18 +778,19 @@ export default function App() {
 
   return (
     <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
-      <div className="topBarRight">
-        <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
-        <div className="topControls">
-          {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
-          {mode === "training" && !finished && <div className="timer" style={{ color: "#a3a3a3" }}>{formatTime(trainingTime)}</div>}
-          {(mode === "mock" || mode === "training") && !finished && <button className="submitTopButton" onClick={confirmSubmit}>{mode === "training" ? "Vyhodnotit" : "Odevzdat"}</button>}
+      <div className="stickyHeader">
+        <div className="topBarRight">
+          <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
+          <div className="topControls">
+            {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
+            {mode === "training" && !finished && <div className="timer" style={{ color: "#a3a3a3" }}>{formatTime(trainingTime)}</div>}
+            {(mode === "mock" || mode === "training") && !finished && <button className="submitTopButton" onClick={confirmSubmit}>{mode === "training" ? "Vyhodnotit" : "Odevzdat"}</button>}
+          </div>
         </div>
-      </div>
 
-      <h1 className="title">{mode === "random" ? "Flashcards" : mode === "mock" ? "Test nanečisto" : "Tréninkový režim"}</h1>
+        <h1 className="title">{mode === "random" ? "Flashcards" : mode === "mock" ? "Test nanečisto" : "Tréninkový režim"}</h1>
 
-      <div className="progress">
+        <div className="progress">
         {mode === "random"
           ? `Zodpovězeno: ${questionSet.filter(q => q.userAnswer !== undefined).length} | Správně: ${score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0} %`
           : `Otázka ${currentIndex + 1} / ${mode === "training" ? maxSeenIndex + 1 : questionSet.length}`}
