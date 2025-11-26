@@ -293,7 +293,9 @@ export default function App() {
   // auto scroll question to center when navigating between questions in mock/random
   useEffect(() => {
     if ((mode !== "mock" && mode !== "random") || !cardRef.current) return;
-    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   }, [currentIndex, mode]);
 
   // auto scroll answer to view when selected - use 'nearest' to minimize movement
@@ -301,15 +303,19 @@ export default function App() {
     if (mode !== "random" || selectedAnswer === null) return;
     const refs = optionRefsForCurrent.current?.[questionSet[currentIndex]?._localIndex] || [];
     if (refs[selectedAnswer]) {
-      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
-      refs[selectedAnswer].focus();
+      setTimeout(() => {
+        refs[selectedAnswer]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        refs[selectedAnswer]?.focus();
+      }, 50);
     }
   }, [selectedAnswer, currentIndex, mode, questionSet]);
 
   // auto scroll for training mode
   useEffect(() => {
     if (mode !== "training" || !cardRef.current) return;
-    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   }, [currentIndex, mode]);
 
   // training timer
