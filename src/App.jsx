@@ -224,6 +224,7 @@ export default function App() {
   const [subject, setSubject] = useState(null); // start with no subject selected
   const [customQuestions, setCustomQuestions] = useState(null); // array or null
   const [activeQuestionsCache, setActiveQuestionsCache] = useState(null); // cached active questions
+  const [menuSelection, setMenuSelection] = useState(0); // for keyboard navigation of menus
 
   const [mode, setMode] = useState(null); // null | random | mock | training | review
   const [questionSet, setQuestionSet] = useState([]);
@@ -649,6 +650,68 @@ export default function App() {
     setSubject("CUSTOM");
     setUploadError("");
   };
+
+  // Global keyboard handler for menu navigation (WASD and arrows)
+  useEffect(() => {
+    if (mode) return; // Only handle menus when not in a quiz mode
+
+    const handleMenuKeydown = (e) => {
+      if (!subject) {
+        // Subject selector menu - 3 buttons
+        if (["w", "W", "ArrowUp"].includes(e.key)) {
+          e.preventDefault();
+          setMenuSelection((prev) => (prev - 1 + 3) % 3);
+        } else if (["s", "S", "ArrowDown"].includes(e.key)) {
+          e.preventDefault();
+          setMenuSelection((prev) => (prev + 1) % 3);
+        }
+      } else if (subject) {
+        // Mode selection menu - 4 buttons
+        if (["w", "W", "ArrowUp"].includes(e.key)) {
+          e.preventDefault();
+          setMenuSelection((prev) => (prev - 1 + 4) % 4);
+        } else if (["s", "S", "ArrowDown"].includes(e.key)) {
+          e.preventDefault();
+          setMenuSelection((prev) => (prev + 1) % 4);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleMenuKeydown);
+    return () => window.removeEventListener("keydown", handleMenuKeydown);
+  }, [mode, subject]);
+
+  // Trigger menu button on Enter key
+  useEffect(() => {
+    if (mode) return;
+
+    const handleMenuEnter = (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (!subject) {
+          // Subject selector - trigger appropriate button
+          if (menuSelection === 0) document.querySelector(".subjectButton:nth-child(1)")?.click();
+          else if (menuSelection === 1) document.querySelector(".subjectButton:nth-child(2)")?.click();
+          else if (menuSelection === 2) document.querySelector(".uploadButton")?.click();
+        } else {
+          // Mode menu - trigger appropriate button
+          const buttons = document.querySelectorAll(".menuColumn .menuButton");
+          buttons[menuSelection]?.click();
+        }
+      } else if (e.key === "Backspace") {
+        e.preventDefault();
+        if (subject) setSubject(null); // Go back to subject selector
+      }
+    };
+
+    window.addEventListener("keydown", handleMenuEnter);
+    return () => window.removeEventListener("keydown", handleMenuEnter);
+  }, [mode, subject, menuSelection]);
+
+  // Reset menu selection when changing screens
+  useEffect(() => {
+    setMenuSelection(0);
+  }, [subject, mode]);
 
   /* ---------- Render ---------- */
 
