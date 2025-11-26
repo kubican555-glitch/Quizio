@@ -162,6 +162,12 @@ body {
   transform: scale(0.97);
 }
 
+.menuButton.selected {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #8b5cf6 100%);
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.8);
+  transform: translateY(-3px);
+}
+
 .menuBackButton {
   border: none;
   border-radius: 12px;
@@ -818,6 +824,13 @@ body {
   border-color: rgba(59, 130, 246, 0.6);
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.subjectButton.selected {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(96, 165, 250, 0.8);
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.6);
+  transform: translateY(-4px);
 }
 
 .subjectIcon {

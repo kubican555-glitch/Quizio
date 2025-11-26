@@ -697,7 +697,7 @@ export default function App() {
 
     window.addEventListener("keydown", handleMenuNav);
     return () => window.removeEventListener("keydown", handleMenuNav);
-  }, [mode, subject, menuSelection];
+  }, [mode, subject, menuSelection]);
 
   /* ---------- Render ---------- */
 
