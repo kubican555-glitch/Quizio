@@ -809,21 +809,26 @@ body {
 }
 
 .subjectGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 1.5rem;
   margin-bottom: 2rem;
+  width: 100%;
+  max-width: 520px;
 }
 
 .subjectButton {
-  padding: 2rem;
-  background: rgba(59, 130, 246, 0.1);
+  width: 100%;
+  padding: 1.8rem 1.4rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 50%, rgba(139, 92, 246, 0.1) 100%);
   border: 2px solid rgba(59, 130, 246, 0.3);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s;
   color: #fff;
   font-weight: 600;
+  font-size: 1.05rem;
 }
 
 .subjectButton:hover {
