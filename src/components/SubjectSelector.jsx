@@ -82,7 +82,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile }) {
   return (
     <div className="subjectSelectorContainer fadeIn">
       <div className="subjectContent">
-        <h1 className="subjectTitle">SPS – Uzavřené otázky</h1>
+        <h1 className="subjectTitle">Trénink uzavřených otázek</h1>
         <p className="subjectSubtitle">Vyber předmět, který chceš procvičovat</p>
 
         <div className="subjectGrid">
