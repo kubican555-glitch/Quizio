@@ -229,6 +229,7 @@ export default function App() {
   const [customQuestions, setCustomQuestions] = useState(null); // array or null
   const [activeQuestionsCache, setActiveQuestionsCache] = useState(null); // cached active questions
   const [menuSelection, setMenuSelection] = useState(0); // for keyboard navigation of menus
+  const menuButtonsRef = useRef([]);
 
   const [mode, setMode] = useState(null); // null | random | mock | training | review
   const [questionSet, setQuestionSet] = useState([]);
