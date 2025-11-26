@@ -765,3 +765,95 @@ body {
     padding-right: env(safe-area-inset-right, 0);
   }
 }
+
+/* === SUBJECT SELECTOR === */
+.subjectSelectorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--vh);
+  padding: 2rem;
+}
+
+.subjectContent {
+  text-align: center;
+  max-width: 600px;
+}
+
+.subjectTitle {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #3b82f6, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subjectSubtitle {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.subjectGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.subjectButton {
+  padding: 2rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: #fff;
+  font-weight: 600;
+}
+
+.subjectButton:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+}
+
+.subjectIcon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.subjectName {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subjectDesc {
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+.uploadError {
+  color: #ef4444;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.uploadHint {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .subjectTitle { font-size: 1.8rem; }
+  .subjectSubtitle { font-size: 1rem; }
+  .subjectGrid { grid-template-columns: 1fr; }
+}

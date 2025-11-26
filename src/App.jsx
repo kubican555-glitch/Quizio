@@ -1,11 +1,8 @@
-// App.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { QUESTIONS } from "./questions";
-import { QUESTIONS_SPS } from "./questionsSPS";
-import { QUESTIONS_STT } from "./questionsSTT";
-import { SubjectSelector } from "./components/SubjectSelector";
+import { QUESTIONS_SPS } from "./questionsSPS.js";
+import { QUESTIONS_STT } from "./questionsSTT.js";
+import { SubjectSelector } from "./components/SubjectSelector.jsx";
 
-// Načtení obrázků (vite)
 const images = import.meta.glob("./images/*.png", { eager: true, as: "url" });
 const IMAGES = {};
 for (const path in images) {
@@ -61,25 +58,17 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
   const wrapperRef = React.useRef(null);
   const dragStateRef = React.useRef({ isDragging: false, startX: 0, scrollLeft: 0, moved: 0 });
 
-  // Auto-scroll na aktuální otázku
   React.useEffect(() => {
     if (!wrapperRef.current) return;
-    
     const wrapper = wrapperRef.current;
     const buttons = wrapper.querySelectorAll('.navNumber');
     const currentButton = buttons[currentIndex];
-    
     if (currentButton) {
       const buttonLeft = currentButton.offsetLeft;
       const buttonWidth = currentButton.offsetWidth;
       const wrapperWidth = wrapper.clientWidth;
-      
       const targetScroll = buttonLeft + buttonWidth / 2 - wrapperWidth / 2;
-      
-      wrapper.scrollTo({
-        left: targetScroll,
-        behavior: 'smooth'
-      });
+      wrapper.scrollTo({ left: targetScroll, behavior: 'smooth' });
     }
   }, [currentIndex]);
 
@@ -177,16 +166,10 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
 
       <div className="options">
         {currentQuestion.options.map((opt, i) => {
-          let style = {};
-          if (mode === "random" && showResult) {
-            if (i === currentQuestion.correctIndex) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e", color: "#ecfdf5" };
-            if (selectedAnswer === i && i !== currentQuestion.correctIndex) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444", color: "#fee2e2" };
-          } else if (mode === "random" && !showResult && selectedAnswer === i) {
-            style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
-          } else if ((mode === "mock" || mode === "training") && currentQuestion.userAnswer === i) {
-            style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
-          }
-
+          const isCorrect = showResult && i === currentQuestion.correctIndex;
+          const isSelected = selectedAnswer === i;
+          const isWrong = showResult && isSelected && i !== currentQuestion.correctIndex;
+          const style = isCorrect ? { backgroundColor: "#10b981", borderColor: "#059669" } : isWrong ? { backgroundColor: "#ef4444", borderColor: "#dc2626" } : {};
           return (
             <button
               key={i}
@@ -211,17 +194,16 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
   );
 }
 
-/* ---------- Utilities ---------- */
-
 function formatTime(s) {
   return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 }
 
-/* ---------- Main App (refactored) ---------- */
+/* ---------- Main App ---------- */
 
 export default function App() {
-  const [mode, setMode] = useState(null); // null | random | mock | training | review
-  const [questionSet, setQuestionSet] = useState([]);
+  const [selectedSubject, setSelectedSubject] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [mode, setMode] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
@@ -234,17 +216,14 @@ export default function App() {
   const [showConfirmExit, setShowConfirmExit] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState(null);
 
-  // refs: per-question refs so keyboard selection always maps to the current question
   const optionRefsForCurrent = useRef({});
   const scrollRef = useRef(null);
   const cardRef = useRef(null);
 
-  // attach stable _localIndex to QUESTIONS once (non-invasive)
   useEffect(() => {
-    QUESTIONS.forEach((q, i) => { q._localIndex = i; });
-  }, []);
+    questions.forEach((q, i) => { q._localIndex = i; });
+  }, [questions]);
 
-  // mobile vh fix
   useEffect(() => {
     const setVH = () => document.documentElement.style.setProperty("--vh", `${window.innerHeight}px`);
     setVH();
@@ -252,41 +231,24 @@ export default function App() {
     return () => window.removeEventListener("resize", setVH);
   }, []);
 
-  // update maxSeenIndex in training mode when user navigates to new question
   useEffect(() => {
     if (mode !== "training") return;
     if (currentIndex > maxSeenIndex) {
-      // Only increase maxSeenIndex when user navigates forward, not when answer is selected
       setMaxSeenIndex(currentIndex);
     }
   }, [currentIndex, mode]);
 
-  // auto scroll card into view for mock/random modes only (not training - user controls scroll)
   useEffect(() => {
     if (!cardRef.current || mode === "training") return;
     cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [currentIndex, mode]);
 
-  // auto focus selected answer for keyboard nav
-  useEffect(() => {
-    if (mode !== "random" || selectedAnswer === null) return;
-    const refs = optionRefsForCurrent.current?.[currentQuestion._localIndex] || [];
-    if (refs[selectedAnswer]) {
-      if (refs[selectedAnswer]) {
-        refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
-        refs[selectedAnswer].focus();
-      }
-    }
-  }, [selectedAnswer, currentIndex, mode]);
-
-  // training timer
   useEffect(() => {
     if (mode !== "training" || finished) return;
     const t = setInterval(() => setTrainingTime((x) => x + 1), 1000);
     return () => clearInterval(t);
   }, [mode, finished]);
 
-  // mock timer
   useEffect(() => {
     if (mode !== "mock" || finished) return;
     const t = setInterval(() => {
@@ -298,19 +260,17 @@ export default function App() {
     return () => clearInterval(t);
   }, [mode, finished]);
 
-  // auto-submit when time runs out
   useEffect(() => {
     if (mode === "mock" && timeLeft === 0 && !finished) {
       submitTest();
     }
   }, [mode, timeLeft, finished]);
 
-  // Keyboard handling (centralized)
   useEffect(() => {
     if (!mode || mode === "review") return;
 
     const onKey = (e) => {
-      const curQ = questionSet[currentIndex] || { options: [] };
+      const curQ = questions[currentIndex] || { options: [] };
       const opts = curQ.options.length;
 
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) e.preventDefault();
@@ -333,81 +293,91 @@ export default function App() {
           handleAnswer(newIdx);
         }
       }
-
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
-        if (mode === "random" && showResult) nextRandomQuestion();
-        else {
+        if (mode !== "random") {
           const newIdx = Math.max(0, currentIndex - 1);
           moveToQuestion(newIdx);
         }
       }
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
-        if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult) confirmRandomAnswer();
-        else {
+        if (mode !== "random") {
           const newIdx = currentIndex + 1;
           moveToQuestion(newIdx);
         }
       }
-
-      if (e.key === " ") {
+      if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        if (mode === "random" && !showResult) confirmRandomAnswer();
         if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult) confirmRandomAnswer();
-        else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
+        if ((mode === "mock" || mode === "training") && !finished) {
+          if (currentIndex < questions.length - 1) moveToQuestion(currentIndex + 1);
+        }
       }
-
-      if (e.key === "Enter") {
-        if (showConfirmSubmit) submitTest();
-        else if (showConfirmExit) confirmExit();
-        else if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult) confirmRandomAnswer();
-      }
-
       if (e.key === "Backspace") {
-        if (curQ.userAnswer !== undefined) clearAnswer();
-        else tryReturnToMenu();
+        if (mode === "random") {
+          if (showResult) {
+            setShowResult(false);
+            setSelectedAnswer(null);
+          }
+        } else {
+          setQuestionSet(q => q.map((x, i) => i === currentIndex ? { ...x, userAnswer: undefined } : x));
+        }
       }
-
       if (e.key === "Escape") {
-        if (fullscreenImage) setFullscreenImage(null);
-        else if (showConfirmSubmit) setShowConfirmSubmit(false);
-        else if (showConfirmExit) setShowConfirmExit(false);
-        else if (mode === "random" && showResult) clearAnswer();
+        if (mode === "random" && showResult) {
+          setShowResult(false);
+          setSelectedAnswer(null);
+        }
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mode, questionSet, currentIndex, showResult, showConfirmSubmit, showConfirmExit, fullscreenImage, maxSeenIndex, finished, selectedAnswer]);
+  }, [mode, currentIndex, selectedAnswer, showResult, questions, finished]);
 
-  /* ---------- Mode starters ---------- */
+  /* ---------- Logic ---------- */
+
+  const handleSelectSubject = (subject) => {
+    if (subject === "sps") {
+      setQuestions([...QUESTIONS_SPS]);
+      setSelectedSubject("sps");
+    } else if (subject === "stt") {
+      setQuestions([...QUESTIONS_STT]);
+      setSelectedSubject("stt");
+    }
+  };
+
+  const handleUploadFile = (uploadedQuestions) => {
+    setQuestions([...uploadedQuestions]);
+    setSelectedSubject("custom");
+  };
+
+  const [questionSet, setQuestionSet] = useState([]);
 
   const startRandomMode = () => {
-    const shuffled = [...QUESTIONS].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, options: [...q.options], userAnswer: undefined, _localIndex: idx }));
-    setQuestionSet(shuffled);
+    const qs = questions.map((q, i) => ({ ...q, userAnswer: undefined, _localIndex: i }));
+    setQuestionSet(qs);
     setMode("random");
     setCurrentIndex(0);
-    setScore({ correct: 0, total: 0 });
-    setFinished(false);
     setSelectedAnswer(null);
     setShowResult(false);
+    setScore({ correct: 0, total: 0 });
     optionRefsForCurrent.current = {};
   };
 
   const startMockTest = () => {
-    const sel = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 40).map((q, idx) => ({ ...q, options: [...q.options], userAnswer: undefined, _localIndex: idx }));
-    setQuestionSet(sel);
-    setTimeLeft(1800);
+    const qs = questions.slice(0, 40).map((q, i) => ({ ...q, userAnswer: undefined, _localIndex: i }));
+    setQuestionSet(qs);
     setMode("mock");
     setCurrentIndex(0);
-    setMaxSeenIndex(0);
+    setTimeLeft(1800);
     setFinished(false);
     optionRefsForCurrent.current = {};
   };
 
   const startTrainingMode = () => {
-    const all = QUESTIONS.map((q, idx) => ({ ...q, options: [...q.options], userAnswer: undefined, _localIndex: idx }));
-    setQuestionSet(all);
+    const qs = questions.map((q, i) => ({ ...q, userAnswer: undefined, _localIndex: i }));
+    setQuestionSet(qs);
     setMode("training");
     setCurrentIndex(0);
     setMaxSeenIndex(0);
@@ -416,104 +386,27 @@ export default function App() {
     optionRefsForCurrent.current = {};
   };
 
-  const startReviewMode = () => setMode("review");
-
-  /* ---------- Answer logic ---------- */
+  const startReviewMode = () => {
+    setMode("review");
+  };
 
   const selectRandomAnswer = (idx) => {
-    if (finished || mode !== "random" || showResult) return;
     setSelectedAnswer(idx);
   };
 
   const clickRandomAnswer = (idx) => {
-    if (finished || mode !== "random" || showResult) return;
-    
-    const currentQ = questionSet[currentIndex];
-    if (!currentQ) return;
-
-    setQuestionSet((prev) => {
-      const copy = [...prev];
-      const q = { ...copy[currentIndex] };
-      q.userAnswer = idx;
-      copy[currentIndex] = q;
-      return copy;
-    });
-
     setSelectedAnswer(idx);
-    setShowResult(true);
-    setScore((s) => {
-      let correct = s.correct;
-      let total = s.total;
-      if (idx === currentQ.correctIndex) correct += 1;
-      total += 1;
-      return { correct, total };
-    });
   };
 
   const confirmRandomAnswer = () => {
-    if (finished || mode !== "random") return;
-
-    const currentQ = questionSet[currentIndex];
-    if (!currentQ) return;
-
-    const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
-
-    setQuestionSet((prev) => {
-      const copy = [...prev];
-      const q = { ...copy[currentIndex] };
-      q.userAnswer = answerToSave;
-      copy[currentIndex] = q;
-      return copy;
-    });
-
+    if (selectedAnswer === null) return;
+    const correct = questionSet[currentIndex].userAnswer === undefined ? selectedAnswer === questionSet[currentIndex].correctIndex : true;
+    const newQS = [...questionSet];
+    newQS[currentIndex].userAnswer = selectedAnswer;
+    setQuestionSet(newQS);
     setShowResult(true);
-    if (selectedAnswer !== null) {
-      setScore((s) => {
-        let correct = s.correct;
-        let total = s.total;
-        if (selectedAnswer === currentQ.correctIndex) correct += 1;
-        total += 1;
-        return { correct, total };
-      });
-    } else {
-      setSelectedAnswer(-1);
-    }
-  };
-
-  const handleAnswer = (idx) => {
-    if (finished || mode === "review") return;
-
-    setQuestionSet((prev) => {
-      const copy = [...prev];
-      const q = { ...copy[currentIndex] };
-      q.userAnswer = idx;
-      copy[currentIndex] = q;
-      return copy;
-    });
-  };
-
-  const clearAnswer = () => {
-    setQuestionSet((prev) => {
-      const copy = [...prev];
-      if (!copy[currentIndex]) return prev;
-      copy[currentIndex] = { ...copy[currentIndex], userAnswer: undefined };
-      return copy;
-    });
-    setSelectedAnswer(null);
-    setShowResult(false);
-    // we intentionally do not auto-decrement score to avoid complexity; user can retake.
-  };
-
-  const moveToQuestion = (newIdx) => {
-    // Bounds check
-    const maxQuestion = questionSet.length - 1;
-    const boundedIdx = Math.max(0, Math.min(newIdx, maxQuestion));
-    
-    // In training mode, increase maxSeenIndex when moving forward
-    if (mode === "training" && boundedIdx > maxSeenIndex && boundedIdx > currentIndex) {
-      setMaxSeenIndex(boundedIdx);
-    }
-    setCurrentIndex(boundedIdx);
+    if (correct) setScore(s => ({ ...s, correct: s.correct + 1 }));
+    setScore(s => ({ ...s, total: s.total + 1 }));
   };
 
   const nextRandomQuestion = () => {
@@ -528,14 +421,25 @@ export default function App() {
     setCurrentIndex(nextIdx);
     setSelectedAnswer(null);
     setShowResult(false);
-    // focus first option of the new question so keyboard works immediately
     setTimeout(() => {
       const refs = optionRefsForCurrent.current?.[questionSet[nextIdx]._localIndex] || [];
       if (refs[0]) refs[0].focus();
     }, 50);
   };
 
-  /* ---------- Submit / exit ---------- */
+  const handleAnswer = (idx) => {
+    const newQS = [...questionSet];
+    newQS[currentIndex].userAnswer = idx;
+    setQuestionSet(newQS);
+  };
+
+  const moveToQuestion = (idx) => {
+    const bounded = Math.max(0, Math.min(idx, questionSet.length - 1));
+    setCurrentIndex(bounded);
+    if (mode === "training" && bounded > maxSeenIndex) {
+      setMaxSeenIndex(bounded);
+    }
+  };
 
   const confirmSubmit = () => setShowConfirmSubmit(true);
   const cancelSubmit = () => setShowConfirmSubmit(false);
@@ -550,12 +454,12 @@ export default function App() {
 
   const tryReturnToMenu = () => {
     if ((mode === "mock" || mode === "training") && !finished) setShowConfirmExit(true);
-    else resetToMenu();
+    else resetToMode();
   };
 
-  const confirmExit = () => { resetToMenu(); setShowConfirmExit(false); };
+  const confirmExit = () => { resetToMode(); setShowConfirmExit(false); };
 
-  const resetToMenu = () => {
+  const resetToMode = () => {
     setMode(null);
     setQuestionSet([]);
     setCurrentIndex(0);
@@ -568,7 +472,16 @@ export default function App() {
     setMaxSeenIndex(0);
   };
 
+  const resetToSubject = () => {
+    setSelectedSubject(null);
+    resetToMode();
+  };
+
   /* ---------- Render ---------- */
+
+  if (!selectedSubject) {
+    return <SubjectSelector onSelectSubject={handleSelectSubject} onUploadFile={handleUploadFile} />;
+  }
 
   if (!mode) {
     return (
@@ -580,6 +493,7 @@ export default function App() {
           <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
           <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
         </div>
+        <button className="menuBackButton" onClick={resetToSubject} style={{ marginTop: "2rem" }}>Změnit předmět</button>
         <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
           Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />
           Mezerník – další/odevzdání • Backspace – odznačit / menu • Enter – potvrzení • Esc – zrušit
@@ -594,7 +508,7 @@ export default function App() {
         <h1 className="title">Prohlížení všech otázek</h1>
         <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
         <div className="reviewGrid">
-          {QUESTIONS.map((q) => (
+          {questions.map((q) => (
             <div key={q.number} className="reviewCard">
               <div className="reviewHeader"><strong>#{q.number}.</strong> {q.question}</div>
               {IMAGES[q.number] && <img src={IMAGES[q.number]} alt="" className="reviewImage" onClick={() => window.open(IMAGES[q.number], "_blank")} />}
@@ -664,11 +578,10 @@ export default function App() {
             )}
           </>
         ) : (
-          <ResultScreen mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} onBack={resetToMenu} />
+          <ResultScreen mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} onBack={resetToMode} />
         )}
       </div>
 
-      {/* Fullscreen obrázek */}
       {fullscreenImage && (
         <div className="fullscreenOverlay" onClick={() => setFullscreenImage(null)}>
           <img src={fullscreenImage} alt="Fullscreen" className="fullscreenImage" />
@@ -676,7 +589,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Dialogy */}
       {showConfirmSubmit && (
         <ConfirmModal title={`Opravdu chceš ${mode === "mock" ? "odevzdat test" : "vyhodnotit otázky"}?`} message={`Tato akce je nevratná.`} onCancel={cancelSubmit} onConfirm={submitTest} />
       )}
