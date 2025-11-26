@@ -296,12 +296,12 @@ export default function App() {
     cardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [currentIndex, mode]);
 
-  // auto focus selected answer for keyboard nav and center on screen
+  // auto focus selected answer for keyboard nav - scroll answer into view without hiding question
   useEffect(() => {
     if (mode !== "random" || selectedAnswer === null) return;
     const refs = optionRefsForCurrent.current?.[questionSet[currentIndex]?._localIndex] || [];
     if (refs[selectedAnswer]) {
-      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "center" });
+      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
       refs[selectedAnswer].focus();
     }
   }, [selectedAnswer, currentIndex, mode, questionSet]);
