@@ -663,11 +663,9 @@ export default function App() {
     }
 
     // Show mode menu after subject is selected
-    const subjectLabel = subject === "SPS" ? "SPS – Uzavřené otázky" : subject === "STT" ? "STT – Uzavřené otázky" : "Vlastní – Uzavřené otázky";
-    
     return (
       <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <h1 className="title">{subjectLabel}</h1>
+        <h1 className="title">Trénink uzavřených otázek</h1>
         <div className="menuColumn">
           <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
           <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
