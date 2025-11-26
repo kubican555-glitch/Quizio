@@ -655,63 +655,49 @@ export default function App() {
   useEffect(() => {
     if (mode) return; // Only handle menus when not in a quiz mode
 
-    const handleMenuKeydown = (e) => {
-      if (!subject) {
-        // Subject selector menu - 3 buttons
-        if (["w", "W", "ArrowUp"].includes(e.key)) {
-          e.preventDefault();
-          setMenuSelection((prev) => (prev - 1 + 3) % 3);
-        } else if (["s", "S", "ArrowDown"].includes(e.key)) {
-          e.preventDefault();
-          setMenuSelection((prev) => (prev + 1) % 3);
-        }
-      } else if (subject) {
-        // Mode selection menu - 4 buttons
-        if (["w", "W", "ArrowUp"].includes(e.key)) {
-          e.preventDefault();
-          setMenuSelection((prev) => (prev - 1 + 4) % 4);
-        } else if (["s", "S", "ArrowDown"].includes(e.key)) {
-          e.preventDefault();
-          setMenuSelection((prev) => (prev + 1) % 4);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleMenuKeydown);
-    return () => window.removeEventListener("keydown", handleMenuKeydown);
-  }, [mode, subject]);
-
-  // Trigger menu button on Enter key
-  useEffect(() => {
-    if (mode) return;
-
-    const handleMenuEnter = (e) => {
-      if (e.key === "Enter") {
+    const handleMenuNav = (e) => {
+      const key = e.key.toLowerCase();
+      
+      if (key === "w" || e.key === "ArrowUp") {
         e.preventDefault();
         if (!subject) {
-          // Subject selector - trigger appropriate button
-          if (menuSelection === 0) document.querySelector(".subjectButton:nth-child(1)")?.click();
-          else if (menuSelection === 1) document.querySelector(".subjectButton:nth-child(2)")?.click();
-          else if (menuSelection === 2) document.querySelector(".uploadButton")?.click();
+          // Subject selector - 3 buttons
+          setMenuSelection((prev) => (prev - 1 + 3) % 3);
         } else {
-          // Mode menu - trigger appropriate button
-          const buttons = document.querySelectorAll(".menuColumn .menuButton");
-          buttons[menuSelection]?.click();
+          // Mode menu - 4 buttons
+          setMenuSelection((prev) => (prev - 1 + 4) % 4);
+        }
+      } else if (key === "s" || e.key === "ArrowDown") {
+        e.preventDefault();
+        if (!subject) {
+          setMenuSelection((prev) => (prev + 1) % 3);
+        } else {
+          setMenuSelection((prev) => (prev + 1) % 4);
+        }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (!subject) {
+          if (menuSelection === 0) setSubject("SPS");
+          else if (menuSelection === 1) setSubject("STT");
+          else if (menuSelection === 2) {
+            const fileInput = document.querySelector("input[type='file']");
+            fileInput?.click();
+          }
+        } else {
+          if (menuSelection === 0) startRandomMode();
+          else if (menuSelection === 1) startMockTest();
+          else if (menuSelection === 2) startTrainingMode();
+          else if (menuSelection === 3) startReviewMode();
         }
       } else if (e.key === "Backspace") {
         e.preventDefault();
-        if (subject) setSubject(null); // Go back to subject selector
+        if (subject) setSubject(null);
       }
     };
 
-    window.addEventListener("keydown", handleMenuEnter);
-    return () => window.removeEventListener("keydown", handleMenuEnter);
-  }, [mode, subject, menuSelection]);
-
-  // Reset menu selection when changing screens
-  useEffect(() => {
-    setMenuSelection(0);
-  }, [subject, mode]);
+    window.addEventListener("keydown", handleMenuNav);
+    return () => window.removeEventListener("keydown", handleMenuNav);
+  }, [mode, subject, menuSelection];
 
   /* ---------- Render ---------- */
 
@@ -720,7 +706,11 @@ export default function App() {
     if (!subject) {
       return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <SubjectSelector onSelectSubject={(subj) => setSubject(subj.toUpperCase())} onUploadFile={handleFileUpload} />
+          <SubjectSelector 
+            menuSelection={menuSelection}
+            onSelectSubject={(subj) => setSubject(subj.toUpperCase())} 
+            onUploadFile={handleFileUpload} 
+          />
         </div>
       );
     }
@@ -730,10 +720,10 @@ export default function App() {
       <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <h1 className="title">Trénink uzavřených otázek</h1>
         <div className="menuColumn">
-          <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
-          <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
-          <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
-          <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
+          <button className={`menuButton ${menuSelection === 0 ? "selected" : ""}`} onClick={startRandomMode}>Flashcards</button>
+          <button className={`menuButton ${menuSelection === 1 ? "selected" : ""}`} onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
+          <button className={`menuButton ${menuSelection === 2 ? "selected" : ""}`} onClick={startTrainingMode}>Tréninkový režim</button>
+          <button className={`menuButton ${menuSelection === 3 ? "selected" : ""}`} onClick={startReviewMode}>Prohlížení otázek</button>
         </div>
         <button className="menuBackButton" onClick={() => setSubject(null)} style={{ marginTop: "2rem" }}>Změnit předmět</button>
 

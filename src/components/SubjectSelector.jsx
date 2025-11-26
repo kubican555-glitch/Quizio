@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export function SubjectSelector({ onSelectSubject, onUploadFile }) {
+export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection = 0 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
 
@@ -87,7 +87,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile }) {
 
         <div className="subjectGrid">
           <button
-            className="subjectButton"
+            className={`subjectButton ${menuSelection === 0 ? "selected" : ""}`}
             onClick={() => onSelectSubject("sps")}
           >
             <div className="subjectIcon">📚</div>
@@ -96,7 +96,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile }) {
           </button>
 
           <button
-            className="subjectButton"
+            className={`subjectButton ${menuSelection === 1 ? "selected" : ""}`}
             onClick={() => onSelectSubject("stt")}
           >
             <div className="subjectIcon">⚙️</div>
@@ -104,7 +104,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile }) {
             <div className="subjectDesc">Strojírenská technologie</div>
           </button>
 
-          <label className="subjectButton uploadButton">
+          <label className={`subjectButton uploadButton ${menuSelection === 2 ? "selected" : ""}`}>
             <div className="subjectIcon">📤</div>
             <div className="subjectName">Vlastní soubor</div>
             <div className="subjectDesc">JSON nebo CSV</div>
