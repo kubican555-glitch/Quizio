@@ -290,29 +290,25 @@ export default function App() {
     }
   }, [currentIndex, mode]);
 
-  // auto center question card when navigating between questions
+  // auto scroll question to center when navigating between questions in mock/random
   useEffect(() => {
-    if (!mode || mode === "review" || mode === "training") return;
-    if (cardRef.current) {
-      setTimeout(() => {
-        cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 0);
-    }
+    if ((mode !== "mock" && mode !== "random") || !cardRef.current) return;
+    cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [currentIndex, mode]);
 
-  // auto focus selected answer for keyboard nav - scroll answer smoothly while keeping question visible
+  // auto scroll answer to view when selected - use 'nearest' to minimize movement
   useEffect(() => {
     if (mode !== "random" || selectedAnswer === null) return;
     const refs = optionRefsForCurrent.current?.[questionSet[currentIndex]?._localIndex] || [];
     if (refs[selectedAnswer]) {
-      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "end" });
+      refs[selectedAnswer].scrollIntoView({ behavior: "smooth", block: "nearest" });
       refs[selectedAnswer].focus();
     }
   }, [selectedAnswer, currentIndex, mode, questionSet]);
 
-  // auto scroll card for training mode (not random - answer nav handles it)
+  // auto scroll for training mode
   useEffect(() => {
-    if (!cardRef.current || mode !== "training") return;
+    if (mode !== "training" || !cardRef.current) return;
     cardRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [currentIndex, mode]);
 
