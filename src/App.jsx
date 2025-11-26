@@ -1,6 +1,9 @@
 // App.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { QUESTIONS } from "./questions";
+import { QUESTIONS_SPS } from "./questionsSPS";
+import { QUESTIONS_STT } from "./questionsSTT";
+import { SubjectSelector } from "./components/SubjectSelector";
 
 // Načtení obrázků (vite)
 const images = import.meta.glob("./images/*.png", { eager: true, as: "url" });
