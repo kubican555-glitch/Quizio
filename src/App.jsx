@@ -1,9 +1,9 @@
 // App.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { QUESTIONS } from "./questions";
-import { QUESTIONS_SPS } from "./questionsSPS";
-import { QUESTIONS_STT } from "./questionsSTT";
-// import { SubjectSelector } from "./components/SubjectSelector"; // optional
+import { QUESTIONS_SPS } from "./questionsSPS.js";
+import { QUESTIONS_STT } from "./questionsSTT.js";
+import { SubjectSelector } from "./components/SubjectSelector.jsx";
 
 // Načtení obrázků (vite)
 const images = import.meta.glob("./images/*.png", { eager: true, as: "url" });
@@ -597,88 +597,79 @@ export default function App() {
 
   /* ---------- File upload for custom questions ---------- */
 
-  const handleFileUpload = async (file) => {
-    setUploadError("");
-    if (!file) return;
-    if (!file.name.toLowerCase().endsWith(".json")) {
-      setUploadError("Podporován je pouze JSON soubor s polem otázek.");
-      return;
+  const parseCSV = (csvText) => {
+    const lines = csvText.trim().split('\n');
+    if (lines.length < 2) throw new Error("CSV soubor musí mít záhlaví a alespoň jednu otázku");
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const numberIdx = headers.indexOf('number');
+    const questionIdx = headers.indexOf('question');
+    const correctIdx = headers.indexOf('correctindex');
+
+    if (numberIdx === -1 || questionIdx === -1 || correctIdx === -1) {
+      throw new Error("CSV musí mít sloupce: number, question, correctIndex a options (option0, option1, ...)");
     }
 
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      if (!Array.isArray(parsed)) {
-        setUploadError("JSON musí být pole otázek.");
-        return;
+    const questions = [];
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(',').map(p => p.trim());
+      if (parts.length < 4) continue;
+
+      const optionHeaders = headers.filter(h => h.startsWith('option'));
+      const options = optionHeaders.map(h => parts[headers.indexOf(h)] || '').filter(o => o);
+
+      if (options.length < 2) {
+        throw new Error(`Otázka ${i} musí mít alespoň 2 možnosti odpovědi (option0, option1, ...)`);
       }
-      // basic validation: each item should have question, options (array), correctIndex (number)
-      const normalized = parsed.map((q, idx) => {
-        if (!q.options || !Array.isArray(q.options)) q.options = [];
-        return {
-          number: q.number ?? idx + 1,
-          question: q.question ?? `Otázka ${idx + 1}`,
-          options: q.options,
-          correctIndex: typeof q.correctIndex === "number" ? q.correctIndex : 0,
-        };
+
+      questions.push({
+        number: parts[numberIdx],
+        question: parts[questionIdx],
+        options: options,
+        correctIndex: parseInt(parts[correctIdx]) || 0
       });
-      setCustomQuestions(normalized);
-      setSubject("CUSTOM");
-    } catch (e) {
-      console.error(e);
-      setUploadError("Chyba při čtení nebo parsování souboru.");
     }
+
+    if (questions.length === 0) throw new Error("Žádné otázky nenalezeny v CSV souboru");
+    return questions;
+  };
+
+  const handleFileUpload = async (questions) => {
+    if (!questions || !Array.isArray(questions)) return;
+    const normalized = questions.map((q, idx) => {
+      if (!q.options || !Array.isArray(q.options)) q.options = [];
+      return {
+        number: q.number ?? idx + 1,
+        question: q.question ?? `Otázka ${idx + 1}`,
+        options: q.options,
+        correctIndex: typeof q.correctIndex === "number" ? q.correctIndex : 0,
+      };
+    });
+    setCustomQuestions(normalized);
+    setSubject("CUSTOM");
+    setUploadError("");
   };
 
   /* ---------- Render ---------- */
 
   if (!mode) {
     return (
-      <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
-        <h1 className="title">SPS – Uzavřené otázky</h1>
+      <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <SubjectSelector onSelectSubject={(subj) => setSubject(subj.toUpperCase())} onUploadFile={handleFileUpload} />
 
-        {/* --- New subject/menu bar above main menu --- */}
-        <div className="subjectSelection" style={{ marginBottom: "1rem" }}>
-          <label style={{ marginRight: "0.5rem" }}><strong>Zdroj otázek:</strong></label>
-          <select value={subject} onChange={(e) => { setSubject(e.target.value); setUploadError(""); }}>
-            <option value="SPS">SPS (z balíčku)</option>
-            <option value="STT">STT (z balíčku)</option>
-            <option value="QUESTIONS">Výchozí (QUESTIONS)</option>
-            <option value="CUSTOM">Vlastní (nahraný JSON)</option>
-          </select>
-
-          <label style={{ marginLeft: "1rem" }}>
-            Nahrát vlastní (JSON):
-            <input
-              type="file"
-              accept=".json,application/json"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                handleFileUpload(f);
-                e.target.value = null;
-              }}
-              style={{ marginLeft: "0.5rem" }}
-            />
-          </label>
-
-          {uploadError && <div style={{ color: "crimson", marginTop: "0.5rem" }}>{uploadError}</div>}
-
-          <div style={{ marginTop: "0.5rem", fontSize: "0.85rem", color: "#666" }}>
-            Poznámka: JSON musí být pole objektů (každý objekt: <em>question</em>, <em>options</em>[], <em>correctIndex</em>).
+        <div style={{ width: "100%", maxWidth: "600px", marginTop: "2rem" }}>
+          <h1 className="title">SPS – Uzavřené otázky</h1>
+          <div className="menuColumn">
+            <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
+            <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
+            <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
+            <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
           </div>
-        </div>
 
-        {/* --- Main menu --- */}
-        <div className="menuColumn">
-          <button className="menuButton" onClick={startRandomMode}>Flashcards</button>
-          <button className="menuButton" onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
-          <button className="menuButton" onClick={startTrainingMode}>Tréninkový režim</button>
-          <button className="menuButton" onClick={startReviewMode}>Prohlížení otázek</button>
-        </div>
-
-        <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
-          Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />
-          Mezerník – další/odevzdání • Backspace – odznačit / menu • Enter – potvrzení • Esc – zrušit
+          <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
+            Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />
+            Mezerník – další/odevzdání • Backspace – odznačit / menu • Enter – potvrzení • Esc – zrušit
+          </div>
         </div>
       </div>
     );
