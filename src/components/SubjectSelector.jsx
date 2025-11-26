@@ -1,8 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection = 0 }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const subjectButtonsRef = useRef([]);
+
+  // Auto-center selected subject button on screen
+  useEffect(() => {
+    if (subjectButtonsRef.current && subjectButtonsRef.current[menuSelection]) {
+      setTimeout(() => {
+        subjectButtonsRef.current[menuSelection]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+    }
+  }, [menuSelection]);
 
   const parseCSV = (csvText) => {
     const lines = csvText.trim().split('\n');
@@ -87,6 +97,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
 
         <div className="subjectGrid">
           <button
+            ref={(el) => subjectButtonsRef.current[0] = el}
             className={`subjectButton ${menuSelection === 0 ? "selected" : ""}`}
             onClick={() => onSelectSubject("sps")}
           >
@@ -96,6 +107,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
           </button>
 
           <button
+            ref={(el) => subjectButtonsRef.current[1] = el}
             className={`subjectButton ${menuSelection === 1 ? "selected" : ""}`}
             onClick={() => onSelectSubject("stt")}
           >
@@ -104,7 +116,9 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
             <div className="subjectDesc">Strojírenská technologie</div>
           </button>
 
-          <label className={`subjectButton uploadButton ${menuSelection === 2 ? "selected" : ""}`}>
+          <label 
+            ref={(el) => subjectButtonsRef.current[2] = el}
+            className={`subjectButton uploadButton ${menuSelection === 2 ? "selected" : ""}`}>
             <div className="subjectIcon">📤</div>
             <div className="subjectName">Vlastní soubor</div>
             <div className="subjectDesc">JSON nebo CSV</div>

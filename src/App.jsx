@@ -704,6 +704,15 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleMenuNav);
   }, [mode, subject, menuSelection]);
 
+  // Auto-center selected menu button on screen
+  useEffect(() => {
+    if (!mode && menuButtonsRef.current && menuButtonsRef.current[menuSelection]) {
+      setTimeout(() => {
+        menuButtonsRef.current[menuSelection]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+    }
+  }, [menuSelection, mode]);
+
   /* ---------- Render ---------- */
 
   if (!mode) {
@@ -722,13 +731,13 @@ export default function App() {
 
     // Show mode menu after subject is selected
     return (
-      <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
         <h1 className="title">Trénink uzavřených otázek</h1>
         <div className="menuColumn">
-          <button className={`menuButton ${menuSelection === 0 ? "selected" : ""}`} onClick={startRandomMode}>Flashcards</button>
-          <button className={`menuButton ${menuSelection === 1 ? "selected" : ""}`} onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
-          <button className={`menuButton ${menuSelection === 2 ? "selected" : ""}`} onClick={startTrainingMode}>Tréninkový režim</button>
-          <button className={`menuButton ${menuSelection === 3 ? "selected" : ""}`} onClick={startReviewMode}>Prohlížení otázek</button>
+          <button ref={(el) => menuButtonsRef.current[0] = el} className={`menuButton ${menuSelection === 0 ? "selected" : ""}`} onClick={startRandomMode}>Flashcards</button>
+          <button ref={(el) => menuButtonsRef.current[1] = el} className={`menuButton ${menuSelection === 1 ? "selected" : ""}`} onClick={startMockTest}>Test nanečisto (40 otázek, 30 min)</button>
+          <button ref={(el) => menuButtonsRef.current[2] = el} className={`menuButton ${menuSelection === 2 ? "selected" : ""}`} onClick={startTrainingMode}>Tréninkový režim</button>
+          <button ref={(el) => menuButtonsRef.current[3] = el} className={`menuButton ${menuSelection === 3 ? "selected" : ""}`} onClick={startReviewMode}>Prohlížení otázek</button>
         </div>
         <button className="menuBackButton" onClick={() => setSubject(null)} style={{ marginTop: "2rem" }}>Změnit předmět</button>
 
