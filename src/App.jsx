@@ -530,6 +530,10 @@ export default function App() {
     const currentQ = questionSet[currentIndex];
     if (!currentQ) return;
     const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
+    
+    // Only count score if this question hasn't been answered yet
+    const hasNotBeenAnswered = currentQ.userAnswer === undefined;
+    
     setQuestionSet((prev) => {
       const copy = [...prev];
       const q = { ...copy[currentIndex] };
@@ -538,10 +542,24 @@ export default function App() {
       return copy;
     });
     setShowResult(true);
+    
+    // Increment score only if this is the first time answering
+    if (hasNotBeenAnswered && answerToSave !== -1) {
+      setScore((s) => {
+        let correct = s.correct;
+        let total = s.total;
+        if (answerToSave === currentQ.correctIndex) correct += 1;
+        total += 1;
+        return { correct, total };
+      });
+    } else if (hasNotBeenAnswered && answerToSave === -1) {
+      // Also count unanswered questions
+      setScore((s) => ({ ...s, total: s.total + 1 }));
+    }
+    
     if (selectedAnswer === null) {
       setSelectedAnswer(-1);
     }
-    // Score is already incremented in clickRandomAnswer, don't double count
   };
 
   const handleAnswer = (idx) => {
