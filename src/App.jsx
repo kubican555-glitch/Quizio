@@ -407,8 +407,15 @@ export default function App() {
         }
       }
 
-      // --- RIGHT / D / ENTER ---
-      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
+      // --- ENTER - Handle modals or navigation ---
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (showConfirmSubmit) submitTest();
+        else if (showConfirmExit) confirmExit();
+      }
+
+      // --- RIGHT / D ---
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
         if (mode === "random" && showResult) {
           nextRandomQuestion();
         } 
@@ -416,7 +423,7 @@ export default function App() {
           if (selectedAnswer !== null) confirmRandomAnswer();
         } 
         else {
-          // Mock / Training / Review - Enter funguje jako Next
+          // Mock / Training / Review - go to next
           const newIdx = currentIndex + 1;
           moveToQuestion(newIdx);
         }
