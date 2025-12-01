@@ -531,9 +531,6 @@ export default function App() {
     if (!currentQ) return;
     const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
     
-    // Only count score if this question hasn't been answered yet
-    const hasNotBeenAnswered = currentQ.userAnswer === undefined;
-    
     setQuestionSet((prev) => {
       const copy = [...prev];
       const q = { ...copy[currentIndex] };
@@ -543,8 +540,8 @@ export default function App() {
     });
     setShowResult(true);
     
-    // Increment score only if this is the first time answering
-    if (hasNotBeenAnswered && answerToSave !== -1) {
+    // Always count every answer, even repeated questions
+    if (answerToSave !== -1) {
       setScore((s) => {
         let correct = s.correct;
         let total = s.total;
@@ -552,8 +549,8 @@ export default function App() {
         total += 1;
         return { correct, total };
       });
-    } else if (hasNotBeenAnswered && answerToSave === -1) {
-      // Also count unanswered questions
+    } else {
+      // Count unanswered attempts
       setScore((s) => ({ ...s, total: s.total + 1 }));
     }
     
