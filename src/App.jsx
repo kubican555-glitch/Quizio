@@ -665,12 +665,12 @@ export default function App() {
       if (key === "w" || e.key === "ArrowUp") {
         e.preventDefault();
         setIsKeyboardMode(true);
-        if (!subject) setMenuSelection((prev) => (prev - 1 + 3) % 3);
+        if (!subject) setMenuSelection((prev) => prev === -1 ? 2 : (prev - 1 + 3) % 3);
         else setMenuSelection((prev) => (prev - 1 + 4) % 4);
       } else if (key === "s" || e.key === "ArrowDown") {
         e.preventDefault();
         setIsKeyboardMode(true);
-        if (!subject) setMenuSelection((prev) => (prev + 1) % 3);
+        if (!subject) setMenuSelection((prev) => prev === -1 ? 0 : (prev + 1) % 3);
         else setMenuSelection((prev) => (prev + 1) % 4);
       } else if (key === "d" || e.key === "ArrowRight" || e.key === "Enter") {
         e.preventDefault();
@@ -696,7 +696,10 @@ export default function App() {
         }
       } else if (key === "a" || e.key === "ArrowLeft" || e.key === "Backspace") {
         e.preventDefault();
-        if (subject) setSubject(null);
+        if (subject) {
+          setSubject(null);
+          setMenuSelection(-1);
+        }
       }
     };
 
