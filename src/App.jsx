@@ -723,9 +723,13 @@ export default function App() {
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <SubjectSelector 
             menuSelection={menuSelection}
-            onSelectSubject={(subj) => setSubject(subj.toUpperCase())} 
+            onSelectSubject={(subj) => {
+              setIsKeyboardMode(false);
+              setSubject(subj.toUpperCase());
+            }} 
             onUploadFile={handleFileUpload} 
-            isKeyboardMode={isKeyboardMode} // NOVÉ
+            isKeyboardMode={isKeyboardMode}
+            setIsKeyboardMode={setIsKeyboardMode}
           />
         </div>
       );

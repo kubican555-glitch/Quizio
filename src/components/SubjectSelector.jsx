@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection = 0 }) {
+export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection = 0, isKeyboardMode = false, setIsKeyboardMode = () => {} }) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const subjectButtonsRef = useRef([]);
@@ -98,8 +98,11 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
         <div className="subjectGrid">
           <button
             ref={(el) => subjectButtonsRef.current[0] = el}
-            className={`subjectButton ${menuSelection === 0 ? "selected" : ""}`}
-            onClick={() => onSelectSubject("sps")}
+            className={`subjectButton ${menuSelection === 0 && isKeyboardMode ? "selected" : ""}`}
+            onClick={() => {
+              setIsKeyboardMode(false);
+              onSelectSubject("sps");
+            }}
           >
             <div className="subjectIcon">📚</div>
             <div className="subjectName">SPS</div>
@@ -108,8 +111,11 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
 
           <button
             ref={(el) => subjectButtonsRef.current[1] = el}
-            className={`subjectButton ${menuSelection === 1 ? "selected" : ""}`}
-            onClick={() => onSelectSubject("stt")}
+            className={`subjectButton ${menuSelection === 1 && isKeyboardMode ? "selected" : ""}`}
+            onClick={() => {
+              setIsKeyboardMode(false);
+              onSelectSubject("stt");
+            }}
           >
             <div className="subjectIcon">⚙️</div>
             <div className="subjectName">STT</div>
@@ -118,7 +124,8 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
 
           <label 
             ref={(el) => subjectButtonsRef.current[2] = el}
-            className={`subjectButton uploadButton ${menuSelection === 2 ? "selected" : ""}`}>
+            className={`subjectButton uploadButton ${menuSelection === 2 && isKeyboardMode ? "selected" : ""}`}
+            onClick={() => setIsKeyboardMode(false)}>
             <div className="subjectIcon">📤</div>
             <div className="subjectName">Vlastní soubor</div>
             <div className="subjectDesc">JSON nebo CSV</div>
