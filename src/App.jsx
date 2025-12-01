@@ -526,7 +526,7 @@ export default function App() {
   };
 
   const confirmRandomAnswer = () => {
-    if (finished || mode !== "random") return;
+    if (finished || mode !== "random" || showResult) return;
     const currentQ = questionSet[currentIndex];
     if (!currentQ) return;
     const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
@@ -538,17 +538,10 @@ export default function App() {
       return copy;
     });
     setShowResult(true);
-    if (selectedAnswer !== null) {
-      setScore((s) => {
-        let correct = s.correct;
-        let total = s.total;
-        if (selectedAnswer === currentQ.correctIndex) correct += 1;
-        total += 1;
-        return { correct, total };
-      });
-    } else {
+    if (selectedAnswer === null) {
       setSelectedAnswer(-1);
     }
+    // Score is already incremented in clickRandomAnswer, don't double count
   };
 
   const handleAnswer = (idx) => {
