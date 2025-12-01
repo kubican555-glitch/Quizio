@@ -407,15 +407,8 @@ export default function App() {
         }
       }
 
-      // --- ENTER - Handle modals or navigation ---
-      if (e.key === "Enter") {
-        e.preventDefault();
-        if (showConfirmSubmit) submitTest();
-        else if (showConfirmExit) confirmExit();
-      }
-
-      // --- RIGHT / D ---
-      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
+      // --- RIGHT / D / ENTER ---
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
         if (mode === "random" && showResult) {
           nextRandomQuestion();
         } 
