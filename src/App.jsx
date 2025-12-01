@@ -407,8 +407,8 @@ export default function App() {
         }
       }
 
-      // --- RIGHT / D / ENTER ---
-      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
+      // --- RIGHT / D ---
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
         if (mode === "random" && showResult) {
           nextRandomQuestion();
         } 
@@ -416,7 +416,7 @@ export default function App() {
           if (selectedAnswer !== null) confirmRandomAnswer();
         } 
         else {
-          // Mock / Training / Review - Enter funguje jako Next
+          // Mock / Training / Review - go to next
           const newIdx = currentIndex + 1;
           moveToQuestion(newIdx);
         }
@@ -429,9 +429,13 @@ export default function App() {
         else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
       }
 
-      if (e.key === "Backspace") {
-        if (curQ.userAnswer !== undefined && mode !== "random") clearAnswer();
-        else tryReturnToMenu();
+      // --- ENTER / BACKSPACE - Exit test ---
+      if (e.key === "Enter" || e.key === "Backspace") {
+        if (e.key === "Backspace" && curQ.userAnswer !== undefined && mode !== "random") {
+          clearAnswer();
+        } else {
+          tryReturnToMenu();
+        }
       }
 
       if (e.key === "Escape") {
