@@ -347,40 +347,12 @@ body {
   overflow-wrap: break-word;
 }
 
-/* === OTÁZKA + OBRÁZEK (STICKY HEADER) === */
+/* === OTÁZKA + OBRÁZEK === */
 .questionHeader {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-
-  /* NOVÉ: Sticky positioning */
-  position: sticky;
-  top: 0;
-  z-index: 20; /* Aby byl nad odpověďmi */
-  background: rgba(30, 41, 59, 0.98); /* Neprůhledné pozadí */
-  backdrop-filter: blur(15px);
-
-  /* Kompenzace paddingu karty, aby sticky header šel od kraje ke kraji */
-  margin-top: -1.2rem; /* Odpovídá hornímu paddingu .card (mobil) */
-  margin-left: -1.2rem;
-  margin-right: -1.2rem;
-  padding: 1.2rem;
-  padding-bottom: 1.5rem;
-
-  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-  border-radius: 24px 24px 0 0;
-  transition: all 0.3s ease;
-}
-
-/* Úprava marginů pro desktop, aby seděly s clamp paddingem karty */
-@media (min-width: 481px) {
-  .questionHeader {
-    margin-top: -1.8rem; 
-    margin-left: -1.8rem;
-    margin-right: -1.8rem;
-    padding: 1.8rem;
-    padding-bottom: 1.5rem;
-  }
+  margin-bottom: 1.2rem;
 }
 
 .questionText {
