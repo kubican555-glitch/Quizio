@@ -222,7 +222,7 @@ export default function App() {
   const [subject, setSubject] = useState(null); 
   const [customQuestions, setCustomQuestions] = useState(null); 
   const [activeQuestionsCache, setActiveQuestionsCache] = useState(null); 
-  const [menuSelection, setMenuSelection] = useState(-1); 
+  const [menuSelection, setMenuSelection] = useState(0); 
   const menuButtonsRef = useRef([]);
 
   const [mode, setMode] = useState(null); 
@@ -407,8 +407,8 @@ export default function App() {
         }
       }
 
-      // --- RIGHT / D ---
-      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight") {
+      // --- RIGHT / D / ENTER ---
+      if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
         if (mode === "random" && showResult) {
           nextRandomQuestion();
         } 
@@ -416,7 +416,7 @@ export default function App() {
           if (selectedAnswer !== null) confirmRandomAnswer();
         } 
         else {
-          // Mock / Training / Review - go to next
+          // Mock / Training / Review - Enter funguje jako Next
           const newIdx = currentIndex + 1;
           moveToQuestion(newIdx);
         }
@@ -429,13 +429,9 @@ export default function App() {
         else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
       }
 
-      // --- ENTER / BACKSPACE - Exit test ---
-      if (e.key === "Enter" || e.key === "Backspace") {
-        if (e.key === "Backspace" && curQ.userAnswer !== undefined && mode !== "random") {
-          clearAnswer();
-        } else {
-          tryReturnToMenu();
-        }
+      if (e.key === "Backspace") {
+        if (curQ.userAnswer !== undefined && mode !== "random") clearAnswer();
+        else tryReturnToMenu();
       }
 
       if (e.key === "Escape") {
@@ -669,12 +665,12 @@ export default function App() {
       if (key === "w" || e.key === "ArrowUp") {
         e.preventDefault();
         setIsKeyboardMode(true);
-        if (!subject) setMenuSelection((prev) => prev === -1 ? 2 : (prev - 1 + 3) % 3);
+        if (!subject) setMenuSelection((prev) => (prev - 1 + 3) % 3);
         else setMenuSelection((prev) => (prev - 1 + 4) % 4);
       } else if (key === "s" || e.key === "ArrowDown") {
         e.preventDefault();
         setIsKeyboardMode(true);
-        if (!subject) setMenuSelection((prev) => prev === -1 ? 0 : (prev + 1) % 3);
+        if (!subject) setMenuSelection((prev) => (prev + 1) % 3);
         else setMenuSelection((prev) => (prev + 1) % 4);
       } else if (key === "d" || e.key === "ArrowRight" || e.key === "Enter") {
         e.preventDefault();
@@ -700,10 +696,7 @@ export default function App() {
         }
       } else if (key === "a" || e.key === "ArrowLeft" || e.key === "Backspace") {
         e.preventDefault();
-        if (subject) {
-          setSubject(null);
-          setMenuSelection(-1);
-        }
+        if (subject) setSubject(null);
       }
     };
 
@@ -727,13 +720,9 @@ export default function App() {
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <SubjectSelector 
             menuSelection={menuSelection}
-            onSelectSubject={(subj) => {
-              setIsKeyboardMode(false);
-              setSubject(subj.toUpperCase());
-            }} 
+            onSelectSubject={(subj) => setSubject(subj.toUpperCase())} 
             onUploadFile={handleFileUpload} 
-            isKeyboardMode={isKeyboardMode}
-            setIsKeyboardMode={setIsKeyboardMode}
+            isKeyboardMode={isKeyboardMode} // NOVÉ
           />
         </div>
       );
