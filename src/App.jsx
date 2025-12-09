@@ -2,16 +2,51 @@ import React, { useState, useEffect, useRef } from "react";
 import { QUESTIONS } from "./questions";
 import { QUESTIONS_SPS } from "./questionsSPS.js";
 import { QUESTIONS_STT } from "./questionsSTT.js";
-// Ujistěte se, že cesta odpovídá vaší struktuře
 import { SubjectSelector } from "./components/SubjectSelector.jsx";
 
-// Načtení obrázků (vite)
-const images = import.meta.glob("./images/*.png", { eager: true, as: "url" });
-const IMAGES = {};
-for (const path in images) {
-  const fileName = path.match(/\/(\d+)\.png$/)?.[1];
-  if (fileName) IMAGES[fileName] = images[path];
+// ----------------------------------------------------------------------
+// Načtení obrázků pro SPS (ze složky images_sps, např. ./images_sps/1.png)
+const images_sps = import.meta.glob("./images_sps/*.png", { eager: true, as: "url" });
+// Načtení obrázků pro STT (ze složky images_stt)
+const images_stt = import.meta.glob("./images_stt/*.png", { eager: true, as: "url" });
+// Načtení obrázků pro CUSTOM (ponecháme původní složku images)
+const images_custom = import.meta.glob("./images/*.png", { eager: true, as: "url" });
+
+// Vytvoření mapy pro snadné vyhledávání
+const allImagesMap = {
+  SPS: images_sps,
+  STT: images_stt,
+  CUSTOM: images_custom,
+  DEFAULT: images_custom, // Pro případ, že subject je "DEFAULT"
+  QUESTIONS: images_custom, // Pro případ, že subject je "QUESTIONS"
+};
+// ----------------------------------------------------------------------
+
+/* ---------- Utilities ---------- */
+
+function formatTime(s) {
+  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 }
+
+const getImageUrl = (subject, questionNumber) => {
+  // Zajištění, že máme platný subject a číslo
+  const effectiveSubject = subject && allImagesMap[subject] ? subject : 'DEFAULT';
+  const numStr = String(questionNumber);
+
+  // Sestavení cesty na základě subjectu
+  let pathPrefix;
+  if (effectiveSubject === 'SPS') {
+    pathPrefix = './images_sps/';
+  } else if (effectiveSubject === 'STT') {
+    pathPrefix = './images_stt/';
+  } else {
+    // CUSTOM, DEFAULT, QUESTIONS
+    pathPrefix = './images/';
+  }
+
+  const imagePath = `${pathPrefix}${numStr}.png`;
+  return allImagesMap[effectiveSubject]?.[imagePath] || null;
+};
 
 /* ---------- Small components ---------- */
 
@@ -30,7 +65,7 @@ function ConfirmModal({ title, message, onCancel, onConfirm, confirmText = "Ano,
   );
 }
 
-function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, onBack }) {
+function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, onBack, currentSubject }) {
   const list = mode === "training" ? questionSet.slice(0, maxSeenIndex + 1) : questionSet;
   return (
     <div className="resultScreen fadeIn">
@@ -40,16 +75,19 @@ function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, on
       {mode === "training" && <p className="timeSpent">Čas: {formatTime(trainingTime)}</p>}
 
       <div className="reviewList">
-        {list.map((q, i) => (
-          <div key={i} className={`reviewQuestion ${q.userAnswer === q.correctIndex ? "correct" : q.userAnswer !== undefined ? "wrong" : "unanswered"}`}>
-            <strong>{i + 1}. {q.question}</strong>
-            {IMAGES[q.number] && <img src={IMAGES[q.number]} alt="" className="questionImage small" onClick={() => window.open(IMAGES[q.number], "_blank")} />}
-            <div><strong>Správná odpověď:</strong> {q.options[q.correctIndex]}</div>
-            {q.userAnswer !== undefined && (
-              <div><strong>Tvá odpověď:</strong> {q.options[q.userAnswer]} {q.userAnswer === q.correctIndex ? "(správně)" : "(špatně)"}</div>
-            )}
-          </div>
-        ))}
+        {list.map((q, i) => {
+          const imageUrl = getImageUrl(currentSubject, q.number); 
+          return (
+            <div key={i} className={`reviewQuestion ${q.userAnswer === q.correctIndex ? "correct" : q.userAnswer !== undefined ? "wrong" : "unanswered"}`}>
+              <strong>{i + 1}. {q.question}</strong>
+              {imageUrl && <img src={imageUrl} alt="" className="questionImage small" onClick={() => window.open(imageUrl, "_blank")} />}
+              <div><strong>Správná odpověď:</strong> {q.options[q.correctIndex]}</div>
+              {q.userAnswer !== undefined && (
+                <div><strong>Tvá odpověď:</strong> {q.options[q.userAnswer]} {q.userAnswer === q.correctIndex ? "(správně)" : "(špatně)"}</div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <button className="navButton primary" style={{ marginTop: "2rem" }} onClick={onBack}>Zpět do menu</button>
@@ -143,10 +181,12 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
   );
 }
 
-function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled, isKeyboardMode }) {
+function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled, isKeyboardMode, currentSubject }) {
   if (!currentQuestion || !currentQuestion.options) {
     return <div>Načítání otázky...</div>;
   }
+
+  const imageUrl = getImageUrl(currentSubject, currentQuestion.number); 
 
   return (
     <div>
@@ -155,9 +195,9 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
           {mode === "random" && `#${currentQuestion.number} `}
           {currentQuestion.question}
         </h2>
-        {IMAGES[currentQuestion.number] && (
+        {imageUrl && (
           <div className="imageWrapper">
-            <img src={IMAGES[currentQuestion.number]} alt="Otázka" className="questionImage" onClick={() => window.open(IMAGES[currentQuestion.number], "_blank")} />
+            <img src={imageUrl} alt="Otázka" className="questionImage" onClick={() => window.open(imageUrl, "_blank")} />
             <div className="fullscreenHint">Klikni pro zvětšení</div>
           </div>
         )}
@@ -170,20 +210,18 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
           if (mode === "random" && showResult) {
             if (i === currentQuestion.correctIndex) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e", color: "#ecfdf5" };
             if (selectedAnswer === i && i !== currentQuestion.correctIndex) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444", color: "#fee2e2" };
-          } 
+          }
           else if (mode === "random" && !showResult) {
-             // Random mód - zvýraznění kurzorem jen pokud je aktivní klávesnice
-             if (selectedAnswer === i && isKeyboardMode) {
-               style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa", outline: "2px solid #60a5fa" };
-             }
-          } 
+            // Random mód - zvýraznění kurzorem jen pokud je aktivní klávesnice
+            if (selectedAnswer === i && isKeyboardMode) {
+              style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa", outline: "2px solid #60a5fa" };
+            }
+          }
           else if ((mode === "mock" || mode === "training")) {
-             // Mock/Training - zobrazení odpovědi, kterou uživatel vybral
-             // Pro navigaci (kurzor) by zde taky mohlo být isKeyboardMode, 
-             // ale v těchto módech se odpověď hned označí, takže to necháme takto.
-             if (currentQuestion.userAnswer === i) {
-                style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
-             }
+            // Mock/Training - zobrazení odpovědi, kterou uživatel vybral
+            if (currentQuestion.userAnswer === i) {
+              style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
+            }
           }
 
           return (
@@ -210,26 +248,21 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
   );
 }
 
-/* ---------- Utilities ---------- */
-
-function formatTime(s) {
-  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
-}
 
 /* ---------- Main App ---------- */
 
 export default function App() {
-  const [subject, setSubject] = useState(null); 
-  const [customQuestions, setCustomQuestions] = useState(null); 
-  const [activeQuestionsCache, setActiveQuestionsCache] = useState(null); 
-  const [menuSelection, setMenuSelection] = useState(0); 
+  const [subject, setSubject] = useState(null);
+  const [customQuestions, setCustomQuestions] = useState(null);
+  const [activeQuestionsCache, setActiveQuestionsCache] = useState(null);
+  const [menuSelection, setMenuSelection] = useState(0);
   const menuButtonsRef = useRef([]);
 
-  const [mode, setMode] = useState(null); 
+  const [mode, setMode] = useState(null);
   const [questionSet, setQuestionSet] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const [selectedAnswer, setSelectedAnswer] = useState(null); 
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
 
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
@@ -277,7 +310,6 @@ export default function App() {
   // --- GLOBAL MOUSE & KEYBOARD DETECTION ---
   useEffect(() => {
     const handleMouseMove = (e) => {
-      // Ignorovat, pokud se myš nepohnula (některé prohlížeče střílí event při kliku)
       if (Math.abs(e.movementX) > 0 || Math.abs(e.movementY) > 0) {
         if (isKeyboardMode) {
           setIsKeyboardMode(false);
@@ -327,16 +359,16 @@ export default function App() {
     if (selectedBtn && cardRef.current) {
       setTimeout(() => {
         const btnRect = selectedBtn.getBoundingClientRect();
-        const headerOffset = 150; 
+        const headerOffset = 150;
 
         if (btnRect.bottom > window.innerHeight) {
           selectedBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
         }
         else if (btnRect.top < headerOffset) {
-           const scrollAmount = window.scrollY + btnRect.top - headerOffset - 20;
-           window.scrollTo({ top: scrollAmount, behavior: "smooth" });
+          const scrollAmount = window.scrollY + btnRect.top - headerOffset - 20;
+          window.scrollTo({ top: scrollAmount, behavior: "smooth" });
         }
-        selectedBtn.focus({ preventScroll: true }); 
+        selectedBtn.focus({ preventScroll: true });
       }, 50);
     }
   }, [selectedAnswer, currentIndex, mode, questionSet, isKeyboardMode]);
@@ -373,7 +405,7 @@ export default function App() {
       const opts = curQ.options.length;
 
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
-         e.preventDefault();
+        e.preventDefault();
       }
 
       // --- UP / W ---
@@ -411,10 +443,10 @@ export default function App() {
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
         if (mode === "random" && showResult) {
           nextRandomQuestion();
-        } 
+        }
         else if (mode === "random" && !showResult) {
           if (selectedAnswer !== null) confirmRandomAnswer();
-        } 
+        }
         else {
           // Mock / Training / Review - go to next
           const newIdx = currentIndex + 1;
@@ -530,7 +562,7 @@ export default function App() {
     const currentQ = questionSet[currentIndex];
     if (!currentQ) return;
     const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
-    
+
     setQuestionSet((prev) => {
       const copy = [...prev];
       const q = { ...copy[currentIndex] };
@@ -539,7 +571,7 @@ export default function App() {
       return copy;
     });
     setShowResult(true);
-    
+
     // Always count every answer, even repeated questions
     if (answerToSave !== -1) {
       setScore((s) => {
@@ -553,7 +585,7 @@ export default function App() {
       // Count unanswered attempts
       setScore((s) => ({ ...s, total: s.total + 1 }));
     }
-    
+
     if (selectedAnswer === null) {
       setSelectedAnswer(-1);
     }
@@ -641,13 +673,6 @@ export default function App() {
     setIsKeyboardMode(false);
   };
 
-  const parseCSV = (csvText) => {
-    // Basic CSV parser placeholder logic
-    // Replace with real parsing logic
-    const lines = csvText.trim().split('\n');
-    return lines.map((l, i) => ({ number: i, question: l, options: ["A", "B"], correctIndex: 0 }));
-  };
-
   const handleFileUpload = async (questions) => {
     if (!questions || !Array.isArray(questions)) return;
     const normalized = questions.map((q, idx) => {
@@ -675,26 +700,21 @@ export default function App() {
         setIsKeyboardMode(true);
         if (!subject) setMenuSelection((prev) => (prev - 1 + 3) % 3);
         else setMenuSelection((prev) => (prev - 1 + 4) % 4);
-      } else if (key === "s" || e.key === "ArrowDown") {
+      } else if (key === "s" || e.key === "S" || e.key === "ArrowDown") {
         e.preventDefault();
         setIsKeyboardMode(true);
         if (!subject) setMenuSelection((prev) => (prev + 1) % 3);
         else setMenuSelection((prev) => (prev + 1) % 4);
-      } else if (key === "d" || e.key === "ArrowRight" || e.key === "Enter") {
+      } else if (key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
         e.preventDefault();
         setIsKeyboardMode(true);
 
-        // Handling Enter/Right Arrow
         if (!subject) {
           if (menuSelection === 0) setSubject("SPS");
           else if (menuSelection === 1) setSubject("STT");
           else if (menuSelection === 2) {
-             // Pokud máme input ve SubjectSelectoru, musíme ho odpálit tam
-             // nebo přes document query, ale zde je selector unmounted,
-             // takže to řeší button click v SubjectSelectoru.
-             // Pro klávesnici zde můžeme zkusit najít input:
-             const fileInput = document.querySelector("input[type='file']");
-             fileInput?.click();
+            const fileInput = document.querySelector("input[type='file']");
+            fileInput?.click();
           }
         } else {
           if (menuSelection === 0) startRandomMode();
@@ -702,7 +722,7 @@ export default function App() {
           else if (menuSelection === 2) startTrainingMode();
           else if (menuSelection === 3) startReviewMode();
         }
-      } else if (key === "a" || e.key === "ArrowLeft" || e.key === "Backspace") {
+      } else if (key === "a" || e.key === "A" || e.key === "ArrowLeft" || e.key === "Backspace") {
         e.preventDefault();
         if (subject) setSubject(null);
       }
@@ -726,11 +746,11 @@ export default function App() {
     if (!subject) {
       return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <SubjectSelector 
+          <SubjectSelector
             menuSelection={menuSelection}
-            onSelectSubject={(subj) => setSubject(subj.toUpperCase())} 
-            onUploadFile={handleFileUpload} 
-            isKeyboardMode={isKeyboardMode} // NOVÉ
+            onSelectSubject={(subj) => setSubject(subj.toUpperCase())}
+            onUploadFile={handleFileUpload}
+            isKeyboardMode={isKeyboardMode}
           />
         </div>
       );
@@ -762,13 +782,16 @@ export default function App() {
         <h1 className="title">Prohlížení otázek ({subject === "CUSTOM" ? "Vlastní" : subject})</h1>
         <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
         <div className="reviewGrid">
-          {questionSet.map((q) => (
-            <div key={q.number} className="reviewCard">
-              <div className="reviewHeader"><strong>#{q.number}.</strong> {q.question}</div>
-              {IMAGES[q.number] && <img src={IMAGES[q.number]} alt="" className="reviewImage" onClick={() => window.open(IMAGES[q.number], "_blank")} />}
-              <div className="reviewAnswer"><strong>Správná:</strong> <span className="correctText">{q.options[q.correctIndex]}</span></div>
-            </div>
-          ))}
+          {questionSet.map((q) => {
+            const imageUrl = getImageUrl(subject, q.number); 
+            return (
+              <div key={q.number} className="reviewCard">
+                <div className="reviewHeader"><strong>#{q.number}.</strong> {q.question}</div>
+                {imageUrl && <img src={imageUrl} alt="" className="reviewImage" onClick={() => window.open(imageUrl, "_blank")} />}
+                <div className="reviewAnswer"><strong>Správná:</strong> <span className="correctText">{q.options[q.correctIndex]}</span></div>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -778,6 +801,20 @@ export default function App() {
 
   return (
     <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
+      {showConfirmSubmit && <ConfirmModal title={mode === "training" ? "Ukončit trénink?" : "Odevzdat test?"} message="Jste si jisti, že chcete předčasně odevzdat?" onCancel={cancelSubmit} onConfirm={submitTest} confirmText={mode === "training" ? "Vyhodnotit" : "Odevzdat"} />}
+      {showConfirmExit && <ConfirmModal title="Ukončit režim?" message="Ztracené odpovědi v Mock testu nebo progres v tréninku nebudou uloženy." onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Opravdu ukončit" />}
+      {finished && (
+        <ResultScreen
+          mode={mode}
+          score={score}
+          trainingTime={trainingTime}
+          questionSet={questionSet}
+          maxSeenIndex={maxSeenIndex}
+          onBack={resetToMenu}
+          currentSubject={subject} // Předáváme subject do ResultScreen
+        />
+      )}
+
       <div className="stickyHeader">
         <div className="topBarRight">
           <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
@@ -800,15 +837,16 @@ export default function App() {
       <div className="card" ref={cardRef}>
         {!finished ? (
           <>
-            <QuestionCard 
-              currentQuestion={currentQuestion} 
-              mode={mode} 
-              showResult={showResult} 
-              selectedAnswer={selectedAnswer} 
-              onSelect={(i) => mode === "random" ? clickRandomAnswer(i) : handleAnswer(i)} 
-              optionRefsForCurrent={optionRefsForCurrent} 
+            <QuestionCard
+              currentQuestion={currentQuestion}
+              mode={mode}
+              showResult={showResult}
+              selectedAnswer={selectedAnswer}
+              onSelect={(i) => mode === "random" ? clickRandomAnswer(i) : handleAnswer(i)}
+              optionRefsForCurrent={optionRefsForCurrent}
               disabled={mode === "random" && showResult}
               isKeyboardMode={isKeyboardMode}
+              currentSubject={subject} // Předáváme subject do QuestionCard
             />
 
             {mode === "random" && !showResult && (
@@ -833,34 +871,27 @@ export default function App() {
                   <button className="navButton" onClick={() => {
                     const newIdx = currentIndex + 1;
                     moveToQuestion(newIdx);
-                  }} disabled={currentIndex === questionSet.length - 1}>Další</button>
+                  }} disabled={currentIndex >= questionSet.length - 1}>Další</button>
                 </div>
-
-                <div className="navigatorWrapper" ref={scrollRef}>
-                  <Navigator questionSet={questionSet} currentIndex={currentIndex} setCurrentIndex={moveToQuestion} mode={mode} maxSeenIndex={maxSeenIndex} />
+                <div className="navigatorPlaceholder">
+                  <Navigator
+                    questionSet={questionSet}
+                    currentIndex={currentIndex}
+                    setCurrentIndex={moveToQuestion}
+                    mode={mode}
+                    maxSeenIndex={maxSeenIndex}
+                  />
                 </div>
               </>
             )}
           </>
-        ) : (
-          <ResultScreen mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} onBack={resetToMenu} />
-        )}
+        ) : null}
       </div>
 
-      {fullscreenImage && (
-        <div className="fullscreenOverlay" onClick={() => setFullscreenImage(null)}>
-          <img src={fullscreenImage} alt="Fullscreen" className="fullscreenImage" />
-          <button className="closeFullscreen" onClick={() => setFullscreenImage(null)}>×</button>
-        </div>
-      )}
+      <div className="footer">
+        {/* Případný kód patičky */}
+      </div>
 
-      {showConfirmSubmit && (
-        <ConfirmModal title={`Opravdu chceš ${mode === "mock" ? "odevzdat test" : "vyhodnotit otázky"}?`} message={`Tato akce je nevratná.`} onCancel={cancelSubmit} onConfirm={submitTest} />
-      )}
-
-      {showConfirmExit && (
-        <ConfirmModal title={`Opravdu chceš opustit test?`} message={`Všechen pokrok bude ztracen.`} onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Opustit" cancelText="Zůstat" />
-      )}
     </div>
   );
 }
