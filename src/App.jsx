@@ -5,11 +5,10 @@ import { QUESTIONS_STT } from "./questionsSTT.js";
 import { SubjectSelector } from "./components/SubjectSelector.jsx";
 
 // ----------------------------------------------------------------------
-// Načtení obrázků pro SPS (ze složky images_sps, např. ./images_sps/1.png)
+// Importy obrázků: Vracíme se k relativním cestám, aby se správně mapovaly.
+// Návratová hodnota je klíčem, který se používá pro vyhledávání (např. "./images_sps/1.png").
 const images_sps = import.meta.glob("./images_sps/*.png", { eager: true, as: "url" });
-// Načtení obrázků pro STT (ze složky images_stt)
 const images_stt = import.meta.glob("./images_stt/*.png", { eager: true, as: "url" });
-// Načtení obrázků pro CUSTOM (ponecháme původní složku images)
 const images_custom = import.meta.glob("./images/*.png", { eager: true, as: "url" });
 
 // Vytvoření mapy pro snadné vyhledávání
@@ -17,8 +16,8 @@ const allImagesMap = {
   SPS: images_sps,
   STT: images_stt,
   CUSTOM: images_custom,
-  DEFAULT: images_custom, // Pro případ, že subject je "DEFAULT"
-  QUESTIONS: images_custom, // Pro případ, že subject je "QUESTIONS"
+  DEFAULT: images_custom, 
+  QUESTIONS: images_custom, 
 };
 // ----------------------------------------------------------------------
 
@@ -28,12 +27,12 @@ function formatTime(s) {
   return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 }
 
+// ÚPRAVA: Zajištění, že sestavená cesta PŘESNĚ odpovídá klíči v allImagesMap
 const getImageUrl = (subject, questionNumber) => {
-  // Zajištění, že máme platný subject a číslo
+  // 1. Určení efektivního subjektu a prefixu pro vyhledávání
   const effectiveSubject = subject && allImagesMap[subject] ? subject : 'DEFAULT';
   const numStr = String(questionNumber);
 
-  // Sestavení cesty na základě subjectu
   let pathPrefix;
   if (effectiveSubject === 'SPS') {
     pathPrefix = './images_sps/';
@@ -44,8 +43,11 @@ const getImageUrl = (subject, questionNumber) => {
     pathPrefix = './images/';
   }
 
-  const imagePath = `${pathPrefix}${numStr}.png`;
-  return allImagesMap[effectiveSubject]?.[imagePath] || null;
+  // 2. Sestavení KLÍČE, který musí být v allImagesMap
+  const imageKey = `${pathPrefix}${numStr}.png`;
+
+  // 3. Vrácení URL z mapy
+  return allImagesMap[effectiveSubject]?.[imageKey] || null;
 };
 
 /* ---------- Small components ---------- */
@@ -811,7 +813,7 @@ export default function App() {
           questionSet={questionSet}
           maxSeenIndex={maxSeenIndex}
           onBack={resetToMenu}
-          currentSubject={subject} // Předáváme subject do ResultScreen
+          currentSubject={subject} 
         />
       )}
 
@@ -846,7 +848,7 @@ export default function App() {
               optionRefsForCurrent={optionRefsForCurrent}
               disabled={mode === "random" && showResult}
               isKeyboardMode={isKeyboardMode}
-              currentSubject={subject} // Předáváme subject do QuestionCard
+              currentSubject={subject} 
             />
 
             {mode === "random" && !showResult && (
