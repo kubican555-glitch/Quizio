@@ -1,3 +1,80 @@
+:root {
+  /* --- BAREVNÁ PALETA --- */
+  /* Dark Mode Defaults */
+  --color-bg-start: #0a0e27;
+  --color-bg-mid: #1a1f3a;
+  --color-bg-end: #2a3155;
+  --color-text-main: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-neutral: #94a3b8;
+
+  /* Glassmorphism / Karty / Navigátor */
+  --color-card-bg-start: rgba(30, 41, 59, 0.95);
+  --color-card-bg-end: rgba(30, 41, 59, 0.8);
+  --color-card-border: rgba(148, 163, 184, 0.15);
+
+  /* Odpovědi */
+  --color-option-bg-start: rgba(30, 41, 59, 0.6);
+  --color-option-bg-end: rgba(30, 41, 59, 0.4);
+  --color-option-border: rgba(148, 163, 184, 0.25);
+  --color-option-hover-bg-start: rgba(59, 130, 246, 0.2);
+  --color-option-hover-bg-end: rgba(59, 130, 246, 0.1);
+
+  /* Navigace */
+  --color-nav-num-bg-start: rgba(30, 41, 59, 0.9);
+  --color-nav-num-bg-end: rgba(30, 41, 59, 0.7);
+  --color-nav-num-border: rgba(148, 163, 184, 0.25);
+
+  /* Tlačítka a Menu */
+  --color-back-btn-bg: rgba(71, 85, 105, 0.6);
+  --color-back-btn-color: #e2e8f0;
+  --color-back-btn-border: rgba(148, 163, 184, 0.2);
+  --color-menu-btn-shadow: rgba(59, 130, 246, 0.5);
+
+  /* Sekundární barvy (odvozené z gradientu) */
+  --color-primary: #3b82f6;
+  --color-secondary: #8b5cf6;
+  --color-primary-light: #60a5fa;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-review-wrong: #fca5a5; /* Světlejší červená pro text v Review */
+  --color-review-correct: #a7f3d0; /* Světlejší zelená pro text v Review */
+}
+
+/* --- SVĚTLÝ MOTIV (Přepíše proměnné) --- */
+body.light-mode {
+  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
+  color: var(--color-text-main);
+  background-attachment: fixed;
+
+  --color-bg-start: #f0f4f8;
+  --color-bg-mid: #e2e8f0;
+  --color-bg-end: #cbd5e1;
+  --color-text-main: #1e293b;
+  --color-text-secondary: #475569;
+  --color-text-neutral: #64748b;
+
+  --color-card-bg-start: rgba(255, 255, 255, 0.9);
+  --color-card-bg-end: rgba(255, 255, 255, 0.8);
+  --color-card-border: rgba(148, 163, 184, 0.5);
+
+  --color-option-bg-start: rgba(255, 255, 255, 0.7);
+  --color-option-bg-end: rgba(255, 255, 255, 0.5);
+  --color-option-border: rgba(148, 163, 184, 0.4);
+  --color-option-hover-bg-start: rgba(59, 130, 246, 0.1);
+  --color-option-hover-bg-end: rgba(59, 130, 246, 0.05);
+
+  --color-nav-num-bg-start: rgba(255, 255, 255, 0.9);
+  --color-nav-num-bg-end: rgba(255, 255, 255, 0.7);
+  --color-nav-num-border: rgba(148, 163, 184, 0.5);
+
+  --color-back-btn-bg: rgba(203, 213, 225, 0.8);
+  --color-back-btn-color: #1e293b;
+  --color-back-btn-border: rgba(148, 163, 184, 0.4);
+  --color-menu-btn-shadow: rgba(59, 130, 246, 0.3);
+}
+
+/* === GLOBALS A RESETY (Používají proměnné) === */
 * {
   margin: 0;
   padding: 0;
@@ -21,12 +98,11 @@ html {
   padding: 0;
   overflow-x: hidden;
   scroll-behavior: smooth;
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a3155 100%);
+  /* Používá proměnné z :root nebo .light-mode */
+  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
   background-attachment: fixed;
   background-size: cover;
   background-repeat: no-repeat;
-
-  /* === NOVÉ: Zajišťuje, aby auto-scroll neschovával prvky pod horní okraj === */
   scroll-padding-top: 140px; 
 }
 
@@ -39,9 +115,15 @@ body {
   overflow-x: hidden;
   background: transparent;
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-  color: #f1f5f9;
+  color: var(--color-text-main); /* Používá proměnnou */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ZAJIŠTĚNÍ ZABLOKOVÁNÍ SCROLLU A KLIKŮ NA POZADÍ */
+body.modal-open {
+    overflow: hidden !important;
 }
 
 /* === ANIMACE === */
@@ -84,6 +166,21 @@ body {
   box-sizing: border-box;
 }
 
+/* NOVÝ OMEZOVACÍ KONTEJNER PRO ZAROVNÁNÍ OBSAHU TESTU */
+.quizContentWrapper {
+  max-width: 960px; /* Širší pro PC */
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* --- Pravidlo pro PC (nad 1024px) --- */
+@media (min-width: 1024px) {
+    .quizContentWrapper {
+        max-width: 960px; 
+    }
+}
+
 /* === HORNÍ LIŠTA === */
 .topBarRight {
   display: flex;
@@ -106,7 +203,7 @@ body {
   font-size: clamp(2rem, 8vw, 2.8rem);
   font-weight: 800;
   text-align: center;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa, #ec4899);
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary), #ec4899);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -130,12 +227,12 @@ body {
   border-radius: 18px;
   padding: 1.8rem 1.4rem;
   cursor: pointer;
-  background: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+  background: linear-gradient(135deg, var(--color-primary), #6366f1 50%, var(--color-secondary) 100%);
   color: #fff;
   font-size: 1.15rem;
   font-weight: 700;
   transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 10px 40px var(--color-menu-btn-shadow);
   position: relative;
   overflow: hidden;
 }
@@ -166,7 +263,7 @@ body {
 }
 
 .menuButton.selected {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #8b5cf6 100%);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 50%, var(--color-secondary) 100%);
   box-shadow: 0 0 30px rgba(96, 165, 250, 0.8);
   transform: translateY(-6px) scale(1.02);
   animation: selectPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -182,17 +279,20 @@ body {
   border: none;
   border-radius: 12px;
   padding: 0.75rem 1.2rem;
-  background: rgba(71, 85, 105, 0.6);
-  color: #e2e8f0;
+  background: var(--color-back-btn-bg); /* Používá proměnnou */
+  color: var(--color-back-btn-color); /* Používá proměnnou */
   font-weight: 600;
   font-size: 0.95rem;
   transition: all 0.3s ease;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--color-back-btn-border); /* Používá proměnnou */
 }
 
 .menuBackButton:hover {
-  background: rgba(71, 85, 105, 0.9);
+  background: var(--color-back-btn-bg); 
   border-color: rgba(59, 130, 246, 0.4);
+}
+.light-mode .menuBackButton:hover {
+  background: rgba(203, 213, 225, 1);
 }
 
 .menuBackButton:active { 
@@ -214,7 +314,7 @@ body {
 }
 
 .submitTopButton {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, var(--color-primary), #2563eb);
   color: white;
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
 }
@@ -230,14 +330,21 @@ body {
 
 .navButton {
   background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  color: var(--color-primary-light);
   border: 2px solid rgba(59, 130, 246, 0.3);
 }
+.light-mode .navButton {
+  background: rgba(59, 130, 246, 0.1);
+}
+
 
 .navButton:hover {
   background: rgba(59, 130, 246, 0.25);
   border-color: rgba(59, 130, 246, 0.6);
   transform: translateY(-1px);
+}
+.light-mode .navButton:hover {
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .navButton:active { 
@@ -245,7 +352,7 @@ body {
 }
 
 .navButton.primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, var(--color-primary), #2563eb);
   color: white;
   border: none;
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
@@ -279,17 +386,26 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.15);
   backdrop-filter: blur(8px);
 }
+.light-mode .progress,
+.light-mode .timer {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  color: var(--color-text-main);
+}
 
 .progress {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(99, 102, 241, 0.08));
   border-color: rgba(59, 130, 246, 0.2);
+}
+.light-mode .progress {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
 }
 
 .timer {
   font-weight: 700;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
   border: 2px solid rgba(59, 130, 246, 0.5);
-  color: #60a5fa;
+  color: var(--color-primary-light);
   padding: 0.9rem 1.8rem;
   border-radius: 14px;
   min-height: 48px;
@@ -302,6 +418,11 @@ body {
   transition: all 0.3s ease;
   cursor: default;
 }
+.light-mode .timer {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
 
 .timerWarning { 
   color: #fbbf24 !important; 
@@ -333,18 +454,22 @@ body {
 .card {
   padding: clamp(1.2rem, 4vw, 1.8rem);
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.8) 100%);
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
   backdrop-filter: blur(30px);
-  border: 2px solid rgba(148, 163, 184, 0.15);
+  border: 2px solid var(--color-card-border);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   margin-bottom: 1.5rem;
   margin-top: 1rem;
-  overflow: visible; /* Změněno z hidden pro správnou funkci sticky */
+  overflow: visible;
   width: 100%;
   max-width: 100%;
   display: block;
   word-wrap: break-word;
   overflow-wrap: break-word;
+}
+.light-mode .card {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* === OTÁZKA + OBRÁZEK === */
@@ -372,6 +497,10 @@ body {
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
   transition: all 0.3s ease;
   background: rgba(0,0,0,0.2);
+}
+.light-mode .questionImage {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .imageWrapper {
@@ -403,17 +532,18 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  margin-top: 1.2rem; /* Odstup od sticky headeru */
+  margin-top: 1.2rem;
 }
 
 .optionButton {
   width: 100%;
   min-height: 60px;
-  border: 2px solid rgba(148, 163, 184, 0.25);
+  border: 2px solid var(--color-option-border); /* Používá proměnnou */
   border-radius: 14px;
   padding: 1.3rem 1.6rem;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(30, 41, 59, 0.4) 100%);
-  color: #e2e8f0;
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-option-bg-start) 0%, var(--color-option-bg-end) 100%);
+  color: var(--color-text-secondary); /* Používá proměnnou */
   text-align: left;
   font-size: clamp(1rem, 4.5vw, 1.1rem);
   cursor: pointer;
@@ -425,15 +555,18 @@ body {
 
 /* NOVÉ: Lepší viditelnost při ovládání klávesnicí */
 .optionButton:focus-visible {
-  outline: 3px solid #60a5fa;
+  outline: 3px solid var(--color-primary-light);
   outline-offset: 2px;
   background: rgba(59, 130, 246, 0.2);
-  border-color: #60a5fa;
+  border-color: var(--color-primary-light);
   transform: translateX(6px);
+}
+.light-mode .optionButton:focus-visible {
+  outline: 3px solid var(--color-primary);
 }
 
 .optionButton:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+  background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%);
   border-color: rgba(59, 130, 246, 0.5);
   transform: translateX(6px);
 }
@@ -441,7 +574,7 @@ body {
 .optionButton:active {
   transform: scale(0.97);
   background: rgba(59, 130, 246, 0.4);
-  border-color: #60a5fa;
+  border-color: var(--color-primary-light);
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 
@@ -457,7 +590,11 @@ body {
   font-size: 0.75rem;
   margin-right: 12px;
   border: 1px solid rgba(255,255,255,0.2);
-  color: #94a3b8;
+  color: var(--color-text-neutral);
+}
+.light-mode .keyHint {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 /* === NAVIGAČNÍ TLAČÍTKA === */
@@ -513,9 +650,10 @@ body {
   width: 52px;
   height: 52px;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
-  color: #cbd5e1;
-  border: 2px solid rgba(148, 163, 184, 0.25);
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-nav-num-bg-start) 0%, var(--color-nav-num-bg-end) 100%);
+  color: var(--color-text-secondary);
+  border: 2px solid var(--color-nav-num-border);
   font-weight: 700;
   font-size: 0.95rem;
   display: flex;
@@ -525,6 +663,9 @@ body {
   flex-shrink: 0;
   cursor: pointer;
 }
+.light-mode .navNumber {
+  color: var(--color-text-main);
+}
 
 .navNumber:hover {
   border-color: rgba(59, 130, 246, 0.4);
@@ -533,8 +674,8 @@ body {
 }
 
 .navNumber.current {
-  background: linear-gradient(135deg, #3b82f6, #6366f1);
-  border-color: #60a5fa;
+  background: linear-gradient(135deg, var(--color-primary), #6366f1);
+  border-color: var(--color-primary-light);
   color: white;
   transform: scale(1.3) translateY(-2px);
   box-shadow: 0 8px 30px rgba(59, 130, 246, 0.8);
@@ -542,10 +683,56 @@ body {
 }
 
 .navNumber.answered {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-  border-color: #60a5fa;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  border-color: var(--color-primary-light);
   color: white;
 }
+
+/* === VÝSLEDKY A REVIEW === */
+
+.reviewSearchInput {
+    padding: 1rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 1rem auto 2rem;
+    display: block;
+    border-radius: 12px;
+    border: 2px solid var(--color-nav-num-border);
+    background: var(--color-nav-num-bg-start);
+    color: var(--color-text-main);
+    font-size: 1.1rem;
+    transition: border-color 0.3s ease;
+}
+.reviewSearchInput:focus {
+    outline: none;
+    border-color: var(--color-primary-light);
+}
+
+.reviewCard .reviewImage {
+    max-width: 400px;
+    height: auto;
+    margin: 1rem auto;
+    display: block;
+    object-fit: contain;
+}
+
+.reviewCard .reviewAnswer strong {
+    color: var(--color-text-main);
+}
+.reviewCard .reviewAnswer .correctText {
+    color: var(--color-review-correct);
+}
+.reviewCard .reviewAnswer .wrongText {
+    color: var(--color-error);
+    font-weight: 700;
+}
+.light-mode .reviewCard .reviewAnswer .wrongText {
+    color: var(--color-error);
+}
+
+/* ============================ */
+/* Zbytek CSS pro review mode je níže (přidáno pro úplnost) */
+/* ============================ */
 
 .navNumber.answered:hover {
   transform: translateY(-2px);
@@ -572,12 +759,12 @@ body {
 
 .bigPercent { 
   font-size: clamp(1.8rem, 7vw, 2.6rem); 
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
   font-weight: 700;
 }
 
 .timeSpent { 
-  color: #94a3b8; 
+  color: var(--color-text-neutral); 
   font-size: 1.5rem; 
   margin-top: 1.5rem;
   font-weight: 600;
@@ -586,7 +773,8 @@ body {
 .reviewList { margin-top: 2.5rem; }
 
 .reviewQuestion {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
   padding: 1.6rem;
   border-radius: 14px;
   margin-bottom: 1.5rem;
@@ -603,20 +791,20 @@ body {
 }
 
 .reviewQuestion.correct { 
-  border-left-color: #22c55e;
+  border-left-color: var(--color-success);
   border-top-color: rgba(34, 197, 94, 0.2);
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(34, 197, 94, 0.05) 100%);
+  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, rgba(34, 197, 94, 0.05) 100%);
 }
 
 .reviewQuestion.wrong { 
-  border-left-color: #ef4444;
+  border-left-color: var(--color-error);
   border-top-color: rgba(239, 68, 68, 0.2);
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(239, 68, 68, 0.05) 100%);
+  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, rgba(239, 68, 68, 0.05) 100%);
 }
 
 .reviewQuestion.unanswered { 
   opacity: 0.8; 
-  border-left-color: #94a3b8;
+  border-left-color: var(--color-text-neutral);
 }
 
 .questionImage.small { 
@@ -633,6 +821,10 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
+.light-mode .questionImage.small {
+  background: rgba(255, 255, 255, 0.8);
+}
+
 
 .questionImage.small:hover {
   transform: scale(1.02);
@@ -697,7 +889,8 @@ body {
 }
 
 .modal {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(30, 41, 59, 0.9) 100%);
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
   padding: 2.5rem;
   border-radius: 20px;
   text-align: center;
@@ -707,6 +900,10 @@ body {
   box-shadow: 0 25px 90px rgba(0, 0, 0, 0.8);
   animation: fadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.light-mode .modal {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
 
 .modal h3 {
   font-size: 1.4rem;
@@ -716,7 +913,7 @@ body {
 
 .modal p {
   font-size: 1rem;
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
@@ -737,11 +934,15 @@ body {
 }
 
 .reviewCard {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
-  border: 2px solid rgba(148, 163, 184, 0.15);
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
+  border: 2px solid var(--color-card-border);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.light-mode .reviewCard {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
 }
 
 .reviewCard:hover {
@@ -750,9 +951,14 @@ body {
   transform: translateY(-6px);
   box-shadow: 0 15px 40px rgba(59, 130, 246, 0.25);
 }
+.light-mode .reviewCard:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+}
+
 
 .reviewHeader {
-  color: #60a5fa;
+  color: var(--color-primary-light);
   font-weight: 700;
   margin-bottom: 1rem;
   font-size: 1.05rem;
@@ -776,15 +982,18 @@ body {
 }
 
 .reviewAnswer {
-  color: #cbd5e1;
+  color: var(--color-text-secondary);
   margin-top: 0.75rem;
   line-height: 1.7;
   font-size: 0.95rem;
 }
 
 .correctText {
-  color: #86efac;
+  color: var(--color-review-correct); /* Používá světlejší zelenou */
   font-weight: 700;
+}
+.wrongText {
+    color: var(--color-review-wrong); /* Používá světlejší červenou */
 }
 
 /* === MOBILNÍ OPTIMALIZACE === */
@@ -797,6 +1006,8 @@ body {
     padding: 1rem; 
     padding-top: max(1rem, env(safe-area-inset-top, 1rem));
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+    padding-left: env(safe-area-inset-left, 0);
+    padding-right: env(safe-area-inset-right, 0);
     margin: 0;
   }
   .topBarRight { flex-direction: column; align-items: stretch; }
@@ -816,6 +1027,7 @@ body {
   .optionButton { min-height: 76px; padding: 1.5rem; }
   .reviewGrid { grid-template-columns: 1fr; }
   .card { padding: 1.2rem; }
+  .quizContentWrapper { max-width: 100%; } /* Na mobilu plná šířka */
 
   body {
     padding-top: env(safe-area-inset-top, 0);
@@ -842,7 +1054,7 @@ body {
 .subjectTitle {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #3b82f6, #a855f7);
+  background: linear-gradient(135deg, var(--color-primary), #a855f7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -850,7 +1062,7 @@ body {
 
 .subjectSubtitle {
   font-size: 1.2rem;
-  color: #888;
+  color: var(--color-text-neutral);
   margin-bottom: 2rem;
 }
 
@@ -872,9 +1084,14 @@ body {
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s;
-  color: #fff;
+  color: var(--color-text-main);
   font-weight: 600;
   font-size: 1.05rem;
+}
+.light-mode .subjectButton {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.05) 50%, rgba(139, 92, 246, 0.05) 100%);
+    border: 2px solid rgba(59, 130, 246, 0.5);
+    color: var(--color-text-main);
 }
 
 .subjectButton:hover {
@@ -883,6 +1100,10 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
+.light-mode .subjectButton:hover {
+    background: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
 
 .subjectButton.selected {
   background: rgba(59, 130, 246, 0.3);
@@ -890,6 +1111,10 @@ body {
   box-shadow: 0 0 30px rgba(96, 165, 250, 0.6);
   transform: translateY(-6px) scale(1.03);
   animation: selectPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.light-mode .subjectButton.selected {
+    background: rgba(59, 130, 246, 0.5);
+    border-color: rgba(96, 165, 250, 1);
 }
 
 .subjectIcon {
@@ -906,11 +1131,11 @@ body {
 
 .subjectDesc {
   font-size: 0.85rem;
-  color: #aaa;
+  color: var(--color-text-neutral);
 }
 
 .uploadError {
-  color: #ef4444;
+  color: var(--color-error);
   margin: 1rem 0;
   padding: 0.5rem;
   border-radius: 8px;
@@ -918,7 +1143,7 @@ body {
 }
 
 .uploadHint {
-  color: #888;
+  color: var(--color-text-neutral);
   font-size: 0.85rem;
   margin-top: 1rem;
   line-height: 1.5;
