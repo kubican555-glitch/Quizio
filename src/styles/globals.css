@@ -103,6 +103,25 @@ body.modal-open { overflow: hidden !important; }
 @keyframes pulseBtn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 @keyframes glow { 0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); } 50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.6); } }
 
+/* SHAKE ANIMACE (Při chybě) */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-2deg); }
+  40% { transform: translateX(8px) rotate(2deg); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.shake {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important;
+}
+
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes flameFlicker { 0% { transform: scale(1) rotate(-3deg); opacity: 0.8; } 100% { transform: scale(1.1) rotate(3deg); opacity: 1; } }
+@keyframes pump { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
 /* === KONTEJNER === */
 .container { max-width: 960px; width: 100%; margin: 0 auto; padding: 0 1rem 1rem 1rem; padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)); min-height: 100dvh; }
 .quizContentWrapper { max-width: 960px; width: 100%; margin: 0 auto; padding: 0 1rem; }
@@ -182,16 +201,10 @@ body.modal-open { overflow: hidden !important; }
 
 /* === FLASHCARDS STATS (COMBO) === */
 .flashcardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  backdrop-filter: blur(8px);
-  border-radius: 16px;
-  padding: 0.8rem 1.5rem;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.15);
+  backdrop-filter: blur(8px); border-radius: 16px; padding: 0.8rem 1.5rem;
+  margin-bottom: 1rem; transition: all 0.3s ease;
 }
 .light-mode .flashcardHeader { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.05); }
 
@@ -205,63 +218,16 @@ body.modal-open { overflow: hidden !important; }
 }
 
 /* Základní plamen (Combo 3-4) */
-.comboFlame { 
-  font-size: 1.8rem; 
-  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); 
-  animation: flameFlicker 1s infinite alternate; 
-  transform-origin: center bottom;
-}
-.comboCount { 
-  font-size: 1.6rem; 
-  font-weight: 900; 
-  background: linear-gradient(135deg, #fbbf24, #f59e0b); 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  font-style: italic; 
-}
+.comboFlame { font-size: 1.8rem; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); animation: flameFlicker 1s infinite alternate; transform-origin: center bottom; }
+.comboCount { font-size: 1.6rem; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: italic; }
 
-/* Střední plamen (Combo 5-9) - VÍCE ORANŽOVÉ A VĚTŠÍ */
-.combo-med .comboFlame { 
-  font-size: 2.2rem; 
-  filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.6)); 
-  animation: pump 0.8s infinite; 
-}
-.combo-med .comboCount { 
-  background: linear-gradient(135deg, #f59e0b, #ef4444); 
-  font-size: 2rem; 
-  text-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
-}
+/* Střední plamen (Combo 5-9) */
+.combo-med .comboFlame { font-size: 2.2rem; filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.6)); animation: pump 0.8s infinite; }
+.combo-med .comboCount { background: linear-gradient(135deg, #f59e0b, #ef4444); font-size: 2rem; text-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
 
-/* Velký plamen (Combo 10+) - FIALOVÝ A ŠÍLENÝ */
-.combo-high .comboFlame { 
-  font-size: 2.8rem; 
-  filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8)); 
-  animation: pump 0.4s infinite; 
-}
-.combo-high .comboCount { 
-  background: linear-gradient(135deg, #ef4444, #a855f7); 
-  font-size: 2.5rem; 
-  animation: pump 0.4s infinite;
-}
-
-/* SHAKE ANIMACE (Při chybě) */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-8px) rotate(-2deg); }
-  40% { transform: translateX(8px) rotate(2deg); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-}
-
-.shake {
-  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-  border-color: var(--color-error) !important;
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important;
-}
-
-@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-@keyframes flameFlicker { 0% { transform: scale(1) rotate(-3deg); opacity: 0.8; } 100% { transform: scale(1.1) rotate(3deg); opacity: 1; } }
-@keyframes pump { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+/* Velký plamen (Combo 10+) */
+.combo-high .comboFlame { font-size: 2.8rem; filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8)); animation: pump 0.4s infinite; }
+.combo-high .comboCount { background: linear-gradient(135deg, #ef4444, #a855f7); font-size: 2.5rem; animation: pump 0.4s infinite; }
 
 /* === KARTA OTÁZKY === */
 .card { padding: clamp(1.5rem, 4vw, 2.2rem); border-radius: 24px; background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%); backdrop-filter: blur(30px); border: 1px solid var(--color-card-border); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); margin-bottom: 1.5rem; margin-top: 1rem; }
@@ -349,14 +315,37 @@ body.modal-open { overflow: hidden !important; }
 .subjectDesc { font-size: 0.85rem; color: var(--color-text-neutral); }
 
 /* === MOBIL === */
-@media (max-width: 480px) {
-  .container { padding: 1rem; }
-  .navbar { flex-direction: column; gap: 0.8rem; padding: 1rem; }
+@media (max-width: 600px) {
+  .container { padding: 1rem; padding-top: env(safe-area-inset-top); }
+
+  /* MENU GRID NA MOBILU */
+  .menuColumn, .subjectGrid {
+    grid-template-columns: 1fr; /* Pod sebou */
+    gap: 1rem; margin-top: 1.5rem; max-width: 100%;
+  }
+
+  .menuButton { padding: 1.5rem; font-size: 1.1rem; width: 100%; }
+
+  .subjectButton {
+    padding: 1.2rem; flex-direction: row; gap: 1rem; text-align: left; align-items: center; justify-content: flex-start;
+  }
+  .subjectIcon { font-size: 2rem; margin-bottom: 0; }
+  .subjectName { margin-bottom: 0; font-size: 1.1rem; }
+  .subjectDesc { display: none; }
+
+  /* NAVBAR NA MOBILU */
+  .navbar { flex-direction: column; gap: 0.8rem; padding: 1rem; align-items: stretch; }
   .navbar-group { width: 100%; justify-content: space-between; }
+
   .actionButtons.spaced { flex-direction: row; gap: 0.8rem; }
   .actionButtons.spaced button { flex: 1; }
   .optionButton { min-height: 70px; padding: 1rem; }
-  .flashcardHeader { flex-direction: row; gap: 1rem; }
+
+  .flashcardHeader { flex-direction: row; gap: 0.5rem; padding: 0.6rem 1rem; justify-content: space-between; }
+  .statLabel { font-size: 0.65rem; }
+  .statValue { font-size: 1.1rem; }
+  .comboFlame { font-size: 1.4rem; }
+  .comboCount { font-size: 1.3rem; }
 }
 
 /* Modals */

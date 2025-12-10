@@ -316,8 +316,8 @@ export default function App() {
 
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [combo, setCombo] = useState(0); // NOVÉ: Combo state
-  const [shake, setShake] = useState(false); // NOVÉ: Shake state
+  const [combo, setCombo] = useState(0); 
+  const [shake, setShake] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(0);
   const [finished, setFinished] = useState(false);
@@ -427,9 +427,18 @@ export default function App() {
     if (mode === "mock" && timeLeft === 0 && !finished) submitTest();
   }, [mode, timeLeft, finished]);
 
+  // --- HLAVNÍ OVLÁDÁNÍ KLÁVESNICÍ V QUIZU ---
   useEffect(() => {
     if (!mode || mode === "review") return;
     const onKey = (e) => {
+      // POKUD JSME NA OBRAZOVCE VÝSLEDKŮ (FINISHED)
+      if (finished) {
+          if (["Backspace", "Escape", "Enter", "ArrowLeft"].includes(e.key)) {
+              resetToMenu();
+          }
+          return;
+      }
+
       const curQ = questionSet[currentIndex] || { options: [] };
       const opts = curQ.options.length;
 
@@ -443,10 +452,20 @@ export default function App() {
         if (mode === "random" && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
         else if (mode !== "random") handleAnswer(curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts);
       }
+
+      // ŠIPKA VLEVO - ZPĚT
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
-        if (mode === "random" && showResult) nextRandomQuestion();
-        else moveToQuestion(Math.max(0, currentIndex - 1));
+        if (mode === "random" && showResult) {
+            nextRandomQuestion();
+        } else if (mode !== "random" && currentIndex === 0) {
+            // Pokud jsme na první otázce v tréninku/testu -> nabídnout odchod
+            tryReturnToMenu();
+        } else {
+            // Jinak jít na předchozí otázku
+            moveToQuestion(Math.max(0, currentIndex - 1));
+        }
       }
+
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
         if (mode === "random" && showResult) nextRandomQuestion();
         else if (mode === "random" && !showResult) { if (selectedAnswer !== null) confirmRandomAnswer(); }
@@ -497,7 +516,7 @@ export default function App() {
     setQuestionSet(all); setMode("review");
   };
 
-  const selectRandomAnswer = (idx) => { if (!finished && mode === "random" && !showResult) { setSelectedAnswer(idx); setIsKeyboardMode(true); }};
+  const selectRandomAnswer = (idx) => { if (!finished && mode === "random" && !showResult) { setSelectedAnswer(idx); setIsKeyboardMode(true); } };
 
   const clickRandomAnswer = (idx) => { 
       if(finished || mode!=="random" || showResult) return;
@@ -603,6 +622,7 @@ export default function App() {
     setCustomQuestions(normalized); setSubject("CUSTOM");
   };
 
+  // Navigace v menu klávesnicí
   useEffect(() => {
     if (mode) return;
     const handleMenuNav = (e) => {
