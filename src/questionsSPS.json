@@ -1,6 +1,6 @@
 [
   {
-    "number": 1,
+    "number": "1",
     "question": "O jaký druh spojení se jedná, pokud jsou dvě součásti spolu spojené pomocí závrtného šroubu?",
     "options": [
       "Spojení se silovým stykem",
@@ -11,7 +11,7 @@
     "correctIndex": 0
   },
   {
-    "number": 2,
+    "number": "2",
     "question": "O jaký druh spojení se jedná, pokud jsou dvě součásti spolu spojené pomocí lícovaného šroubu?",
     "options": [
       "Spojení se silovým stykem",
@@ -22,7 +22,7 @@
     "correctIndex": 1
   },
   {
-    "number": 3,
+    "number": "3",
     "question": "Jaký závit mají nejběžněji šrouby (běžně k zakoupení v hobbymarketu)?",
     "options": [
       "Jednochodý pravý",
@@ -33,7 +33,7 @@
     "correctIndex": 0
   },
   {
-    "number": 4,
+    "number": "4",
     "question": "Jaké označení má nejmenší průměr závitu šroubu?",
     "options": [
       "d",
@@ -44,7 +44,7 @@
     "correctIndex": 3
   },
   {
-    "number": 5,
+    "number": "5",
     "question": "Jaké označení má rozteč (stoupání) závitu?",
     "options": [
       "D",
@@ -55,7 +55,7 @@
     "correctIndex": 1
   },
   {
-    "number": 6,
+    "number": "6",
     "question": "Na šroubu je vyroben čtyřchodý závit. Jaký je vztah mezi jeho stoupáním a roztečí?",
     "options": [
       "Stoupání je dvakrát větší než rozteč",
@@ -66,7 +66,7 @@
     "correctIndex": 1
   },
   {
-    "number": 7,
+    "number": "7",
     "question": "Jaký druh závitu je závit s označením Tr48x8?",
     "options": [
       "Metrický závit",
@@ -77,7 +77,7 @@
     "correctIndex": 2
   },
   {
-    "number": 8,
+    "number": "8",
     "question": "V možnostech jsou uvedeny účely použití podložek ve šroubových spojích. Které možnosti mezi ostatní nepatří?",
     "options": [
       "Vytvoření tvarového styku mezi šroubem (maticí) a spojovanou součástí",
@@ -88,7 +88,7 @@
     "correctIndex": 0
   },
   {
-    "number": 9,
+    "number": "9",
     "question": "Pokud je realizováno pojištění šroubového spoje pomocí korunkové matice, pak je nutné zároveň použít i další součást. Kterou?",
     "options": [
       "Polymidový kroužek",
@@ -99,7 +99,7 @@
     "correctIndex": 1
   },
   {
-    "number": 10,
+    "number": "10",
     "question": "Pokud první číslo pevnostní třídy šroubu vynásobíme krát 100, pak vypočítáme materiálu šroubu jeho mez …",
     "options": [
       "pevnosti",
@@ -110,7 +110,7 @@
     "correctIndex": 0
   },
   {
-    "number": 11,
+    "number": "11",
     "question": "Závit M20x2-6H. O jaký závit se jedná?",
     "options": [
       "Levý vnitřní metrický závit",
@@ -121,7 +121,7 @@
     "correctIndex": 1
   },
   {
-    "number": 12,
+    "number": "12",
     "question": "Závit M30x3(L5) LH-6g. O jaký závit se jedná?",
     "options": [
       "Trojchodý levý vnější metrický závit",
@@ -132,7 +132,7 @@
     "correctIndex": 1
   },
   {
-    "number": 13,
+    "number": "13",
     "question": "Co musí být splněno, aby byl závit samosvorný?",
     "options": [
       "Třecí úhel musí být větší než úhel stoupání",
@@ -143,7 +143,7 @@
     "correctIndex": 0
   },
   {
-    "number": 14,
+    "number": "14",
     "question": "Na jaké druhy namáhání se pevnostně kontroluje závit šroubu?",
     "options": [
       "Pouze na tah",
@@ -154,7 +154,7 @@
     "correctIndex": 2
   },
   {
-    "number": 15,
+    "number": "15",
     "question": "Na jaké druhy namáhání se pevnostně kontroluje dřík lícovaného šroubu?",
     "options": [
       "Pouze na tah",
@@ -165,7 +165,7 @@
     "correctIndex": 2
   },
   {
-    "number": 16,
+    "number": "16",
     "question": "Jaký šroub vidíte na obrázku?",
     "options": [
       "Lícovaný",
@@ -176,7 +176,7 @@
     "correctIndex": 1
   },
   {
-    "number": 17,
+    "number": "17",
     "question": "Jakou matici vidíte na obrázku?",
     "options": [
       "KM",
@@ -187,7 +187,7 @@
     "correctIndex": 1
   },
   {
-    "number": 18,
+    "number": "18",
     "question": "Jakou podložku vidíte na obrázku?",
     "options": [
       "Pružnou",
@@ -198,7 +198,7 @@
     "correctIndex": 1
   },
   {
-    "number": 19,
+    "number": "19",
     "question": "Jaký závit má šroub na obrázku?",
     "options": [
       "Jednochodý levý závit",
@@ -209,7 +209,7 @@
     "correctIndex": 0
   },
   {
-    "number": 20,
+    "number": "20",
     "question": "Šroub na obrázku má velikost (je označen jako) M10 x 45 dle normy ISO 4014. Které písmenko na obrázku lze nahradit číslem 45 (tedy délkou šroubu v mm)?",
     "options": [
       "A",
@@ -220,7 +220,7 @@
     "correctIndex": 1
   },
   {
-    "number": 21,
+    "number": "21",
     "question": "Který z těchto druhů spojů se považuje za nerozebíratelný?",
     "options": [
       "Šroubový spoj",
@@ -231,7 +231,7 @@
     "correctIndex": 3
   },
   {
-    "number": 22,
+    "number": "22",
     "question": "Který z těchto spojů se primárně nepovažuje za spoj s tvarovým stykem?",
     "options": [
       "Šroubový spoj",
@@ -242,7 +242,7 @@
     "correctIndex": 0
   },
   {
-    "number": 23,
+    "number": "23",
     "question": "Která z těchto spojovacích součástí se kontroluje i na ohyb?",
     "options": [
       "Šroub",
@@ -253,7 +253,7 @@
     "correctIndex": 2
   },
   {
-    "number": 24,
+    "number": "24",
     "question": "Ke kterému z uvedených účelů je nejméně vhodný kotlíkový spoj?",
     "options": [
       "K ustavení vzájemné přesné polohy",
@@ -264,7 +264,7 @@
     "correctIndex": 1
   },
   {
-    "number": 25,
+    "number": "25",
     "question": "Který druh kotlíku má vůči ostatním nejnižší hmotnost (při podobných rozměrech)?",
     "options": [
       "Válcový kotlík",
@@ -275,7 +275,7 @@
     "correctIndex": 2
   },
   {
-    "number": 26,
+    "number": "26",
     "question": "Který druh kotlíku je pojištěn vůči vypadnutí samosvorností?",
     "options": [
       "Válcový kotlík",
@@ -286,7 +286,7 @@
     "correctIndex": 1
   },
   {
-    "number": 27,
+    "number": "27",
     "question": "Který druh kotlíku je pojištěn vůči vypadnutí správným uložením (nejčastěji 17/m6)?",
     "options": [
       "Válcový kotlík",
@@ -297,7 +297,7 @@
     "correctIndex": 0
   },
   {
-    "number": 28,
+    "number": "28",
     "question": "Kterou z těchto spojovacích součástí nekontrolujeme primárně (pouze) na otlačení a střih?",
     "options": [
       "Lícovaný šroub",
@@ -308,7 +308,7 @@
     "correctIndex": 0
   },
   {
-    "number": 29,
+    "number": "29",
     "question": "Čepy jsou v otvorech spojovaných součástí uloženy …",
     "options": [
       "s vůlí",
@@ -319,7 +319,7 @@
     "correctIndex": 0
   },
   {
-    "number": 30,
+    "number": "30",
     "question": "Při použití které z těchto normalizovaných součástí (v souvislosti s pojištěním čepového spoje) není potřeba dělat v čepu drážku určitého tvaru?",
     "options": [
       "Přidržka čepu",
@@ -330,7 +330,7 @@
     "correctIndex": 0
   },
   {
-    "number": 31,
+    "number": "31",
     "question": "Přímé nýtování za studena znamená, že se jedná o nýtování …",
     "options": [
       "bez použití nýtu při běžné okolní teplotě",
@@ -341,7 +341,7 @@
     "correctIndex": 0
   },
   {
-    "number": 32,
+    "number": "32",
     "question": "Po nýtování za tepla vzniká nýtový spoj …",
     "options": [
       "pouze se silovým stykem",
@@ -352,7 +352,7 @@
     "correctIndex": 1
   },
   {
-    "number": 33,
+    "number": "33",
     "question": "Který z uvedených parametrů nepatří mezi výhody nýtových spojů (oproti svarovým spojům)?",
     "options": [
       "Lze spojovat různé materiály",
@@ -363,7 +363,7 @@
     "correctIndex": 3
   },
   {
-    "number": 34,
+    "number": "34",
     "question": "Který z uvedených parametrů nepatří mezi nevýhody nýtových spojů (oproti svarovým spojům)?",
     "options": [
       "Vysoká hlučnost při nýtování",
@@ -374,7 +374,7 @@
     "correctIndex": 3
   },
   {
-    "number": 35,
+    "number": "35",
     "question": "Pro které druhy kolíků je nutné vyrobit ve spojovaných součástech přesnou (vystřeženou) díru?",
     "options": [
       "Pro válcové a kuželové kolíky",
@@ -385,7 +385,7 @@
     "correctIndex": 0
   },
   {
-    "number": 36,
+    "number": "36",
     "question": "Co se nejpravděpodobněji nachází na obrázku?",
     "options": [
       "Kotlík",
@@ -396,7 +396,7 @@
     "correctIndex": 1
   },
   {
-    "number": 37,
+    "number": "37",
     "question": "Jaký druh kolíku se nachází na obrázku?",
     "options": [
       "Válcový",
@@ -407,7 +407,7 @@
     "correctIndex": 2
   },
   {
-    "number": 38,
+    "number": "38",
     "question": "Čím je nejvhodnější pojistit čep na obrázku? Předpokládejte, že se na čepu nebudou dělat žádné úpravy!",
     "options": [
       "Pojistným kroužkem",
@@ -418,7 +418,7 @@
     "correctIndex": 0
   },
   {
-    "number": 39,
+    "number": "39",
     "question": "Jaký druh nýtu se nachází na obrázku?",
     "options": [
       "Rozklepávací sešívací",
@@ -429,7 +429,7 @@
     "correctIndex": 3
   },
   {
-    "number": 40,
+    "number": "40",
     "question": "Jakou součástí z uvedených nelze zajistit tento čep na obrázku? Předpokládejte, že se na čepu nebudou dělat žádné úpravy!",
     "options": [
       "Vnitřním pojistným kroužkem",
@@ -440,7 +440,7 @@
     "correctIndex": 3
   },
   {
-    "number": 41,
+    "number": "41",
     "question": "Který z těchto spojů se neřadí (ani částečně) mezi spoje s tvarovým stykem?",
     "options": [
       "Neokrouhlý spoj",
@@ -451,7 +451,7 @@
     "correctIndex": 3
   },
   {
-    "number": 42,
+    "number": "42",
     "question": "Který z těchto spojů se neřadí mezi spoje nerozebíratelné?",
     "options": [
       "Svarový spoj",
@@ -462,7 +462,7 @@
     "correctIndex": 2
   },
   {
-    "number": 43,
+    "number": "43",
     "question": "Jaká spojovací součást se používá pro vznik svěrného spoje?",
     "options": [
       "Šroub",
@@ -473,7 +473,7 @@
     "correctIndex": 0
   },
   {
-    "number": 44,
+    "number": "44",
     "question": "Šířka drážky v náboji i hřídeli pro těsné pero dle normy ČSN 02 2562 musí být vyrobena přesně. Jaké parametry z hlediska rozměru a drsnosti se na její boky předepisují?",
     "options": [
       "Šířka drážky je vždy v toleranci P9 a na bokách drážek je drsnost Ra 3,2",
@@ -484,7 +484,7 @@
     "correctIndex": 0
   },
   {
-    "number": 45,
+    "number": "45",
     "question": "Který druh pera se používá pro spojení hřídele s nábojem, pokud požadujeme častý axiální posuv náboje po hřídeli?",
     "options": [
       "Těsné pero",
@@ -495,7 +495,7 @@
     "correctIndex": 1
   },
   {
-    "number": 46,
+    "number": "46",
     "question": "Které pero mezi ostatní logicky nepatří?",
     "options": [
       "Výměnné pero",
@@ -506,7 +506,7 @@
     "correctIndex": 1
   },
   {
-    "number": 47,
+    "number": "47",
     "question": "U kterých druhů per je nutné pojistit náboj vůči hřídeli v axiálním směru?",
     "options": [
       "Pouze u spojení těsným perem",
@@ -517,7 +517,7 @@
     "correctIndex": 2
   },
   {
-    "number": 48,
+    "number": "48",
     "question": "Při použití kterého druhu pera je nejméně zeslaben průřez hřídele (vzhledem k její pevnosti)?",
     "options": [
       "Při použití těsného pera",
@@ -528,7 +528,7 @@
     "correctIndex": 0
   },
   {
-    "number": 49,
+    "number": "49",
     "question": "Na který z těchto druhů namáhání obvykle (pouze) kontrolujeme normalizovaná těsná pera?",
     "options": [
       "Otlačení mezi hřídelem a perem",
@@ -539,7 +539,7 @@
     "correctIndex": 2
   },
   {
-    "number": 50,
+    "number": "50",
     "question": "Které z těchto spojení dokáže (při zachování podobných rozměrů) přenést největší krouticí moment?",
     "options": [
       "Spojení se dvěma těsnými pery",
@@ -550,7 +550,7 @@
     "correctIndex": 3
   },
   {
-    "number": 51,
+    "number": "51",
     "question": "Který druh drážkování je nejvíce podobný teoretickému použití spojení s několika těsnými pery?",
     "options": [
       "Rovnoboké drážkování",
@@ -561,7 +561,7 @@
     "correctIndex": 0
   },
   {
-    "number": 52,
+    "number": "52",
     "question": "U kterého z těchto druhů spojení hřídele s nábojem s tvarovým stykem není nutné pojišťovat náboj v axiálním směru?",
     "options": [
       "U spojení těsným perem",
@@ -572,7 +572,7 @@
     "correctIndex": 3
   },
   {
-    "number": 53,
+    "number": "53",
     "question": "U spojení kterým druhem klínu není potřeba dělat tvarové změny na hřídeli při výrobě?",
     "options": [
       "Při spojení pomocí třecího klínu",
@@ -583,7 +583,7 @@
     "correctIndex": 1
   },
   {
-    "number": 54,
+    "number": "54",
     "question": "Co je jednou ze základních výhod svěrných (a rozpěrných) spojů oproti ostatním druhům spojení hřídele s nábojem?",
     "options": [
       "Přenášení největších kroutících momentů",
@@ -594,7 +594,7 @@
     "correctIndex": 1
   },
   {
-    "number": 55,
+    "number": "55",
     "question": "Tlakový spoj vytvořený lisováním za studena vznikne tak, že ...",
     "options": [
       "se hřídel silou (pomocí lisu) vtlačí do díry v náboji za běžné okolní teploty.",
@@ -605,7 +605,7 @@
     "correctIndex": 0
   },
   {
-    "number": 56,
+    "number": "56",
     "question": "Jaká součást je na obrázku?",
     "options": [
       "Pero",
@@ -616,7 +616,7 @@
     "correctIndex": 2
   },
   {
-    "number": 57,
+    "number": "57",
     "question": "Jakou hlavu by měl mít šroub, který se vkládá do otvoru v součásti na obrázku?",
     "options": [
       "Šestihrannou",
@@ -627,7 +627,7 @@
     "correctIndex": 2
   },
   {
-    "number": 58,
+    "number": "58",
     "question": "Pro jakou součást je vytvořena drážka v hřídeli na obrázku?",
     "options": [
       "Pro Woodruffovo pero",
@@ -638,7 +638,7 @@
     "correctIndex": 0
   },
   {
-    "number": 59,
+    "number": "59",
     "question": "Co je na obrázku?",
     "options": [
       "Pomůcka pro vytvoření tlakového spoje za studena",
@@ -649,7 +649,7 @@
     "correctIndex": 0
   },
   {
-    "number": 60,
+    "number": "60",
     "question": "Součást na obrázku má uvnitř v otvoru vyrobeno",
     "options": [
       "vnitřní ozubení.",
@@ -660,7 +660,7 @@
     "correctIndex": 1
   },
   {
-    "number": 61,
+    "number": "61",
     "question": "Která z těchto hřídelí nepřenáší kroutící moment?",
     "options": [
       "Nosná hřídel",
@@ -671,7 +671,7 @@
     "correctIndex": 0
   },
   {
-    "number": 62,
+    "number": "62",
     "question": "V jakém provedení se konstruují hybné hřídele?",
     "options": [
       "Vždy otočně",
@@ -682,7 +682,7 @@
     "correctIndex": 0
   },
   {
-    "number": 63,
+    "number": "63",
     "question": "Na jaký druh namáhání primárně kontrolujeme nosné hřídele?",
     "options": [
       "Ohyb",
@@ -693,7 +693,7 @@
     "correctIndex": 0
   },
   {
-    "number": 64,
+    "number": "64",
     "question": "Které tvrzení o hřídelových čepech NENÍ pravdivé?",
     "options": [
       "Jsou to části hřídele, které jsou ve styku s ložiskem.",
@@ -704,7 +704,7 @@
     "correctIndex": 3
   },
   {
-    "number": 65,
+    "number": "65",
     "question": "Který z těchto hřídelových čepů NENÍ určen k zachycení síly rovnoběžné s osou hřídele?",
     "options": [
       "Krční",
@@ -715,7 +715,7 @@
     "correctIndex": 2
   },
   {
-    "number": 66,
+    "number": "66",
     "question": "Který z těchto hřídelových čepů NENÍ určen k zachycení síly kolmé k ose hřídele?",
     "options": [
       "Krční",
@@ -726,7 +726,7 @@
     "correctIndex": 0
   },
   {
-    "number": 67,
+    "number": "67",
     "question": "Na jaký druh namáhání kontrolujeme axiální hřídelové čepy?",
     "options": [
       "Ohyb",
@@ -737,7 +737,7 @@
     "correctIndex": 1
   },
   {
-    "number": 68,
+    "number": "68",
     "question": "Který z těchto hřídelových čepů NEPOTŘEBUJE nutně dělený náboj?",
     "options": [
       "Krční",
@@ -748,7 +748,7 @@
     "correctIndex": 2
   },
   {
-    "number": 69,
+    "number": "69",
     "question": "Co se rozumí pojmem \"kritické otáčky\" hřídele?",
     "options": [
       "Jsou to maximální otáčky hřídele při větších otáčkách hřídel nemůže pracovat.",
@@ -759,7 +759,7 @@
     "correctIndex": 2
   },
   {
-    "number": 70,
+    "number": "70",
     "question": "Na kterém parametru primárně závisí velikost \"kritických otáček\" hřídele?",
     "options": [
       "Průhyb hřídele způsobený vlastní tíhou.",
@@ -770,7 +770,7 @@
     "correctIndex": 1
   },
   {
-    "number": 71,
+    "number": "71",
     "question": "Co způsobuje každý tzv. konstrukční vrub na hřídeli?",
     "options": [
       "Zvýšenou koncentraci napětí",
@@ -781,7 +781,7 @@
     "correctIndex": 0
   },
   {
-    "number": 72,
+    "number": "72",
     "question": "Který z uvedených prvků hřídele NENÍ konstrukčním vrubem?",
     "options": [
       "Drážka pro pero",
@@ -792,7 +792,7 @@
     "correctIndex": 1
   },
   {
-    "number": 73,
+    "number": "73",
     "question": "Který z těchto parametrů NENÍ potřebný k výpočtu velikosti přenášeného kroutícího momentu na hřídeli?",
     "options": [
       "Přenášený výkon",
@@ -803,7 +803,7 @@
     "correctIndex": 3
   },
   {
-    "number": 74,
+    "number": "74",
     "question": "Na čem NEZÁVISÍ volba materiálu hřídele?",
     "options": [
       "Na způsobu a velikosti zatížení",
@@ -814,7 +814,7 @@
     "correctIndex": 3
   },
   {
-    "number": 75,
+    "number": "75",
     "question": "Který vzorec byste použili pro výpočet redukovaného momentu na hybné hřídeli (kruhového průřezu)?",
     "options": [
       "M_RED = √(M_O² + 3·M_K²)",
@@ -825,7 +825,7 @@
     "correctIndex": 2
   },
   {
-    "number": 76,
+    "number": "76",
     "question": "Na obrázku je schéma (řez) jednostupňové převodovky. Jaký způsobem je namáhána výstupní hřídel v (červeně) označeném místě?",
     "options": [
       "Pouze na ohyb",
@@ -836,7 +836,7 @@
     "correctIndex": 2
   },
   {
-    "number": 77,
+    "number": "77",
     "question": "Jaký druh hřídele je na obrázku?",
     "options": [
       "Nosná",
@@ -847,7 +847,7 @@
     "correctIndex": 1
   },
   {
-    "number": 78,
+    "number": "78",
     "question": "K čemu je vyrobena (šipkou) označená drážka na vyobrazené hřídeli?",
     "options": [
       "Pro těsné pero",
@@ -858,7 +858,7 @@
     "correctIndex": 2
   },
   {
-    "number": 79,
+    "number": "79",
     "question": "Na obrázku se nachází Kardanová hřídel. O jaký druh hřídele se tedy jedná?",
     "options": [
       "Nosnou",
@@ -869,7 +869,7 @@
     "correctIndex": 1
   },
   {
-    "number": 80,
+    "number": "80",
     "question": "Na obrázku se nachází průřez jednostupňovou šnekovou převodovkou. Vstupní (modrá) hřídel je v místech A a C uložena v ložiscích, uprostřed mezi ložisky (místo B) se nachází šnek (který je v záběru se šnekovým kolem nad ním) a v místě D je vstupní válcový konec (pro připojení k pohonu). Mezi jakými dvěma místy na této hřídeli působí kroutící moment?",
     "options": [
       "Mezi A a C",
@@ -880,7 +880,7 @@
     "correctIndex": 3
   },
   {
-    "number": 81,
+    "number": "81",
     "question": "Jak se nazývá druh svaru, u kterého svařované součásti leží (plochou) na sobě svar je mezi těmito plochami?",
     "options": [
       "Tupý svar",
@@ -891,7 +891,7 @@
     "correctIndex": 3
   },
   {
-    "number": 82,
+    "number": "82",
     "question": "Do které kategorie svarů lze zařadit svar tvaru \"U\"?",
     "options": [
       "Tupé svary",
@@ -902,7 +902,7 @@
     "correctIndex": 0
   },
   {
-    "number": 83,
+    "number": "83",
     "question": "Který z uvedených materiálů je nejhůře svařitelný (resp. obvykle nesvařitelný)?",
     "options": [
       "Oceli",
@@ -913,7 +913,7 @@
     "correctIndex": 3
   },
   {
-    "number": 84,
+    "number": "84",
     "question": "Co nepatří mezi výhody svařování?",
     "options": [
       "Vysoká produktivita vytváření spojů",
@@ -924,29 +924,29 @@
     "correctIndex": 3
   },
   {
-    "number": 85,
+    "number": "85",
     "question": "Pro který z uvedených svarů obvykle není potřeba přídavný materiál?",
     "options": [
       "Děrový svar",
       "Rohový svar",
       "Lemový svar",
-      "Svar tvaru \"V"
+      "Svar tvaru \"V\""
     ],
     "correctIndex": 2
   },
   {
-    "number": 86,
+    "number": "86",
     "question": "Čemu se nejvíce podobá značka pro označení montážního svaru?",
     "options": [
       "Kružnici",
       "Praporku",
-      "Písmenu \"Z",
+      "Písmenu \"Z\"",
       "Pravoúhlému trojúhelníku"
     ],
     "correctIndex": 1
   },
   {
-    "number": 87,
+    "number": "87",
     "question": "Jaký druh tepelného zpracování se provádí u svařenců za účelem snížení vnitřního pnutí?",
     "options": [
       "Žíhání",
@@ -957,7 +957,7 @@
     "correctIndex": 0
   },
   {
-    "number": 88,
+    "number": "88",
     "question": "Kterou z uvedených zásad NENÍ vhodné dodržet při konstruování velkého složitého svařence se žebry?",
     "options": [
       "Přesné rozměry svařence obrábět až po svaření",
@@ -968,7 +968,7 @@
     "correctIndex": 3
   },
   {
-    "number": 89,
+    "number": "89",
     "question": "Na jaký druh namáhání kontrolujeme vždy přeplátované spoje?",
     "options": [
       "Tah",
@@ -979,7 +979,7 @@
     "correctIndex": 1
   },
   {
-    "number": 90,
+    "number": "90",
     "question": "Čím vzniká pájený spoj?",
     "options": [
       "Adhezí",
@@ -990,7 +990,7 @@
     "correctIndex": 2
   },
   {
-    "number": 91,
+    "number": "91",
     "question": "Co je to \"pájka\"?",
     "options": [
       "Přístroj pro tavení přídavného materiálu při pájení",
@@ -1001,7 +1001,7 @@
     "correctIndex": 1
   },
   {
-    "number": 92,
+    "number": "92",
     "question": "Přídavné materiály pro pájení rozlišujeme na měkké a tvrdé. Který z uvedených materiálů by se dal zařadit do měkkých?",
     "options": [
       "Měd'",
@@ -1012,7 +1012,7 @@
     "correctIndex": 3
   },
   {
-    "number": 93,
+    "number": "93",
     "question": "Co nepatří mezi výhody pájených spojů?",
     "options": [
       "Možnost spojování i hůře tavitelných materiálů",
@@ -1023,7 +1023,7 @@
     "correctIndex": 3
   },
   {
-    "number": 94,
+    "number": "94",
     "question": "Co nepatří mezi výhody lepených spojů?",
     "options": [
       "Lepidla mají izolační vlastnosti",
@@ -1034,7 +1034,7 @@
     "correctIndex": 3
   },
   {
-    "number": 95,
+    "number": "95",
     "question": "Na co si nemusíte dát pozor při konstruování (navrhování) lepeného spoje?",
     "options": [
       "Na maximální možnou velikost stykové plochy",
@@ -1045,7 +1045,7 @@
     "correctIndex": 3
   },
   {
-    "number": 96,
+    "number": "96",
     "question": "Jaký druh svaru je na obrázku?",
     "options": [
       "Tupý",
@@ -1056,7 +1056,7 @@
     "correctIndex": 3
   },
   {
-    "number": 97,
+    "number": "97",
     "question": "Na výkrese se u svaru nachází následující značka. O jaký svar se nejedná?",
     "options": [
       "Koutový",
@@ -1067,7 +1067,7 @@
     "correctIndex": 3
   },
   {
-    "number": 98,
+    "number": "98",
     "question": "Na výkrese se u svaru nachází následující značka. O jaký svar se jedná?",
     "options": [
       "Přeplátovaný",
@@ -1078,7 +1078,7 @@
     "correctIndex": 2
   },
   {
-    "number": 99,
+    "number": "99",
     "question": "Dvě zobrazené součásti (hranaté trubky) jsou spojeny červeně vyobrazeným bodovým svarem a jsou namáhány zakreslenými silami. Jakým způsobem je svar namáhán?",
     "options": [
       "Střihem (smykem)",
@@ -1089,7 +1089,7 @@
     "correctIndex": 1
   },
   {
-    "number": 100,
+    "number": "100",
     "question": "V rámci výroby vyobrazeného celku (žlutá deska a modrý váleček) je potřeba udělat tyto operace: 1- Svaření desky s válečkem 2- Obrobení čelních ploch 3- Výroba přesného rozměru s tolerancí H7 4- Výroba hrubého plného válečku s Ø40 Jaký je nejvhodnější postup při výrobě vyobrazeného celku?",
     "options": [
       "4-1-2-3",
@@ -1100,7 +1100,7 @@
     "correctIndex": 0
   },
   {
-    "number": 101,
+    "number": "101",
     "question": "Jak se nazývá součást potrubí, která slouží k vyrovnání změny délek potrubí v důsledku změny teploty?",
     "options": [
       "Armatura",
@@ -1111,7 +1111,7 @@
     "correctIndex": 2
   },
   {
-    "number": 102,
+    "number": "102",
     "question": "Která z uvedených součástí potrubí se neřadí mezi armatury?",
     "options": [
       "Součást sloužící k regulaci průtoku v potrubí",
@@ -1122,7 +1122,7 @@
     "correctIndex": 3
   },
   {
-    "number": 103,
+    "number": "103",
     "question": "Co znamená, když je na trubce napsáno \"PN10\"?",
     "options": [
       "Znamená to, že maximální pracovní tlak je 10 MPa.",
@@ -1133,7 +1133,7 @@
     "correctIndex": 3
   },
   {
-    "number": 104,
+    "number": "104",
     "question": "Co znamená, když je na trubce napsáno \"DN400\"?",
     "options": [
       "Znamená to, že vnitřní průměr potrubí je přibližně 400 mm.",
@@ -1144,7 +1144,7 @@
     "correctIndex": 0
   },
   {
-    "number": 105,
+    "number": "105",
     "question": "Na kterém z uvedených parametrů nezávisí minimální tloušťka stěny potrubí?",
     "options": [
       "Na průměru potrubí",
@@ -1155,7 +1155,7 @@
     "correctIndex": 3
   },
   {
-    "number": 106,
+    "number": "106",
     "question": "Jaký druh materiálu trubky je nejméně vhodný pro vedení odpadního potrubí?",
     "options": [
       "Ocelové potrubí",
@@ -1166,7 +1166,7 @@
     "correctIndex": 0
   },
   {
-    "number": 107,
+    "number": "107",
     "question": "Co nepatří mezi výhody plastových potrubí?",
     "options": [
       "Nízká hmotnost",
@@ -1177,7 +1177,7 @@
     "correctIndex": 2
   },
   {
-    "number": 108,
+    "number": "108",
     "question": "Ke kterému druhu spojení trubek jsou potřeba šrouby a matice jako spojovací materiály?",
     "options": [
       "Hrdlové spojení",
@@ -1188,7 +1188,7 @@
     "correctIndex": 1
   },
   {
-    "number": 109,
+    "number": "109",
     "question": "Který druh spojení trubek lze nejlépe utěsnit pomocí Iněných vlasců nebo teflonových pásek?",
     "options": [
       "Hrdlové spojení",
@@ -1199,7 +1199,7 @@
     "correctIndex": 2
   },
   {
-    "number": 110,
+    "number": "110",
     "question": "Na kterém z uvedených parametrů NEZÁVISÍ velikost prodloužení trubky při zvýšení její teploty?",
     "options": [
       "Světlost trubky",
@@ -1210,7 +1210,7 @@
     "correctIndex": 0
   },
   {
-    "number": 111,
+    "number": "111",
     "question": "Jak se nazývá prvek potrubí, který zajišťuje, aby dopravovaná látku proudila pouze v jednom směru?",
     "options": [
       "Zpětná klapka",
@@ -1221,7 +1221,7 @@
     "correctIndex": 0
   },
   {
-    "number": 112,
+    "number": "112",
     "question": "Jak se nazývá prvek potrubí, kterým nelze regulovat velikost průtoku dopravované látky?",
     "options": [
       "Škrticí klapka",
@@ -1232,7 +1232,7 @@
     "correctIndex": 1
   },
   {
-    "number": 113,
+    "number": "113",
     "question": "Pro správnou funkci potrubí je třeba zajistit, aby ...",
     "options": [
       "na začátku a na konci potrubí byl neustále rozdílný tlak.",
@@ -1243,7 +1243,7 @@
     "correctIndex": 1
   },
   {
-    "number": 114,
+    "number": "114",
     "question": "Co udává tzv. pracovní stupeň potrubí?",
     "options": [
       "Maximální přetlak v potrubí v závislosti na teplotě přepravované látky",
@@ -1254,7 +1254,7 @@
     "correctIndex": 0
   },
   {
-    "number": 115,
+    "number": "115",
     "question": "Jaká je základní jednotka veličiny \"objemový průtok\"?",
     "options": [
       "m²/s",
@@ -1265,7 +1265,7 @@
     "correctIndex": 0
   },
   {
-    "number": 116,
+    "number": "116",
     "question": "Co zobrazuje tato schématická značka na potrubním schématu?",
     "options": [
       "Hydromotor",
@@ -1276,7 +1276,7 @@
     "correctIndex": 3
   },
   {
-    "number": 117,
+    "number": "117",
     "question": "Jaká součást je na obrázku?",
     "options": [
       "Pojistné šoupátko",
@@ -1287,7 +1287,7 @@
     "correctIndex": 1
   },
   {
-    "number": 118,
+    "number": "118",
     "question": "O jaké spojení trubek se jedná, pokud se několik takových trubek na obrázku spojí za sebe?",
     "options": [
       "Hrdlové spojení",
@@ -1298,7 +1298,7 @@
     "correctIndex": 0
   },
   {
-    "number": 119,
+    "number": "119",
     "question": "Jak se souhrnně nazývají součásti na obrázcích?",
     "options": [
       "Armatury",
@@ -1309,7 +1309,7 @@
     "correctIndex": 2
   },
   {
-    "number": 120,
+    "number": "120",
     "question": "K čemu nelze použít součást na obrázku?",
     "options": [
       "Ke snížení přenosu hluku a vibrací po potrubí",
@@ -1320,7 +1320,7 @@
     "correctIndex": 3
   },
   {
-    "number": 121,
+    "number": "121",
     "question": "Ozubené převody jsou",
     "options": [
       "přímé převody se silovým stykem.",
@@ -1331,7 +1331,7 @@
     "correctIndex": 1
   },
   {
-    "number": 122,
+    "number": "122",
     "question": "Co NEPATŘÍ mezi výhody ozubených převodů?",
     "options": [
       "Přenos velkých výkonů",
@@ -1342,7 +1342,7 @@
     "correctIndex": 3
   },
   {
-    "number": 123,
+    "number": "123",
     "question": "Osy ozubených kol kuželového soukolí jsou navzájem",
     "options": [
       "kolineární.",
@@ -1353,7 +1353,7 @@
     "correctIndex": 2
   },
   {
-    "number": 124,
+    "number": "124",
     "question": "Jaký je poměr mezi velikostí průměrů základní ($D_{b}$) a roztečné ($D$) kružnice u běžného čelního ozubeného kola s vnějším ozubením?",
     "options": [
       "$D_{b}<D$",
@@ -1364,7 +1364,7 @@
     "correctIndex": 0
   },
   {
-    "number": 125,
+    "number": "125",
     "question": "Který z těchto parametrů ozubeného čelního soukolí s vnějším ozubením NELZE spočítat pomocí modulu?",
     "options": [
       "Osovou vzdálenost",
@@ -1375,7 +1375,7 @@
     "correctIndex": 0
   },
   {
-    "number": 126,
+    "number": "126",
     "question": "Které tvrzení NENÍ pravdivé o \"základním profilu\" evolventního ozubení?",
     "options": [
       "Průměr roztečné kružnice se rovná nekonečnu.",
@@ -1386,7 +1386,7 @@
     "correctIndex": 0
   },
   {
-    "number": 127,
+    "number": "127",
     "question": "Jak NELZE dosáhnout toho, aby nedošlo u čelního ozubeného kola s přímými zuby k podřezání jeho pały?",
     "options": [
       "Změnou úhlu záběru",
@@ -1397,7 +1397,7 @@
     "correctIndex": 3
   },
   {
-    "number": 128,
+    "number": "128",
     "question": "Při kterém z těchto případů dojde k podřezání paty zubu čelního ozubeného kola s přímými zuby s úhlem záběru 20°?",
     "options": [
       "Při výrobě ozubeného kola, které má 18 zubů.",
@@ -1408,7 +1408,7 @@
     "correctIndex": 2
   },
   {
-    "number": 129,
+    "number": "129",
     "question": "Který z těchto parametrů se změní, pokud při výrobě čelního ozubeného kola s přímými zuby použijeme korekci (v porovnání s tím, pokud bychom ji nepoužili)?",
     "options": [
       "Úhel záběru",
@@ -1419,7 +1419,7 @@
     "correctIndex": 0
   },
   {
-    "number": 130,
+    "number": "130",
     "question": "Která z těchto sil je u čelního ozubeného kola s přímými zuby při záběru nulová?",
     "options": [
       "Tangenciální síla",
@@ -1430,7 +1430,7 @@
     "correctIndex": 1
   },
   {
-    "number": 131,
+    "number": "131",
     "question": "Jak NEJSOU namáhány zuby ozubených kol?",
     "options": [
       "Na ohyb",
@@ -1441,7 +1441,7 @@
     "correctIndex": 1
   },
   {
-    "number": 132,
+    "number": "132",
     "question": "Který parametr není důležitý při kontrole zubu ozubeného kola na ohyb?",
     "options": [
       "Přenášený moment",
@@ -1452,7 +1452,7 @@
     "correctIndex": 3
   },
   {
-    "number": 133,
+    "number": "133",
     "question": "Co NEPATŘÍ mezi výhody čelních ozubených kol se šikmými zuby (v porovnání s přímými zuby)?",
     "options": [
       "Tichý chod",
@@ -1463,7 +1463,7 @@
     "correctIndex": 0
   },
   {
-    "number": 134,
+    "number": "134",
     "question": "Jaká je hlavní výhoda šnekových soukolí?",
     "options": [
       "Velká účinnost",
@@ -1474,7 +1474,7 @@
     "correctIndex": 3
   },
   {
-    "number": 135,
+    "number": "135",
     "question": "Která z těchto sil je u kuželového ozubeného kola (úhel os 90°) při záběru nulová?",
     "options": [
       "Tangenciální síla",
@@ -1485,7 +1485,7 @@
     "correctIndex": 3
   },
   {
-    "number": 136,
+    "number": "136",
     "question": "Čím vzniklo typické poškození ozubeného kola na obrázku?",
     "options": [
       "Pittingem",
@@ -1496,7 +1496,7 @@
     "correctIndex": 0
   },
   {
-    "number": 137,
+    "number": "137",
     "question": "O jaký druh ozubeného soukolí na obrázku se jedná?",
     "options": [
       "Čelní",
@@ -1507,7 +1507,7 @@
     "correctIndex": 2
   },
   {
-    "number": 138,
+    "number": "138",
     "question": "Jaký typ ozubeného kola je na obrázku?",
     "options": [
       "Čelní ozubené kolo s přímými zuby",
@@ -1518,7 +1518,7 @@
     "correctIndex": 3
   },
   {
-    "number": 139,
+    "number": "139",
     "question": "Na obrázku je nekorigované čelní ozubené kolo s deseti přímými zuby. Kterou kótu na obrázku nelze vypočítat pouze se znalostí hodnoty modulu a zmíněného počtu zubů?",
     "options": [
       "A",
@@ -1529,7 +1529,7 @@
     "correctIndex": 1
   },
   {
-    "number": 140,
+    "number": "140",
     "question": "Který ze zakótovaných průměrů ozubeného kola Ize nazvat jako patní?",
     "options": [
       "A",
@@ -1540,7 +1540,7 @@
     "correctIndex": 2
   },
   {
-    "number": 141,
+    "number": "141",
     "question": "Jaký druh tření vzniká v kluzných ložiscích?",
     "options": [
       "Valivé tření",
@@ -1551,7 +1551,7 @@
     "correctIndex": 1
   },
   {
-    "number": 142,
+    "number": "142",
     "question": "Který druh tření v kluzných ložiscích má nejnižší součinitel smykového tření?",
     "options": [
       "Suché",
@@ -1562,7 +1562,7 @@
     "correctIndex": 2
   },
   {
-    "number": 143,
+    "number": "143",
     "question": "Který druh tření v kluzných ložiscích lze použít pouze pro malé rychlosti pohybu?",
     "options": [
       "Suché",
@@ -1573,7 +1573,7 @@
     "correctIndex": 0
   },
   {
-    "number": 144,
+    "number": "144",
     "question": "Které kluzné ložisko se NESKLÁDÁ z více částí?",
     "options": [
       "Ložiskové pouzdro",
@@ -1584,7 +1584,7 @@
     "correctIndex": 0
   },
   {
-    "number": 145,
+    "number": "145",
     "question": "Který z těchto materiálů kluzných ložisek nejméně snáší rázy?",
     "options": [
       "Ložiskové kompozice",
@@ -1595,7 +1595,7 @@
     "correctIndex": 1
   },
   {
-    "number": 146,
+    "number": "146",
     "question": "Kluzná ložiska NEKONTROLUJEME na",
     "options": [
       "otlačení.",
@@ -1606,7 +1606,7 @@
     "correctIndex": 3
   },
   {
-    "number": 147,
+    "number": "147",
     "question": "K čemu slouží u valivých ložisek klec?",
     "options": [
       "Držení valivých elementů",
@@ -1617,7 +1617,7 @@
     "correctIndex": 0
   },
   {
-    "number": 148,
+    "number": "148",
     "question": "Které ložisko se NEPOVAŽUJE za ložisko s \"čarovým\" stykem?",
     "options": [
       "Kuličkové ložisko",
@@ -1628,7 +1628,7 @@
     "correctIndex": 0
   },
   {
-    "number": 149,
+    "number": "149",
     "question": "Které z těchto ložisek NEDOKÁŽE zachytit axiální i radiální sílu dohromady?",
     "options": [
       "Kuličkové ložisko s kosoúhlým stykem",
@@ -1639,7 +1639,7 @@
     "correctIndex": 3
   },
   {
-    "number": 150,
+    "number": "150",
     "question": "Které z těchto ložisek NEDOKÁŽE zachytit žádnou axiální sílu (bez ohledu na speciální konstrukce)?",
     "options": [
       "Axiální kuličkové ložisko",
@@ -1650,7 +1650,7 @@
     "correctIndex": 1
   },
   {
-    "number": 151,
+    "number": "151",
     "question": "Které z těchto ložisek je nejméně vhodné pro snášení velkých rázů?",
     "options": [
       "Kuličkové ložisko",
@@ -1661,7 +1661,7 @@
     "correctIndex": 2
   },
   {
-    "number": 152,
+    "number": "152",
     "question": "Jaký druh uložení se nejčastěji volí pro uložení valivého ložiska na hřídeli?",
     "options": [
       "Uložení s vůlí",
@@ -1672,18 +1672,18 @@
     "correctIndex": 0
   },
   {
-    "number": 153,
+    "number": "153",
     "question": "Který parametr NENÍ potřebný pro výpočet trvanlivosti ložiska v hodinách?",
     "options": [
-      "Dynamická únosnost \"C",
-      "Dynamické ekvivalentní zatížení \"P",
-      "Otáčky hřídele \"n",
-      "Průměr hřídele \"d"
+      "Dynamická únosnost \"C\"",
+      "Dynamické ekvivalentní zatížení \"P\"",
+      "Otáčky hřídele \"n\"",
+      "Průměr hřídele \"d\""
     ],
     "correctIndex": 1
   },
   {
-    "number": 154,
+    "number": "154",
     "question": "Který parametr NEHRAJE zásadní roli při výběru typu valivého ložiska?",
     "options": [
       "Poměr axiální a radiální síly působící na ložisko",
@@ -1694,7 +1694,7 @@
     "correctIndex": 3
   },
   {
-    "number": 155,
+    "number": "155",
     "question": "Co je výhodou kluzných ložisek?",
     "options": [
       "Teoreticky nepotřebují mazání",
@@ -1705,7 +1705,7 @@
     "correctIndex": 0
   },
   {
-    "number": 156,
+    "number": "156",
     "question": "K čemu slouží (šipkou) označená část na zobrazené ložiskové jednotce?",
     "options": [
       "K uchycení ložiska ke hřídeli",
@@ -1716,7 +1716,7 @@
     "correctIndex": 2
   },
   {
-    "number": 157,
+    "number": "157",
     "question": "Pro jaké síly je vhodné ložisko na obrázku?",
     "options": [
       "Velké radiální a malé axiální",
@@ -1727,7 +1727,7 @@
     "correctIndex": 3
   },
   {
-    "number": 158,
+    "number": "158",
     "question": "Která část a proč chybí válečkovému ložisku na obrázku?",
     "options": [
       "Chybí vnitřní kroužek, protože je volně posuvný (oddělávací)",
@@ -1738,7 +1738,7 @@
     "correctIndex": 0
   },
   {
-    "number": 159,
+    "number": "159",
     "question": "Jaký typ valivého ložiska je na obrázku?",
     "options": [
       "Kuličkové",
@@ -1749,7 +1749,7 @@
     "correctIndex": 3
   },
   {
-    "number": 160,
+    "number": "160",
     "question": "Které tvrzení o ložisku na obrázku NENÍ pravdivé?",
     "options": [
       "Jedná se o kluzné ložisko",
@@ -1760,7 +1760,7 @@
     "correctIndex": 1
   },
   {
-    "number": 161,
+    "number": "161",
     "question": "Jak NELZE vypočítat převodový poměr u řetězového převodu?",
     "options": [
       "Jako poměr otáček obou řetězových kol",
@@ -1771,7 +1771,7 @@
     "correctIndex": 3
   },
   {
-    "number": 162,
+    "number": "162",
     "question": "Kuželový třecí převod je převod ...",
     "options": [
       "se silovým stykem",
@@ -1782,7 +1782,7 @@
     "correctIndex": 3
   },
   {
-    "number": 163,
+    "number": "163",
     "question": "Kterou z možností NELZE zajistit snížení prokluzu u třecích převodů?",
     "options": [
       "Zvýšení přítlačné síly mezi oběma třecími koly",
@@ -1793,7 +1793,7 @@
     "correctIndex": 2
   },
   {
-    "number": 164,
+    "number": "164",
     "question": "Přes jaké plochy se přenáší síly mezi řemenicemi a úzkým klínovým řemenem? Přenáší se přes ...",
     "options": [
       "boky řemene",
@@ -1804,7 +1804,7 @@
     "correctIndex": 0
   },
   {
-    "number": 165,
+    "number": "165",
     "question": "Co je výhodou třecích převodů?",
     "options": [
       "Malé namáhání ložisek",
@@ -1815,7 +1815,7 @@
     "correctIndex": 3
   },
   {
-    "number": 166,
+    "number": "166",
     "question": "Řetězové převody jsou převody ...",
     "options": [
       "nepřímé se silovým stykem",
@@ -1826,7 +1826,7 @@
     "correctIndex": 3
   },
   {
-    "number": 167,
+    "number": "167",
     "question": "Jaký je poměr obvodových rychlostí obou řemenic v řemenovém převodu při zanedbání prokluzu?",
     "options": [
       "Hnací řemenice má větší obvodovou rychlost než hnaná",
@@ -1837,7 +1837,7 @@
     "correctIndex": 2
   },
   {
-    "number": 168,
+    "number": "168",
     "question": "Kam se umísťuje napínací kladka v řemenovém převodu?",
     "options": [
       "Do ochablé části pásu a co nejblíže malé řemenice",
@@ -1848,7 +1848,7 @@
     "correctIndex": 0
   },
   {
-    "number": 169,
+    "number": "169",
     "question": "Co NEPATŘÍ mezi výhody řemenových převodů s ozubenými řemeny?",
     "options": [
       "Pracují bez skluzu",
@@ -1859,7 +1859,7 @@
     "correctIndex": 1
   },
   {
-    "number": 170,
+    "number": "170",
     "question": "Co patří mezi výhody řemenových převodů s klínovými řemeny oproti třecím převodům?",
     "options": [
       "Malé zatížení ložisek",
@@ -1870,7 +1870,7 @@
     "correctIndex": 3
   },
   {
-    "number": 171,
+    "number": "171",
     "question": "Jaký druh „opásání“ se používá téměř výhradně u řetězových převodů?",
     "options": [
       "Uzavřené",
@@ -1881,7 +1881,7 @@
     "correctIndex": 0
   },
   {
-    "number": 172,
+    "number": "172",
     "question": "Co NEPATŘÍ mezi výhody řetězových převodů?",
     "options": [
       "Menší namáhání ložisek",
@@ -1892,7 +1892,7 @@
     "correctIndex": 3
   },
   {
-    "number": 173,
+    "number": "173",
     "question": "Který z uvedených řetězů NENÍ plně normalizovaný?",
     "options": [
       "Článkový řetěz",
@@ -1903,7 +1903,7 @@
     "correctIndex": 0
   },
   {
-    "number": 174,
+    "number": "174",
     "question": "Který z uvedených řetězů má nejmenší tření mezi ním a řetězovým kolem při běhu?",
     "options": [
       "Pouzdrový řetěz",
@@ -1914,7 +1914,7 @@
     "correctIndex": 1
   },
   {
-    "number": 175,
+    "number": "175",
     "question": "Jak se jmenuje řetěz, který je snadno rozebíratelný vzájemným pootočením článků o 90° a vysunutím?",
     "options": [
       "Pouzdrový řetěz",
@@ -1925,7 +1925,7 @@
     "correctIndex": 1
   },
   {
-    "number": 176,
+    "number": "176",
     "question": "Jak se jmenuje řetěz na obrázku?",
     "options": [
       "Fleyerův řetěz",
@@ -1936,7 +1936,7 @@
     "correctIndex": 2
   },
   {
-    "number": 177,
+    "number": "177",
     "question": "Jaký druh řemenu je na obrázku?",
     "options": [
       "Klínový řemen",
@@ -1947,7 +1947,7 @@
     "correctIndex": 0
   },
   {
-    "number": 178,
+    "number": "178",
     "question": "Jaký druh soukolí je na obrázku?",
     "options": [
       "Kuželové soukolí",
@@ -1958,7 +1958,7 @@
     "correctIndex": 2
   },
   {
-    "number": 179,
+    "number": "179",
     "question": "Pro jaký řemen je vhodná řemenice na obrázku?",
     "options": [
       "Pro žádný – nejedná se o řemenici",
@@ -1969,7 +1969,7 @@
     "correctIndex": 3
   },
   {
-    "number": 180,
+    "number": "180",
     "question": "Jaký úhel opásání má hnaná řemenice na obrázku?",
     "options": [
       "Do 90°",
@@ -1980,7 +1980,7 @@
     "correctIndex": 3
   },
   {
-    "number": 181,
+    "number": "181",
     "question": "Jaká je hlavní funkce všech spojek?",
     "options": [
       "Přenos krouticího momentu",
@@ -1991,7 +1991,7 @@
     "correctIndex": 0
   },
   {
-    "number": 182,
+    "number": "182",
     "question": "Jaká je základní vlastnost pevných (mechanických neovládaných) spojek?",
     "options": [
       "Jsou jednoduché a levné",
@@ -2002,7 +2002,7 @@
     "correctIndex": 0
   },
   {
-    "number": 183,
+    "number": "183",
     "question": "Jaká je základní vlastnost vyrovnávacích (mechanických neovládaných) spojek?",
     "options": [
       "Jsou jednoduché a levné",
@@ -2013,7 +2013,7 @@
     "correctIndex": 1
   },
   {
-    "number": 184,
+    "number": "184",
     "question": "Která z těchto výsuvných ovládaných spojek NEPŘENÁŠÍ krouticí moment pomocí silového styku?",
     "options": [
       "Čelní třecí spojka",
@@ -2024,7 +2024,7 @@
     "correctIndex": 3
   },
   {
-    "number": 185,
+    "number": "185",
     "question": "Která z těchto spojek se řadí mezi ovládané spojky?",
     "options": [
       "Korýtková spojka",
@@ -2035,7 +2035,7 @@
     "correctIndex": 0
   },
   {
-    "number": 186,
+    "number": "186",
     "question": "Která z těchto spojek se NEŘADÍ mezi ovládané spojky?",
     "options": [
       "Volnoběžná spojka",
@@ -2046,7 +2046,7 @@
     "correctIndex": 3
   },
   {
-    "number": 187,
+    "number": "187",
     "question": "Jaký obchodní název má spojka s pryžovou deskou?",
     "options": [
       "BKN",
@@ -2057,7 +2057,7 @@
     "correctIndex": 1
   },
   {
-    "number": 188,
+    "number": "188",
     "question": "Jakým způsobem (stykem) přenáší krouticí moment nejjednodušší trubková spojka?",
     "options": [
       "Materiálovým stykem",
@@ -2068,7 +2068,7 @@
     "correctIndex": 0
   },
   {
-    "number": 189,
+    "number": "189",
     "question": "Jak se nazývají spojky, které dokážou přenášet krouticí moment pouze v jednom směru otáčení?",
     "options": [
       "Rozběhové spojky",
@@ -2079,7 +2079,7 @@
     "correctIndex": 1
   },
   {
-    "number": 190,
+    "number": "190",
     "question": "Která spojka se používá pro vytvoření tzv. Kardanova závěsu, používaného typicky pro pohon vozidel?",
     "options": [
       "Kloubová spojka",
@@ -2090,7 +2090,7 @@
     "correctIndex": 0
   },
   {
-    "number": 191,
+    "number": "191",
     "question": "Která z těchto brzd funguje primárně na principu vláknového tření?",
     "options": [
       "Jednočelisťová brzda",
@@ -2101,7 +2101,7 @@
     "correctIndex": 1
   },
   {
-    "number": 192,
+    "number": "192",
     "question": "Která z těchto pásových brzd je nejvhodnější pro oba smysly otáčení?",
     "options": [
       "Jednoduchá",
@@ -2112,7 +2112,7 @@
     "correctIndex": 3
   },
   {
-    "number": 193,
+    "number": "193",
     "question": "Která z těchto brzd NENAMÁHÁ brzděnou hřídel na ohyb?",
     "options": [
       "Jednočelisťová brzda",
@@ -2123,7 +2123,7 @@
     "correctIndex": 2
   },
   {
-    "number": 194,
+    "number": "194",
     "question": "Na principu jakého jednoduchého stroje funguje jednočelisťová brzda?",
     "options": [
       "Páka",
@@ -2134,7 +2134,7 @@
     "correctIndex": 0
   },
   {
-    "number": 195,
+    "number": "195",
     "question": "Která ze základních typů brzd je nejvíce samočinně chlazena vzduchem?",
     "options": [
       "Jednočelisťová brzda",
@@ -2145,7 +2145,7 @@
     "correctIndex": 3
   },
   {
-    "number": 196,
+    "number": "196",
     "question": "Která ze základních typů brzd lze zařadit mezi axiální brzdy?",
     "options": [
       "Jednočelisťová brzda",
@@ -2156,7 +2156,7 @@
     "correctIndex": 2
   },
   {
-    "number": 197,
+    "number": "197",
     "question": "Která z těchto informací obecně o brzdách NENÍ pravdivá?",
     "options": [
       "Slouží k zajištění klidové polohy",
@@ -2167,7 +2167,7 @@
     "correctIndex": 0
   },
   {
-    "number": 198,
+    "number": "198",
     "question": "Na kterém z těchto parametrů nezávisí velikost ovládací síly jednočelisťové brzdy?",
     "options": [
       "Materiál brzdového obložení",
@@ -2178,7 +2178,7 @@
     "correctIndex": 2
   },
   {
-    "number": 199,
+    "number": "199",
     "question": "Lamelové brzdy jsou konstrukčně podobné ...",
     "options": [
       "spojkám",
@@ -2189,7 +2189,7 @@
     "correctIndex": 0
   },
   {
-    "number": 200,
+    "number": "200",
     "question": "Jaká síla vždy působí proti síle třecí při brzdění?",
     "options": [
       "Obvodová síla",
@@ -2200,7 +2200,7 @@
     "correctIndex": 1
   },
   {
-    "number": 201,
+    "number": "201",
     "question": "Hydrostatické mechanismy se řadí mezi mechanismy",
     "options": [
       "kinematické.",
@@ -2211,7 +2211,7 @@
     "correctIndex": 2
   },
   {
-    "number": 202,
+    "number": "202",
     "question": "Co NEPATŘÍ mezi výhody hydrostatických mechanismů?",
     "options": [
       "Přenos energie na velké vzdálenosti",
@@ -2222,7 +2222,7 @@
     "correctIndex": 2
   },
   {
-    "number": 203,
+    "number": "203",
     "question": "Který prvek NENÍ součástí hydrostatického mechanismu?",
     "options": [
       "Nádrž",
@@ -2233,7 +2233,7 @@
     "correctIndex": 3
   },
   {
-    "number": 204,
+    "number": "204",
     "question": "Který druh energie má zcela zanedbatelnou hodnotu při přenosu sil v hydrostatickém mechanismu?",
     "options": [
       "Potenciální",
@@ -2244,7 +2244,7 @@
     "correctIndex": 1
   },
   {
-    "number": 205,
+    "number": "205",
     "question": "Jaký účel má v hydrostatickém mechanismu hydrogenerátor?",
     "options": [
       "Mění energii mechanickou na tlakovou",
@@ -2255,7 +2255,7 @@
     "correctIndex": 0
   },
   {
-    "number": 206,
+    "number": "206",
     "question": "Které z těchto druhů čerpadel má nejmenší tlakové pulzace kapaliny na výstupu?",
     "options": [
       "Zubové čerpadlo",
@@ -2266,7 +2266,7 @@
     "correctIndex": 3
   },
   {
-    "number": 207,
+    "number": "207",
     "question": "Které z těchto druhů čerpadel je konstrukčně nejjednodušší?",
     "options": [
       "Zubové čerpadlo",
@@ -2277,7 +2277,7 @@
     "correctIndex": 0
   },
   {
-    "number": 208,
+    "number": "208",
     "question": "Ve kterém z těchto čerpadel Ize nalézt klikový mechanismus?",
     "options": [
       "Zubové čerpadlo",
@@ -2288,7 +2288,7 @@
     "correctIndex": 2
   },
   {
-    "number": 209,
+    "number": "209",
     "question": "Které z těchto druhů čerpadel Ize regulovat změnou excentricity rotoru vůči statoru?",
     "options": [
       "Řadové pístové čerpadlo",
@@ -2299,7 +2299,7 @@
     "correctIndex": 1
   },
   {
-    "number": 210,
+    "number": "210",
     "question": "Které z těchto druhů čerpadel Ize regulovat naklopením desky ovládající pohyb pístů?",
     "options": [
       "Řadové pístové čerpadlo",
@@ -2310,7 +2310,7 @@
     "correctIndex": 3
   },
   {
-    "number": 211,
+    "number": "211",
     "question": "Jaký základní tvar má značka pro čerpadlo v normalizovaných hydraulických schématech?",
     "options": [
       "Kružnice",
@@ -2321,7 +2321,7 @@
     "correctIndex": 0
   },
   {
-    "number": 212,
+    "number": "212",
     "question": "V normalizovaných hydraulických schématech se elektrický motor značí písmenkem M, kolem něhož je...",
     "options": [
       "kružnice.",
@@ -2332,7 +2332,7 @@
     "correctIndex": 0
   },
   {
-    "number": 213,
+    "number": "213",
     "question": "Která z možností nevyjadřuje funkci nádrže v hydrostatických mechanismech?",
     "options": [
       "Zásobování (uchování) pracovní kapaliny",
@@ -2343,7 +2343,7 @@
     "correctIndex": 1
   },
   {
-    "number": 214,
+    "number": "214",
     "question": "K čemu slouží v hydrostatickém mechanismu pojistný ventil?",
     "options": [
       "K řízení velikosti tlaku v obvodu",
@@ -2354,7 +2354,7 @@
     "correctIndex": 0
   },
   {
-    "number": 215,
+    "number": "215",
     "question": "K čemu slouží v hydrostatickém mechanismu škrtící ventil?",
     "options": [
       "K řízení velikosti tlaku v obvodu",
@@ -2365,7 +2365,7 @@
     "correctIndex": 1
   },
   {
-    "number": 216,
+    "number": "216",
     "question": "Celek na obrázku Ize nejlépe použít jako",
     "options": [
       "jednočinný hydrogenerátor.",
@@ -2376,7 +2376,7 @@
     "correctIndex": 3
   },
   {
-    "number": 217,
+    "number": "217",
     "question": "Jaký celek je na obrázku?",
     "options": [
       "jednočinný hydrogenerátor.",
@@ -2387,7 +2387,7 @@
     "correctIndex": 3
   },
   {
-    "number": 218,
+    "number": "218",
     "question": "Který prvek hydraulického systému má schématickou značku na obrázku?",
     "options": [
       "Zpětný ventil",
@@ -2398,7 +2398,7 @@
     "correctIndex": 0
   },
   {
-    "number": 219,
+    "number": "219",
     "question": "Jaký druh hydrogenerátoru je na obrázku?",
     "options": [
       "Radiální pístový",
@@ -2409,7 +2409,7 @@
     "correctIndex": 1
   },
   {
-    "number": 220,
+    "number": "220",
     "question": "Jakou funkci má prvek na obrázku v hydrostatickém systému?",
     "options": [
       "Zvyšování potenciální energie kapaliny",
@@ -2420,7 +2420,7 @@
     "correctIndex": 3
   },
   {
-    "number": 221,
+    "number": "221",
     "question": "Který z uvedených druhů dopravníků se NEŘADÍ mezi dopravníky s tažným elementem?",
     "options": [
       "Pásový dopravník",
@@ -2431,7 +2431,7 @@
     "correctIndex": 3
   },
   {
-    "number": 222,
+    "number": "222",
     "question": "Který z uvedených druhů dopravníků se řadí mezi dopravníky s tažným elementem?",
     "options": [
       "Eskalátor",
@@ -2442,7 +2442,7 @@
     "correctIndex": 0
   },
   {
-    "number": 223,
+    "number": "223",
     "question": "Který z uvedených druhů dopravníků se jinak nazývá \"elevátor\"?",
     "options": [
       "Pohyblivé schodiště",
@@ -2453,7 +2453,7 @@
     "correctIndex": 1
   },
   {
-    "number": 224,
+    "number": "224",
     "question": "Který převod principiálně pohání pásový dopravník?",
     "options": [
       "Řemenový převod",
@@ -2464,7 +2464,7 @@
     "correctIndex": 2
   },
   {
-    "number": 225,
+    "number": "225",
     "question": "K jakému druhu dopravy primárně není určen pásový dopravník?",
     "options": [
       "Ke kontinuální dopravě",
@@ -2475,7 +2475,7 @@
     "correctIndex": 2
   },
   {
-    "number": 226,
+    "number": "226",
     "question": "Kterým z těchto způsobů NELZE zvýšit dopravované množství materiálu pásovým dopravníkem?",
     "options": [
       "Zvětšením ložné šířky pásu",
@@ -2486,7 +2486,7 @@
     "correctIndex": 3
   },
   {
-    "number": 227,
+    "number": "227",
     "question": "Který buben u šikmého pásového dopravníku (doprava materiálu směrem nahoru) bude hnací?",
     "options": [
       "Vždy ten výše položený",
@@ -2497,7 +2497,7 @@
     "correctIndex": 0
   },
   {
-    "number": 228,
+    "number": "228",
     "question": "Který druh válečků pod pásem NENALEZNEME u pásového dopravníku?",
     "options": [
       "Vodící válečky",
@@ -2508,7 +2508,7 @@
     "correctIndex": 3
   },
   {
-    "number": 229,
+    "number": "229",
     "question": "Při výpočtu výkonu motoru pro pásový dopravník NENÍ nutné uvažovat ...",
     "options": [
       "třecí síly.",
@@ -2519,7 +2519,7 @@
     "correctIndex": 3
   },
   {
-    "number": 230,
+    "number": "230",
     "question": "K jakému druhu dopravy je primárně určen korečkový dopravník?",
     "options": [
       "K přerušované dopravě",
@@ -2530,7 +2530,7 @@
     "correctIndex": 2
   },
   {
-    "number": 231,
+    "number": "231",
     "question": "Který z uvedených druhů dopravníků NENÍ vhodný pro přepravu sypkého materiálu?",
     "options": [
       "Článkový dopravník",
@@ -2541,7 +2541,7 @@
     "correctIndex": 0
   },
   {
-    "number": 232,
+    "number": "232",
     "question": "Který z uvedených druhů dopravníků je NEJMÉNĚ vhodný pro přepravu horkého materiálu?",
     "options": [
       "Článkový dopravník",
@@ -2552,7 +2552,7 @@
     "correctIndex": 1
   },
   {
-    "number": 233,
+    "number": "233",
     "question": "Lze hřeblovými dopravníky a redlery dopravovat materiál horizontálně, šikmo i vertikálně?",
     "options": [
       "Ano, oběma je to možné.",
@@ -2563,7 +2563,7 @@
     "correctIndex": 2
   },
   {
-    "number": 234,
+    "number": "234",
     "question": "Kterému dopravníku je nejblíže princip fungování pohyblivého schodiště?",
     "options": [
       "Elevátoru",
@@ -2574,7 +2574,7 @@
     "correctIndex": 1
   },
   {
-    "number": 235,
+    "number": "235",
     "question": "U kterého z uvedených dopravníků by NEMOHLO být tažným elementem lano?",
     "options": [
       "Vozíkový dopravník",
@@ -2585,7 +2585,7 @@
     "correctIndex": 2
   },
   {
-    "number": 236,
+    "number": "236",
     "question": "Na obrázku je běžný pásový dopravník zobrazený bez samotného pásu. K čemu slouží váleček označený červenou šipkou?",
     "options": [
       "Pro podporu pásu ve vratné větvi",
@@ -2596,7 +2596,7 @@
     "correctIndex": 0
   },
   {
-    "number": 237,
+    "number": "237",
     "question": "Jaký typ dopravníku s tažným elementem je na obrázku?",
     "options": [
       "Korečkový",
@@ -2607,7 +2607,7 @@
     "correctIndex": 1
   },
   {
-    "number": 238,
+    "number": "238",
     "question": "S jakým typem dopravníku nejpravděpodobněji souvisí tato součást?",
     "options": [
       "S elevátorem",
@@ -2618,7 +2618,7 @@
     "correctIndex": 0
   },
   {
-    "number": 239,
+    "number": "239",
     "question": "Pásový dopravník na obrázku má konstruktér v úmyslu umístit pod úhlem 20°. K jakému účelu slouží označená oblast a kde by měla být umístěna?",
     "options": [
       "Jedná se napínání pásu, umístí se tudíž v nejvyšším možném místě",
@@ -2629,7 +2629,7 @@
     "correctIndex": 2
   },
   {
-    "number": 240,
+    "number": "240",
     "question": "Jakým přízviskem by se dal nejlépe označit tento dopravník?",
     "options": [
       "Článkový",
@@ -2640,7 +2640,7 @@
     "correctIndex": 0
   },
   {
-    "number": 241,
+    "number": "241",
     "question": "Který z uvedených druhů dopravníků se NEŘADÍ mezi dopravníky bez tažného elementu?",
     "options": [
       "Korečkový dopravník",
@@ -2651,7 +2651,7 @@
     "correctIndex": 0
   },
   {
-    "number": 242,
+    "number": "242",
     "question": "Který z uvedených druhů dopravníků se řadí mezi dopravníky bez tažného elementu?",
     "options": [
       "Elevátor",
@@ -2662,7 +2662,7 @@
     "correctIndex": 3
   },
   {
-    "number": 243,
+    "number": "243",
     "question": "Kterým z těchto způsobů NELZE zvýšit dopravované množství materiálu šnekovým dopravníkem?",
     "options": [
       "Zvýšením otáček šneku",
@@ -2673,7 +2673,7 @@
     "correctIndex": 3
   },
   {
-    "number": 244,
+    "number": "244",
     "question": "Ke kterému z uvedených druhů dopravy primárně NESLOUŽÍ šnekový dopravník?",
     "options": [
       "K horizontální dopravě",
@@ -2684,7 +2684,7 @@
     "correctIndex": 0
   },
   {
-    "number": 245,
+    "number": "245",
     "question": "Jak se nazývá křivka, která tvoří šnek šnekového dopravníku?",
     "options": [
       "Šroubovice",
@@ -2695,7 +2695,7 @@
     "correctIndex": 0
   },
   {
-    "number": 246,
+    "number": "246",
     "question": "Lze naplnit dopravní žlab šnekového dopravníku na 100%?",
     "options": [
       "Ano, zvýší se tím dopravní množství",
@@ -2706,7 +2706,7 @@
     "correctIndex": 2
   },
   {
-    "number": 247,
+    "number": "247",
     "question": "Který z těchto dopravníků bez tažného elementu nikdy nepotřebuje pro svoji funkci pohon?",
     "options": [
       "Šnekový dopravník",
@@ -2717,7 +2717,7 @@
     "correctIndex": 1
   },
   {
-    "number": 248,
+    "number": "248",
     "question": "Který z těchto dopravníků bez tažného elementu bude při pořízení pravděpodobně nejlevnější?",
     "options": [
       "Šnekový dopravník",
@@ -2728,7 +2728,7 @@
     "correctIndex": 1
   },
   {
-    "number": 249,
+    "number": "249",
     "question": "Co je základní podmínkou pro to, aby mohl být přepravován materiál v dopravním žlabu?",
     "options": [
       "Dostatečný náklon dopravního žlabu, aby bylo překonáno smykové tření",
@@ -2739,7 +2739,7 @@
     "correctIndex": 0
   },
   {
-    "number": 250,
+    "number": "250",
     "question": "Jaký materiál Ize přepravovat pomocí válečkové tratě?",
     "options": [
       "Jakýkoliv",
@@ -2750,7 +2750,7 @@
     "correctIndex": 3
   },
   {
-    "number": 251,
+    "number": "251",
     "question": "Jak nemůže být přepravován materiál pomocí válečkové tratě?",
     "options": [
       "Posouváním lidskou silou",
@@ -2761,7 +2761,7 @@
     "correctIndex": 3
   },
   {
-    "number": 252,
+    "number": "252",
     "question": "Při rychlém pohybu vibračního dopravníku vzad (proti směru dopravy materiálu) je...",
     "options": [
       "třecí síla větší než setrvačná.",
@@ -2772,7 +2772,7 @@
     "correctIndex": 1
   },
   {
-    "number": 253,
+    "number": "253",
     "question": "Při pomalém pohybu vibračního dopravníku vpřed (ve směru dopravy materiálu) je...",
     "options": [
       "třecí síla větší než gravitační.",
@@ -2783,7 +2783,7 @@
     "correctIndex": 2
   },
   {
-    "number": 254,
+    "number": "254",
     "question": "U poháněné válečkové tratě musí být poháněn ...",
     "options": [
       "každý váleček.",
@@ -2794,7 +2794,7 @@
     "correctIndex": 2
   },
   {
-    "number": 255,
+    "number": "255",
     "question": "U kterého z těchto dopravníků bez tažného elementu hraje nejmenší roli smykové tření?",
     "options": [
       "Šnekový dopravník",
@@ -2805,7 +2805,7 @@
     "correctIndex": 3
   },
   {
-    "number": 256,
+    "number": "256",
     "question": "Jaký druh dopravníku bez tažného elementu je na obrázku?",
     "options": [
       "Nejedná se o dopravník bez tažného elementu, ale s tažným elementem",
@@ -2816,7 +2816,7 @@
     "correctIndex": 1
   },
   {
-    "number": 257,
+    "number": "257",
     "question": "K dopravě jakého materiálu se nejlépe hodí šnekovice na obrázku?",
     "options": [
       "Lepivého tekoucího materiálu",
@@ -2827,7 +2827,7 @@
     "correctIndex": 2
   },
   {
-    "number": 258,
+    "number": "258",
     "question": "K jakému účelu slouží zakroužkovaná část na obrázku tohoto šnekového dopravníku?",
     "options": [
       "Jako vstup dopravovaného materiálu do dopravníku",
@@ -2838,7 +2838,7 @@
     "correctIndex": 2
   },
   {
-    "number": 259,
+    "number": "259",
     "question": "Na obrázku je dopravník, u kterého lze upravit jeho celkovou délku. Jak Ize takový dopravník použít pro dopravu kusového materiálu?",
     "options": [
       "Jakkoliv dlouhý, ale vždy musí být skloněný pod určitým úhlem, a proto má nastavovací nohy.",
@@ -2849,7 +2849,7 @@
     "correctIndex": 2
   },
   {
-    "number": 260,
+    "number": "260",
     "question": "K jakému účelu je na tomto dopravníku umístěný označený motor s převodovkou?",
     "options": [
       "Proto, aby roztočil válečky přes pomocný převod",
@@ -2860,7 +2860,7 @@
     "correctIndex": 1
   },
   {
-    "number": 261,
+    "number": "261",
     "question": "Existuje případ, kdy může do klece výtahu se zakázanou dopravou osob vstoupit osoba?",
     "options": [
       "Ne, v žádném případě",
@@ -2871,7 +2871,7 @@
     "correctIndex": 0
   },
   {
-    "number": 262,
+    "number": "262",
     "question": "Do které skupiny výtahů se podle normy řadí tzv. páternoster?",
     "options": [
       "Výtahy pro dopravu osob",
@@ -2882,7 +2882,7 @@
     "correctIndex": 1
   },
   {
-    "number": 263,
+    "number": "263",
     "question": "Jaký druh zdvihadla je výtahový stroj, který zvedá a spouští klec?",
     "options": [
       "Zvedák",
@@ -2893,7 +2893,7 @@
     "correctIndex": 1
   },
   {
-    "number": 264,
+    "number": "264",
     "question": "Jaký druh lan se nejčastěji používá jako zvedací prostředky u výtahů?",
     "options": [
       "Protisměrně vinutá ocelová lana",
@@ -2904,7 +2904,7 @@
     "correctIndex": 0
   },
   {
-    "number": 265,
+    "number": "265",
     "question": "Jaký druh řetězů se nejčastěji používá jako zvedací prostředky u výtahů?",
     "options": [
       "Gallův řetěz",
@@ -2915,7 +2915,7 @@
     "correctIndex": 0
   },
   {
-    "number": 266,
+    "number": "266",
     "question": "Na co je nutné dát pozor při konstrukci uchycení kabiny výtahu?",
     "options": [
       "Počet lan držící výtahovou klec je dán normou a tíhu výtahové klece je nezbytné rozdělit rovnoměrně na všechna lana",
@@ -2926,7 +2926,7 @@
     "correctIndex": 0
   },
   {
-    "number": 267,
+    "number": "267",
     "question": "Co musí být v prostoru výtahu vedeno?",
     "options": [
       "Jen kabina (klec)",
@@ -2937,7 +2937,7 @@
     "correctIndex": 2
   },
   {
-    "number": 268,
+    "number": "268",
     "question": "Na jaký druh namáhání jsou namáhána lana?",
     "options": [
       "Tah",
@@ -2948,7 +2948,7 @@
     "correctIndex": 0
   },
   {
-    "number": 269,
+    "number": "269",
     "question": "Jak se nazývá prostor, ve kterém se pohybuje kabina výtahu?",
     "options": [
       "Šachta",
@@ -2959,7 +2959,7 @@
     "correctIndex": 0
   },
   {
-    "number": 270,
+    "number": "270",
     "question": "Jakou hmotnost musí mít protizávaží?",
     "options": [
       "Stejnou jako kabina výtahu",
@@ -2970,7 +2970,7 @@
     "correctIndex": 2
   },
   {
-    "number": 271,
+    "number": "271",
     "question": "Na čem z uvedených NEZÁVISÍ volba výkonu elektromotoru pro pohon výtahu?",
     "options": [
       "Na rychlosti pohybu kabiny výtahu",
@@ -2981,7 +2981,7 @@
     "correctIndex": 3
   },
   {
-    "number": 272,
+    "number": "272",
     "question": "Co z uvedených NENÍ součástí výtahové šachty?",
     "options": [
       "Nárazníky",
@@ -2992,7 +2992,7 @@
     "correctIndex": 3
   },
   {
-    "number": 273,
+    "number": "273",
     "question": "Co NEPATŘÍ mezi nevýhody páternosteru?",
     "options": [
       "Složitá konstrukce",
@@ -3003,7 +3003,7 @@
     "correctIndex": 3
   },
   {
-    "number": 274,
+    "number": "274",
     "question": "K čemu obvykle slouží páternoster?",
     "options": [
       "Ke kontinuální přepravě osob",
@@ -3014,7 +3014,7 @@
     "correctIndex": 0
   },
   {
-    "number": 275,
+    "number": "275",
     "question": "Co NEPATŘÍ mezi výhody hydraulických výtahů?",
     "options": [
       "Tichý chod",
@@ -3025,7 +3025,7 @@
     "correctIndex": 3
   },
   {
-    "number": 276,
+    "number": "276",
     "question": "Co spojuje celek na obrázku u výtahů?",
     "options": [
       "Kabinu s vodícími lištami",
@@ -3036,7 +3036,7 @@
     "correctIndex": 1
   },
   {
-    "number": 277,
+    "number": "277",
     "question": "Jak se nazývá výtah, jehož zjednodušené schéma a reálná podoba je na obrázku?",
     "options": [
       "Oběžný",
@@ -3047,7 +3047,7 @@
     "correctIndex": 0
   },
   {
-    "number": 278,
+    "number": "278",
     "question": "Na obrázku je lano vhodné pro nesení výtahové klece. Jak se nazývá jeho část označená šipkou?",
     "options": [
       "Pramen",
@@ -3058,7 +3058,7 @@
     "correctIndex": 2
   },
   {
-    "number": 279,
+    "number": "279",
     "question": "Jak se nazývá zařízení výtahu na obrázku?",
     "options": [
       "Vodítko",
@@ -3069,7 +3069,7 @@
     "correctIndex": 3
   },
   {
-    "number": 280,
+    "number": "280",
     "question": "Jak se nazývá zařízení na obrázku v souvislosti s výtahy?",
     "options": [
       "Omezovač",
@@ -3080,7 +3080,7 @@
     "correctIndex": 2
   },
   {
-    "number": 281,
+    "number": "281",
     "question": "Co se rozumí pojmem \"vyložení jeřábu\"?",
     "options": [
       "Maximální výška, do které lze břemeno jeřábem zvednout",
@@ -3091,7 +3091,7 @@
     "correctIndex": 1
   },
   {
-    "number": 282,
+    "number": "282",
     "question": "Co se rozumí pojmem \"klopný moment\"? Pozn.: V hranaté závorce je jednotka dané veličiny.",
     "options": [
       "Síla [N], která se snaží při transportu břemene naklápět jeřáb",
@@ -3102,7 +3102,7 @@
     "correctIndex": 3
   },
   {
-    "number": 283,
+    "number": "283",
     "question": "Do které z těchto kategorií lze zařadit mostový jeřáb",
     "options": [
       "Věžové jeřáby",
@@ -3113,7 +3113,7 @@
     "correctIndex": 2
   },
   {
-    "number": 284,
+    "number": "284",
     "question": "Čím se vyznačuje věžový jeřáb?",
     "options": [
       "Nosná konstrukce je příhradová",
@@ -3124,7 +3124,7 @@
     "correctIndex": 0
   },
   {
-    "number": 285,
+    "number": "285",
     "question": "Prolamovaný profil nosné konstrukce jeřábu vznikne tak, dojde k úpravě válcovaného ocelového profilu nejčastěji tvaru",
     "options": [
       "U",
@@ -3135,7 +3135,7 @@
     "correctIndex": 1
   },
   {
-    "number": 286,
+    "number": "286",
     "question": "Zdvihací ústrojí jeřábu je kombinací",
     "options": [
       "kladkostroje a zvedáku.",
@@ -3146,7 +3146,7 @@
     "correctIndex": 2
   },
   {
-    "number": 287,
+    "number": "287",
     "question": "Který ze zmíněných parametrů NENÍ nutné zohlednit při návrhu elektromotoru pro zdvihací zařízení jeřábu?",
     "options": [
       "Nosnost jeřábu",
@@ -3157,7 +3157,7 @@
     "correctIndex": 1
   },
   {
-    "number": 288,
+    "number": "288",
     "question": "Na kterém z uvedených parametrů NEZÁVISÍ rychlost zdvihání břemene jeřábem?",
     "options": [
       "Otáčky elektromotoru",
@@ -3168,7 +3168,7 @@
     "correctIndex": 3
   },
   {
-    "number": 289,
+    "number": "289",
     "question": "Která z uvedených možností se NEPOUŽÍVÁ jako zdvíhací prostředek u jeřábů?",
     "options": [
       "Textilní lana",
@@ -3179,7 +3179,7 @@
     "correctIndex": 3
   },
   {
-    "number": 290,
+    "number": "290",
     "question": "Který z uvedených názvů NEOZNAČUJE název ocelového lana?",
     "options": [
       "Seal",
@@ -3190,7 +3190,7 @@
     "correctIndex": 3
   },
   {
-    "number": 291,
+    "number": "291",
     "question": "Který z uvedených typů řetězů se NEPOUŽÍVÁ u jeřábů jako zvedací prostředek?",
     "options": [
       "Článkové řetězy",
@@ -3201,7 +3201,7 @@
     "correctIndex": 3
   },
   {
-    "number": 292,
+    "number": "292",
     "question": "Který z nabízených uchopovacích prostředků drží transportované těleso pomocí smykového tření?",
     "options": [
       "Dvojitý hák",
@@ -3212,7 +3212,7 @@
     "correctIndex": 2
   },
   {
-    "number": 293,
+    "number": "293",
     "question": "Na jaký druh namáhání (z nabízených možností) se kontrolují pojezdové kolejnice pro pojezd jeřábů?",
     "options": [
       "Krut",
@@ -3223,7 +3223,7 @@
     "correctIndex": 1
   },
   {
-    "number": 294,
+    "number": "294",
     "question": "Co NEPATŘÍ mezi výhody textilních lan jako zvedacích prostředků u jeřábů?",
     "options": [
       "Nízká hmotnost",
@@ -3234,7 +3234,7 @@
     "correctIndex": 3
   },
   {
-    "number": 295,
+    "number": "295",
     "question": "Jakým převodem je nejčastěji realizován mechanismus otáčení jeřábu kolem své osy?",
     "options": [
       "Řetězovým",
@@ -3245,7 +3245,7 @@
     "correctIndex": 2
   },
   {
-    "number": 296,
+    "number": "296",
     "question": "Jaký typický druh jeřábu je na obrázku?",
     "options": [
       "Věžový",
@@ -3256,7 +3256,7 @@
     "correctIndex": 2
   },
   {
-    "number": 297,
+    "number": "297",
     "question": "Jakým způsobem je primárně namáhán označený profil (červenou šipkou) na obrázku při zvedání břemene tímto sloupovým jeřábem?",
     "options": [
       "Na tah",
@@ -3267,7 +3267,7 @@
     "correctIndex": 0
   },
   {
-    "number": 298,
+    "number": "298",
     "question": "Jak se nazývá konstrukce, ze které je vyroben výložník tohoto jeřábu?",
     "options": [
       "Prolamovaná",
@@ -3278,7 +3278,7 @@
     "correctIndex": 0
   },
   {
-    "number": 299,
+    "number": "299",
     "question": "Jakým slovem by se nejlépe dal označit prostředek na obrázku pro uchopování břemen jeřábů?",
     "options": [
       "Drapák",
@@ -3289,7 +3289,7 @@
     "correctIndex": 3
   },
   {
-    "number": 300,
+    "number": "300",
     "question": "Jak se nazývá (označené) červené zařízení na obrázku?",
     "options": [
       "Kladkostroj",
@@ -3300,7 +3300,7 @@
     "correctIndex": 0
   },
   {
-    "number": 301,
+    "number": "301",
     "question": "Co je to pístové čerpadlo?",
     "options": [
       "Hnací pístový stroj sloužící pro dopravu kapalin",
@@ -3311,7 +3311,7 @@
     "correctIndex": 1
   },
   {
-    "number": 302,
+    "number": "302",
     "question": "Kterému rovinnému obrazci se nejvíce podobá teoretický pracovní digram jednočinného pístového čerpadla?",
     "options": [
       "Obdélníku",
@@ -3322,7 +3322,7 @@
     "correctIndex": 0
   },
   {
-    "number": 303,
+    "number": "303",
     "question": "Následující informace popisují fázi sání u jednočinného pístového čerpadla. Která informace NENÍ pravdivá?",
     "options": [
       "Píst se pohybuje z horní úvratě do dolní.",
@@ -3333,7 +3333,7 @@
     "correctIndex": 1
   },
   {
-    "number": 304,
+    "number": "304",
     "question": "Následující informace popisují fázi výtlaku u jednočinného pístového čerpadla. Která informace NENÍ pravdivá?",
     "options": [
       "Píst se pohybuje z dolní úvratě do horní.",
@@ -3344,7 +3344,7 @@
     "correctIndex": 2
   },
   {
-    "number": 305,
+    "number": "305",
     "question": "Na kterém z uvedených parametrů NEZÁVISÍ výkon motoru pístového čerpadla?",
     "options": [
       "Geodetická dopravní výška",
@@ -3355,7 +3355,7 @@
     "correctIndex": 3
   },
   {
-    "number": 306,
+    "number": "306",
     "question": "Které z uvedených druhů čerpadel má nejméně rovnoměrný výtok čerpané kapaliny?",
     "options": [
       "Jednočinné čerpadlo",
@@ -3366,7 +3366,7 @@
     "correctIndex": 0
   },
   {
-    "number": 307,
+    "number": "307",
     "question": "Které z uvedených druhů čerpadel má nejrovnoměrnější výtok čerpané kapaliny?",
     "options": [
       "Jednočinné čerpadlo",
@@ -3377,7 +3377,7 @@
     "correctIndex": 2
   },
   {
-    "number": 308,
+    "number": "308",
     "question": "U kterého z uvedených druhů pístových čerpadel lze použít zkrácený klikový mechanismus?",
     "options": [
       "Jednočinné čerpadlo",
@@ -3388,7 +3388,7 @@
     "correctIndex": 0
   },
   {
-    "number": 309,
+    "number": "309",
     "question": "Jak se jmenuje součást pístových čerpadel, která pomáhá zmenšit pulzování tlaku v kapalině?",
     "options": [
       "Vzdušník",
@@ -3399,7 +3399,7 @@
     "correctIndex": 0
   },
   {
-    "number": 310,
+    "number": "310",
     "question": "U kterého z uvedených druhů pístových čerpadel NEDOCHÁZÍ k sání pouze při jednom pohybu pístu?",
     "options": [
       "Jednočinné čerpadlo",
@@ -3410,7 +3410,7 @@
     "correctIndex": 1
   },
   {
-    "number": 311,
+    "number": "311",
     "question": "U kterého z těchto druhů pístových čerpadel se nachází ventily přímo v pístu?",
     "options": [
       "Jednočinné čerpadlo",
@@ -3421,7 +3421,7 @@
     "correctIndex": 3
   },
   {
-    "number": 312,
+    "number": "312",
     "question": "U kterého z těchto druhů pístových čerpadel NEDOCHÁZÍ alespoň při jednom pohybu pístu zároveň k sání i výtlaku?",
     "options": [
       "Jednočinné čerpadlo",
@@ -3432,7 +3432,7 @@
     "correctIndex": 0
   },
   {
-    "number": 313,
+    "number": "313",
     "question": "Na kterém z těchto parametrů NEZÁVISÍ rychlost zavírání ventilů pístových čerpadel?",
     "options": [
       "Otáčky motoru čerpadla",
@@ -3443,7 +3443,7 @@
     "correctIndex": 3
   },
   {
-    "number": 314,
+    "number": "314",
     "question": "Jaký hydraulický prvek z uvedených je obvykle umístěn v sacím koši na počátku sacího potrubí čerpadla?",
     "options": [
       "Redukční ventil",
@@ -3454,7 +3454,7 @@
     "correctIndex": 1
   },
   {
-    "number": 315,
+    "number": "315",
     "question": "Jak se nazývá druh pístu pístových čerpadel válcového tvaru, který se vyznačuje tím, že je jeho délka větší než průměr?",
     "options": [
       "Kotoučový píst",
@@ -3465,7 +3465,7 @@
     "correctIndex": 2
   },
   {
-    "number": 316,
+    "number": "316",
     "question": "Na obrázku je (ideální) pracovní p-V diagram pístového čerpadla. Jak se nazývá fáze, která nastává z bodu 3 do bodu 4?",
     "options": [
       "Izochorické sání",
@@ -3476,7 +3476,7 @@
     "correctIndex": 2
   },
   {
-    "number": 317,
+    "number": "317",
     "question": "Na obrázku je (ideální) pracovní p-V diagram pístového čerpadla. Ve kterých dvou bodech diagramu se píst nachází v dolní úvrati?",
     "options": [
       "1 a 2",
@@ -3487,7 +3487,7 @@
     "correctIndex": 1
   },
   {
-    "number": 318,
+    "number": "318",
     "question": "Jaké typické pístové čerpadlo je na obrázku?",
     "options": [
       "Diferenciální",
@@ -3498,18 +3498,18 @@
     "correctIndex": 2
   },
   {
-    "number": 319,
+    "number": "319",
     "question": "Na obrázku je obecné schéma čerpací soustavy. Jak velká je celková \"manometrická\" dopravní výška?",
     "options": [
-      "Přesně jako kóta \"A",
-      "Přesně jako kóta \"C",
-      "V rozmezí kót \"A\" a \"C",
-      "Větší než kóta \"A"
+      "Přesně jako kóta \"A\"",
+      "Přesně jako kóta \"C\"",
+      "V rozmezí kót \"A\" a \"C\"",
+      "Větší než kóta \"A\""
     ],
     "correctIndex": 0
   },
   {
-    "number": 320,
+    "number": "320",
     "question": "Jak se nazývá součást související s pístovými čerpadly na obrázku?",
     "options": [
       "Vzdušník",
@@ -3520,7 +3520,7 @@
     "correctIndex": 0
   },
   {
-    "number": 321,
+    "number": "321",
     "question": "Co je to kompresor?",
     "options": [
       "Hnací pístový stroj sloužící pro dopravu kapalin",
@@ -3531,7 +3531,7 @@
     "correctIndex": 3
   },
   {
-    "number": 322,
+    "number": "322",
     "question": "Následující informace popisují fázi komprese u pístového kompresoru. Která informace NENÍ pravdivá?",
     "options": [
       "Píst se pohybuje z dolní úvratě do horní.",
@@ -3542,7 +3542,7 @@
     "correctIndex": 3
   },
   {
-    "number": 323,
+    "number": "323",
     "question": "Následující informace popisují fázi expanze u pístového kompresoru. Která informace NENÍ pravdivá?",
     "options": [
       "Píst se pohybuje z dolní úvratě do horní.",
@@ -3553,7 +3553,7 @@
     "correctIndex": 0
   },
   {
-    "number": 324,
+    "number": "324",
     "question": "Následující informace popisují fázi výtlaku u pístového kompresoru. Která informace NENÍ pravdivá?",
     "options": [
       "Píst se pohybuje z dolní úvratě do horní.",
@@ -3564,7 +3564,7 @@
     "correctIndex": 1
   },
   {
-    "number": 325,
+    "number": "325",
     "question": "Následující informace popisují fázi sání u pístového kompresoru. Která informace NENÍ pravdivá?",
     "options": [
       "Píst se pohybuje z horní úvratě do dolní.",
@@ -3575,7 +3575,7 @@
     "correctIndex": 2
   },
   {
-    "number": 326,
+    "number": "326",
     "question": "Co se rozumí pojmem \"kompresní poměr\"?",
     "options": [
       "Podíl počátečního a konečného objemu plynu při jeho stlačování",
@@ -3586,7 +3586,7 @@
     "correctIndex": 0
   },
   {
-    "number": 327,
+    "number": "327",
     "question": "Čeho NELZE dosáhnout pomocí vícestupňové komprese?",
     "options": [
       "Nižší teploty plynu na konci komprese",
@@ -3597,7 +3597,7 @@
     "correctIndex": 0
   },
   {
-    "number": 328,
+    "number": "328",
     "question": "Co je řazeno mezi jednotlivými stupni při vícestupňové kompresi?",
     "options": [
       "Chladič",
@@ -3608,7 +3608,7 @@
     "correctIndex": 0
   },
   {
-    "number": 329,
+    "number": "329",
     "question": "Při vícestupňové kompresi: Jaké parametry bude mít plyn na vstupu do druhého stupně oproti výstupu z prvního stupně?",
     "options": [
       "Bude mít stejnou teplotu, tlak i objem",
@@ -3619,7 +3619,7 @@
     "correctIndex": 1
   },
   {
-    "number": 330,
+    "number": "330",
     "question": "Jak se nazývají ventily, které jsou nejčastěji používány u pístových kompresorů?",
     "options": [
       "Membránové ventily",
@@ -3630,7 +3630,7 @@
     "correctIndex": 1
   },
   {
-    "number": 331,
+    "number": "331",
     "question": "Kterým z těchto zařízení NELZE regulovat činnost kompresoru, resp. tlak a průtok plynu na výtlaku?",
     "options": [
       "Vzdušníkem",
@@ -3641,7 +3641,7 @@
     "correctIndex": 3
   },
   {
-    "number": 332,
+    "number": "332",
     "question": "Jak se nazývá zařízení, kterým se mění velikost škodlivého pracovního prostoru pístového kompresoru?",
     "options": [
       "Reduktor",
@@ -3652,7 +3652,7 @@
     "correctIndex": 3
   },
   {
-    "number": 333,
+    "number": "333",
     "question": "Kterou z těchto činností NELZE regulovat činnost pístového kompresoru?",
     "options": [
       "Vhodným ovládáním sacího ventilu",
@@ -3663,7 +3663,7 @@
     "correctIndex": 3
   },
   {
-    "number": 334,
+    "number": "334",
     "question": "Jakou funkci NEMÁ přívod oleje ke klikovému mechanismu pístového kompresoru?",
     "options": [
       "Mazání kompresoru",
@@ -3674,7 +3674,7 @@
     "correctIndex": 3
   },
   {
-    "number": 335,
+    "number": "335",
     "question": "Jak se jmenuje \"kompresor s rotačním pohybem pístu\", který se často používá k přeplňování spalovacích motorů?",
     "options": [
       "Rootsovo dmychadlo",
@@ -3685,7 +3685,7 @@
     "correctIndex": 0
   },
   {
-    "number": 336,
+    "number": "336",
     "question": "Na obrázku je teoretický pracovní p-V diagram pístového kompresoru. Jak se nazývá fáze, která nastává z bodu 2 do bodu 3?",
     "options": [
       "Adiabatická komprese",
@@ -3696,7 +3696,7 @@
     "correctIndex": 0
   },
   {
-    "number": 337,
+    "number": "337",
     "question": "Na obrázku je (tlustou černou čarou nakreslený) skutečný pracovní p-V diagram pístového kompresoru. Co se děje během červeně zakroužkované fáze?",
     "options": [
       "Pracovní médium je v pracovním prostoru kompresoru a je stlačováno",
@@ -3707,7 +3707,7 @@
     "correctIndex": 3
   },
   {
-    "number": 338,
+    "number": "338",
     "question": "Jak se jmenuje přístroj ke stlačování plynu na obrázku?",
     "options": [
       "Pístový turbokompresor",
@@ -3718,7 +3718,7 @@
     "correctIndex": 3
   },
   {
-    "number": 339,
+    "number": "339",
     "question": "Na obrázku je typický pístový kompresor. Jak se nazývá červená součást, která je jeho součástí?",
     "options": [
       "Reaktor",
@@ -3729,7 +3729,7 @@
     "correctIndex": 2
   },
   {
-    "number": 340,
+    "number": "340",
     "question": "Jak by se dala nejlépe pojmenovat součást související s pístovými kompresory na obrázku?",
     "options": [
       "Píst kompresoru",
@@ -3740,7 +3740,7 @@
     "correctIndex": 1
   },
   {
-    "number": 341,
+    "number": "341",
     "question": "Co je to zážehový spalovací motor?",
     "options": [
       "Tepelný hnací pístový stroj",
@@ -3751,7 +3751,7 @@
     "correctIndex": 0
   },
   {
-    "number": 342,
+    "number": "342",
     "question": "Jak se nazývá zážehový spalovací motor, jehož píst koná rotační pohyb?",
     "options": [
       "Stirlingův motor",
@@ -3762,7 +3762,7 @@
     "correctIndex": 1
   },
   {
-    "number": 343,
+    "number": "343",
     "question": "Během kolika otáček klikové hřídele proběhne jeden pracovní cyklus dvoudobého zážehového spalovacího motoru?",
     "options": [
       "Během 1 otáčky klikové hřídele",
@@ -3773,7 +3773,7 @@
     "correctIndex": 0
   },
   {
-    "number": 344,
+    "number": "344",
     "question": "Jak se jinak nazývá uspořádání válců \"boxer\" spalovacího motoru?",
     "options": [
       "Řadové uspořádání",
@@ -3784,7 +3784,7 @@
     "correctIndex": 3
   },
   {
-    "number": 345,
+    "number": "345",
     "question": "Následující informace popisují fázi zážehu u čtyřdobého zážehového spalovacího motoru. Která informace NENÍ pravdivá?",
     "options": [
       "K zážehu dochází samovznícením",
@@ -3795,7 +3795,7 @@
     "correctIndex": 0
   },
   {
-    "number": 346,
+    "number": "346",
     "question": "Jaká z následujících podmínek NEPLATÍ pro vytvoření ideálního (teoretického) pracovního diagramu zážehového spalovacího motoru?",
     "options": [
       "Dochází k výměně obsahu válce",
@@ -3806,7 +3806,7 @@
     "correctIndex": 0
   },
   {
-    "number": 347,
+    "number": "347",
     "question": "Jaké je přibližně účinnost čtyřdobého zážehového spalovacího motoru?",
     "options": [
       "0,1",
@@ -3817,7 +3817,7 @@
     "correctIndex": 1
   },
   {
-    "number": 348,
+    "number": "348",
     "question": "Který z těchto parametrů NENÍ nutné měřit při určování \"měrné spotřeby paliva\" spalovacího motoru?",
     "options": [
       "Hmotnost spotřebovaného paliva",
@@ -3828,7 +3828,7 @@
     "correctIndex": 3
   },
   {
-    "number": 349,
+    "number": "349",
     "question": "Jak se nazývá mechanismus, který ovládá činnost ventilů spalovacího motoru?",
     "options": [
       "Rozvodový mechanismus",
@@ -3839,7 +3839,7 @@
     "correctIndex": 0
   },
   {
-    "number": 350,
+    "number": "350",
     "question": "Ve kterém technickém detailu z uvedených není podstatný rozdíl mezi dvoudobým a čtyřdobým zážehovým spalovacím motorem?",
     "options": [
       "V rozvodovém mechanismu",
@@ -3850,7 +3850,7 @@
     "correctIndex": 3
   },
   {
-    "number": 351,
+    "number": "351",
     "question": "Co NEPATŘÍ mezi nevýhody dvoudobých zážehových spalovacích motorů (oproti čtyřdobým zážehovým)?",
     "options": [
       "Nižší výkon",
@@ -3861,7 +3861,7 @@
     "correctIndex": 0
   },
   {
-    "number": 352,
+    "number": "352",
     "question": "Jakou veličinu vyjadřuje plocha (obsah) ohraničená skutečným pracovním diagramem dvoudobého zážehového motoru?",
     "options": [
       "Užitečnou práci motoru",
@@ -3872,7 +3872,7 @@
     "correctIndex": 2
   },
   {
-    "number": 353,
+    "number": "353",
     "question": "Pokud se palivo (benzín) dostává do sacího potrubí před škrtící klapkou pomocí přetlaku, pak hovoříme o",
     "options": [
       "karburátoru",
@@ -3883,7 +3883,7 @@
     "correctIndex": 1
   },
   {
-    "number": 354,
+    "number": "354",
     "question": "Která součást z uvedených NENÍ součástí ventilového rozvodu OHC?",
     "options": [
       "Rozvodová tyč",
@@ -3894,7 +3894,7 @@
     "correctIndex": 0
   },
   {
-    "number": 355,
+    "number": "355",
     "question": "Během které fáze pracovního cyklu čtyřdobého zážehového spalovacího motoru koná motor práci?",
     "options": [
       "Během expanze",
@@ -3905,7 +3905,7 @@
     "correctIndex": 0
   },
   {
-    "number": 356,
+    "number": "356",
     "question": "Na obrázku je ideální pracovní p-V diagram zážehového motoru. Jak se nazývá fáze, která nastává z bodu 4 do bodu 1?",
     "options": [
       "Izochorický odvod tepla",
@@ -3916,7 +3916,7 @@
     "correctIndex": 0
   },
   {
-    "number": 357,
+    "number": "357",
     "question": "Na obrázku je skutečný pracovní p-V diagram dvoudobého zážehového motoru. Ve kterém z červeně označených bodů dochází k zážehu (vytvoření jiskry svíčkou)?",
     "options": [
       "D",
@@ -3927,7 +3927,7 @@
     "correctIndex": 3
   },
   {
-    "number": 358,
+    "number": "358",
     "question": "Jak se nazývá motor (uspořádání motoru), pokud jsou písty umístěny tak, jak je vidět na obrázku?",
     "options": [
       "Boxer",
@@ -3938,7 +3938,7 @@
     "correctIndex": 0
   },
   {
-    "number": 359,
+    "number": "359",
     "question": "Jak se nazývá celek na obrázku?",
     "options": [
       "Karburátor",
@@ -3949,7 +3949,7 @@
     "correctIndex": 0
   },
   {
-    "number": 360,
+    "number": "360",
     "question": "Kterou písmennou zkratkou by se dal nejlépe označit rozvodový mechanismus motoru na obrázku?",
     "options": [
       "DOHC",
@@ -3960,7 +3960,7 @@
     "correctIndex": 3
   },
   {
-    "number": 361,
+    "number": "361",
     "question": "Během kolika otáček klikové hřídele proběhne jeden pracovní cyklus čtyřdobého vznětového spalovacího motoru?",
     "options": [
       "Během 2 otáček klikové hřídele",
@@ -3971,7 +3971,7 @@
     "correctIndex": 0
   },
   {
-    "number": 362,
+    "number": "362",
     "question": "Co se nachází ve válci čtyřdobého vznětového motoru na začátku kompresní fáze?",
     "options": [
       "Pouze vzduch",
@@ -3982,7 +3982,7 @@
     "correctIndex": 0
   },
   {
-    "number": 363,
+    "number": "363",
     "question": "Následující informace popisují fázi vstřiku paliva u čtyřdobého vznětového spalovacího motoru. Která informace NENÍ pravdivá?",
     "options": [
       "K vstříknutí paliva dochází, když je píst přesně v horní úvrati",
@@ -3993,7 +3993,7 @@
     "correctIndex": 3
   },
   {
-    "number": 364,
+    "number": "364",
     "question": "Jaká z následujících podmínek platí pro vytvoření skutečného pracovního diagramu zážehového spalovacího motoru?",
     "options": [
       "Kompresní a expanzní fáze probíhají podle polytropického děje",
@@ -4004,7 +4004,7 @@
     "correctIndex": 0
   },
   {
-    "number": 365,
+    "number": "365",
     "question": "Jaké je přibližně maximální účinnost čtyřdobého vznětového spalovacího motoru?",
     "options": [
       "0,2",
@@ -4015,7 +4015,7 @@
     "correctIndex": 2
   },
   {
-    "number": 366,
+    "number": "366",
     "question": "Co NEPATŘÍ mezi výhody vznětových spalovacích motorů v porovnání s motory zážehovými?",
     "options": [
       "Nižší hlučnost",
@@ -4026,7 +4026,7 @@
     "correctIndex": 0
   },
   {
-    "number": 367,
+    "number": "367",
     "question": "Co rozumíme pojmem \"kompresní poměr\"?",
     "options": [
       "Podíl mezi maximálním a minimálním objemem válce motoru",
@@ -4037,7 +4037,7 @@
     "correctIndex": 0
   },
   {
-    "number": 368,
+    "number": "368",
     "question": "Jaký děj ideálního plynu popisuje odvod tepla z pracovního prostoru motoru?",
     "options": [
       "Izochorický děj",
@@ -4048,7 +4048,7 @@
     "correctIndex": 0
   },
   {
-    "number": 369,
+    "number": "369",
     "question": "Která součást z uvedených NENÍ součástí ventilového rozvodu SV?",
     "options": [
       "Vahadlo",
@@ -4059,7 +4059,7 @@
     "correctIndex": 3
   },
   {
-    "number": 370,
+    "number": "370",
     "question": "Jaké jsou otáčky vačkové hřídele rozvodového mechanismu v porovnání s otáčkami klikové hřídele u čtyřdobého vznětového spalovacího motoru?",
     "options": [
       "Kliková hřídel se otáčí dvakrát rychleji než vačková hřídel",
@@ -4070,7 +4070,7 @@
     "correctIndex": 0
   },
   {
-    "number": 371,
+    "number": "371",
     "question": "Co NEPATŘÍ (v porovnání s ostatními druhy) mezi nevýhody ventilového rozvodu s visutými ventily (OHV)?",
     "options": [
       "Špatný tvar spalovacího prostoru",
@@ -4081,7 +4081,7 @@
     "correctIndex": 0
   },
   {
-    "number": 372,
+    "number": "372",
     "question": "Který z těchto parametrů NENÍ důležitý pro výpočet průměru pístu (hlavního rozměru klikového mechanismu spalovacího motoru)?",
     "options": [
       "Teplota výfukových plynů",
@@ -4092,7 +4092,7 @@
     "correctIndex": 0
   },
   {
-    "number": 373,
+    "number": "373",
     "question": "Kam NEMŮŽE být vstříknuto palivo u vznětových spalovacích motorů?",
     "options": [
       "Do sacího potrubí",
@@ -4103,7 +4103,7 @@
     "correctIndex": 0
   },
   {
-    "number": 374,
+    "number": "374",
     "question": "Co NEPATŘÍ mezi výhody nepřímého vstřikování u vznětových spalovacích motorů?",
     "options": [
       "Vyšší účinnost motoru",
@@ -4114,7 +4114,7 @@
     "correctIndex": 3
   },
   {
-    "number": 375,
+    "number": "375",
     "question": "Kterou z těchto vad by NEZPŮSOBILO špatné chlazení spalovacích motorů?",
     "options": [
       "Korozi kovových částí motoru",
@@ -4125,7 +4125,7 @@
     "correctIndex": 3
   },
   {
-    "number": 376,
+    "number": "376",
     "question": "Na obrázku je ideální pracovní p-V diagram vznětového motoru. Jak se nazývá fáze, která nastává z bodu 5 do bodu 1?",
     "options": [
       "Izobarický výfuk",
@@ -4136,7 +4136,7 @@
     "correctIndex": 0
   },
   {
-    "number": 377,
+    "number": "377",
     "question": "Na obrázku je skutečný pracovní p-V diagram čtyřdobého vznětového motoru. Ve kterém z červeně označených bodů dochází k zavření výfukového ventilu?",
     "options": [
       "A",
@@ -4147,7 +4147,7 @@
     "correctIndex": 2
   },
   {
-    "number": 378,
+    "number": "378",
     "question": "Z jakého motoru je píst na obrázku?",
     "options": [
       "Z čtyřdobého vznětového motoru s přímým vstřikováním",
@@ -4158,7 +4158,7 @@
     "correctIndex": 0
   },
   {
-    "number": 379,
+    "number": "379",
     "question": "K jakému účelu slouží u motoru tento celek?",
     "options": [
       "K přeplňování",
@@ -4169,7 +4169,7 @@
     "correctIndex": 0
   },
   {
-    "number": 380,
+    "number": "380",
     "question": "Jak se nazývá součást na obrázku?",
     "options": [
       "Vstřikovač paliva",
@@ -4180,7 +4180,7 @@
     "correctIndex": 0
   },
   {
-    "number": 381,
+    "number": "381",
     "question": "K jaké změně energie dochází v rotoru odstředivých čerpadel?",
     "options": [
       "Mechanická energie se mění na kinetickou a tlakovou",
@@ -4191,7 +4191,7 @@
     "correctIndex": 0
   },
   {
-    "number": 382,
+    "number": "382",
     "question": "Jak se mění energie kapaliny v difuzoru odstředivého čerpadla?",
     "options": [
       "Zvyšuje se tlaková energie kapaliny, ale snižuje se její kinetická energie",
@@ -4202,7 +4202,7 @@
     "correctIndex": 0
   },
   {
-    "number": 383,
+    "number": "383",
     "question": "Co je to odstředivé čerpadlo?",
     "options": [
       "Hnaný hydrodynamický lopatkový stroj",
@@ -4213,7 +4213,7 @@
     "correctIndex": 0
   },
   {
-    "number": 384,
+    "number": "384",
     "question": "Co NEPATŘÍ mezi výhody odstředivých čerpadel (oproti pístovým čerpadlům)?",
     "options": [
       "Vyšší účinnost",
@@ -4224,7 +4224,7 @@
     "correctIndex": 0
   },
   {
-    "number": 385,
+    "number": "385",
     "question": "Jakým směrem vstupuje kapalina do rotoru všech odstředivých čerpadel?",
     "options": [
       "Rovnoběžně s osou rotoru",
@@ -4235,7 +4235,7 @@
     "correctIndex": 0
   },
   {
-    "number": 386,
+    "number": "386",
     "question": "Jakým směrem vystupuje kapalina z rotoru radiálního odstředivého čerpadla?",
     "options": [
       "Kolmo k ose rotoru",
@@ -4246,7 +4246,7 @@
     "correctIndex": 0
   },
   {
-    "number": 387,
+    "number": "387",
     "question": "Jakou rychlost udává kapalině obvodová rychlost oběžného kola (rotoru)?",
     "options": [
       "Unášivou rychlost",
@@ -4257,7 +4257,7 @@
     "correctIndex": 0
   },
   {
-    "number": 388,
+    "number": "388",
     "question": "Které z těchto odstředivých čerpadel by se nejpravděpodobněji použilo pro velké průtoky při dopravě kapalin?",
     "options": [
       "Axiální čerpadlo",
@@ -4268,7 +4268,7 @@
     "correctIndex": 0
   },
   {
-    "number": 389,
+    "number": "389",
     "question": "Proč má lopatka vrtulového kola směrem od středu vrtule (rotoru) stále menší sklon?",
     "options": [
       "Kvůli zvětšující se obvodové rychlosti",
@@ -4279,7 +4279,7 @@
     "correctIndex": 2
   },
   {
-    "number": 390,
+    "number": "390",
     "question": "Jakou funkci má v konstrukci radiálního odstředivého čerpadla tzv. lucerna?",
     "options": [
       "Spojuje hydraulickou a mechanickou část stroje",
@@ -4290,7 +4290,7 @@
     "correctIndex": 2
   },
   {
-    "number": 391,
+    "number": "391",
     "question": "Jaká je jednotka veličiny \"měrná energie\"?",
     "options": [
       "J.kg⁻¹",
@@ -4301,7 +4301,7 @@
     "correctIndex": 0
   },
   {
-    "number": 392,
+    "number": "392",
     "question": "Jaký počet lopatek má obvykle (nejčastěji) vrtulové kolo axiálního odstředivého čerpadla?",
     "options": [
       "2 až 4",
@@ -4312,7 +4312,7 @@
     "correctIndex": 0
   },
   {
-    "number": 393,
+    "number": "393",
     "question": "Který z těchto parametrů je nejdůležitější pro to, do jaké výšky dané odstředivé čerpadlo dokáže čerpat kapalinu?",
     "options": [
       "Měrná energie",
@@ -4323,7 +4323,7 @@
     "correctIndex": 0
   },
   {
-    "number": 394,
+    "number": "394",
     "question": "Jak se nazývá jev, při kterém v kapalině vzniklé vzduchové dutiny implodují (vyplňují se vodou), čímž dochází k rázům způsobující rozrušování materiálů různých částí odstředivých čerpadel?",
     "options": [
       "Kavitace",
@@ -4334,7 +4334,7 @@
     "correctIndex": 0
   },
   {
-    "number": 395,
+    "number": "395",
     "question": "Který parametr NENÍ potřebný pro výpočet výkonu motoru odstředivého čerpadla?",
     "options": [
       "Otáčky rotoru",
@@ -4345,7 +4345,7 @@
     "correctIndex": 0
   },
   {
-    "number": 396,
+    "number": "396",
     "question": "Jak se nazývá součást na obrázku?",
     "options": [
       "Vířidlo",
@@ -4356,7 +4356,7 @@
     "correctIndex": 0
   },
   {
-    "number": 397,
+    "number": "397",
     "question": "Z jakého typu odstředivého čerpadla je oběžné kolo na obrázku a jakým směrem se otáčí (z pohledu tohoto obrázku) při čerpání kapaliny?",
     "options": [
       "Z radiálního čerpadla a točí se proti směru hodinových ručiček",
@@ -4367,7 +4367,7 @@
     "correctIndex": 0
   },
   {
-    "number": 398,
+    "number": "398",
     "question": "Pro jaké průtoky a dodané (měrné) energie kapalině jsou nejvhodnější tato oběžná kola čerpadel?",
     "options": [
       "Pro velké průtoky a malé měrné energie",
@@ -4378,18 +4378,18 @@
     "correctIndex": 0
   },
   {
-    "number": 399,
+    "number": "399",
     "question": "Na obrázku jsou rychlostní trojúhelníky radiálního oběžného kola hydrodynamického čerpadla na vstupu kapaliny na lopatky (modrou barvou) a na výstupu kapaliny z lopatky (červenou barvou). Které dvě rychlosti by se daly nazvat jako \"unášivé\"?",
     "options": [
-      "c a \"e",
-      "b a \"d",
-      "a a \"f",
+      "c a \"e\"",
+      "b a \"d\"",
+      "a a \"f\"",
       "Unášivé rychlosti se na obrázku nenachází"
     ],
     "correctIndex": 2
   },
   {
-    "number": 400,
+    "number": "400",
     "question": "Na obrázku je čtvrtinový řez typického provedení radiálního hydrodynamického čerpadla. Co se nachází v zakroužkované oblasti?",
     "options": [
       "Ucpávka",
@@ -4400,7 +4400,7 @@
     "correctIndex": 3
   },
   {
-    "number": 401,
+    "number": "401",
     "question": "K jaké přeměně energie dochází ve vodních turbínách?",
     "options": [
       "Z mechanické na kinetickou a tlakovou",
@@ -4411,7 +4411,7 @@
     "correctIndex": 1
   },
   {
-    "number": 402,
+    "number": "402",
     "question": "Pokud má vodní dílo spád 40 m, pak se s největší pravděpodobností jedná o vodní dílo ...",
     "options": [
       "... nízkotlaké.",
@@ -4422,7 +4422,7 @@
     "correctIndex": 0
   },
   {
-    "number": 403,
+    "number": "403",
     "question": "K čemu ve vodních dílech slouží tzv. česlo?",
     "options": [
       "Čistění vody",
@@ -4433,7 +4433,7 @@
     "correctIndex": 3
   },
   {
-    "number": 404,
+    "number": "404",
     "question": "Který druh vodní turbíny NENÍ vhodné použít v nízkotlakých vodních dílech?",
     "options": [
       "Francisova turbína",
@@ -4444,7 +4444,7 @@
     "correctIndex": 2
   },
   {
-    "number": 405,
+    "number": "405",
     "question": "Které vodní dílo se v České republice nenachází?",
     "options": [
       "Nízkotlaké vodní dílo",
@@ -4455,7 +4455,7 @@
     "correctIndex": 3
   },
   {
-    "number": 406,
+    "number": "406",
     "question": "U kterého druhu vodního díla (vodní elektrárny) dochází ve výsledku ke ztrátě energie (a ne k jejímu získání)?",
     "options": [
       "Nízkotlaké vodní dílo",
@@ -4466,7 +4466,7 @@
     "correctIndex": 0
   },
   {
-    "number": 407,
+    "number": "407",
     "question": "Který druh turbíny je nejvíce vhodný pro všechny typy vodních děl?",
     "options": [
       "Francisova turbína",
@@ -4477,7 +4477,7 @@
     "correctIndex": 2
   },
   {
-    "number": 408,
+    "number": "408",
     "question": "Který druh turbíny se neřadí mezi turbíny přetlakové?",
     "options": [
       "Francisova turbína",
@@ -4488,7 +4488,7 @@
     "correctIndex": 0
   },
   {
-    "number": 409,
+    "number": "409",
     "question": "Pouze jakou energii dokáže zpracovávat rovnotlaká vodní turbína?",
     "options": [
       "Kinetická energie",
@@ -4499,7 +4499,7 @@
     "correctIndex": 2
   },
   {
-    "number": 410,
+    "number": "410",
     "question": "Co se děje s tlakovou a kinetickou energií v trysce před rovnotlakou vodní turbínou?",
     "options": [
       "Klesá tlaková i kinetická energie",
@@ -4510,7 +4510,7 @@
     "correctIndex": 0
   },
   {
-    "number": 411,
+    "number": "411",
     "question": "Jak se nazývá zařízení, které vypadá jako kuželové potrubí přeměňující kinetickou energii vody na její tlakovou energii, což zajišťuje odvod vody od turbíny?",
     "options": [
       "Savka",
@@ -4521,7 +4521,7 @@
     "correctIndex": 1
   },
   {
-    "number": 412,
+    "number": "412",
     "question": "Rotor které z uvedených turbín má obvykle nejmenší počet lopatek?",
     "options": [
       "Francisova turbína",
@@ -4532,7 +4532,7 @@
     "correctIndex": 1
   },
   {
-    "number": 413,
+    "number": "413",
     "question": "Rotor které z uvedených turbín má natáčecí lopatky pro regulaci jejího chodu?",
     "options": [
       "Francisova turbína",
@@ -4543,7 +4543,7 @@
     "correctIndex": 1
   },
   {
-    "number": 414,
+    "number": "414",
     "question": "Která z uvedených turbín má nejvyšší účinnost?",
     "options": [
       "Francisova turbína",
@@ -4554,7 +4554,7 @@
     "correctIndex": 0
   },
   {
-    "number": 415,
+    "number": "415",
     "question": "U které z těchto turbín se regulace neprovádí natočením lopatek (ať už těch na rotoru nebo stacionárních mimo rotor)?",
     "options": [
       "Peltonova turbína",
@@ -4565,7 +4565,7 @@
     "correctIndex": 1
   },
   {
-    "number": 416,
+    "number": "416",
     "question": "Jaký typ vodního díla je nejpravděpodobněji na obrázku?",
     "options": [
       "Nízkotlaké",
@@ -4576,7 +4576,7 @@
     "correctIndex": 0
   },
   {
-    "number": 417,
+    "number": "417",
     "question": "K jaké turbíně patří součást na obrázku?",
     "options": [
       "Peltonově",
@@ -4587,7 +4587,7 @@
     "correctIndex": 2
   },
   {
-    "number": 418,
+    "number": "418",
     "question": "Rotor které turbíny je na obrázku?",
     "options": [
       "Peltonové",
@@ -4598,7 +4598,7 @@
     "correctIndex": 3
   },
   {
-    "number": 419,
+    "number": "419",
     "question": "Na obrázku je Francisova turbína. K čemu slouží zařízení natřené oranžovou barvou?",
     "options": [
       "K odvodu vody z turbíny",
@@ -4609,7 +4609,7 @@
     "correctIndex": 3
   },
   {
-    "number": 420,
+    "number": "420",
     "question": "Které barvě odpovídá oblast použití Peltonovy turbíny?",
     "options": [
       "Červené",
@@ -4620,7 +4620,7 @@
     "correctIndex": 0
   },
   {
-    "number": 421,
+    "number": "421",
     "question": "Co je to parní turbína?",
     "options": [
       "Hnací lopatkový stroj",
@@ -4631,7 +4631,7 @@
     "correctIndex": 0
   },
   {
-    "number": 422,
+    "number": "422",
     "question": "K jaké přeměně energie dochází v parních turbínách?",
     "options": [
       "Kinetická a tlaková energie se mění na mechanickou",
@@ -4642,7 +4642,7 @@
     "correctIndex": 2
   },
   {
-    "number": 423,
+    "number": "423",
     "question": "Ve kterém z uvedených zařízení se nepoužívá (ani nikdy nepoužívala) parní turbína?",
     "options": [
       "Uhelná elektrárna",
@@ -4653,7 +4653,7 @@
     "correctIndex": 0
   },
   {
-    "number": 424,
+    "number": "424",
     "question": "Jak se nazývá zařízení (část) parní turbíny, ve které dochází k přeměně tlakové energie na kinetickou?",
     "options": [
       "Rozváděcí kolo",
@@ -4664,7 +4664,7 @@
     "correctIndex": 2
   },
   {
-    "number": 425,
+    "number": "425",
     "question": "Které tvrzení o \"rovnotlaké parní turbíně\" NENÍ pravdivé?",
     "options": [
       "Rotorem je (plná) hřídel s lopatkami",
@@ -4675,7 +4675,7 @@
     "correctIndex": 1
   },
   {
-    "number": 426,
+    "number": "426",
     "question": "Které tvrzení o \"přetlakové parní turbíně\" NENÍ pravdivé?",
     "options": [
       "Rotorem je buben (dutá hřídel) s lopatkami",
@@ -4686,7 +4686,7 @@
     "correctIndex": 1
   },
   {
-    "number": 427,
+    "number": "427",
     "question": "Jaké otáčky mají (přibližně) rotory parních turbín provozované v ČR?",
     "options": [
       "50 otáček za minutu",
@@ -4697,7 +4697,7 @@
     "correctIndex": 0
   },
   {
-    "number": 428,
+    "number": "428",
     "question": "K jaké přeměně energie dochází v tryskách parních turbín?",
     "options": [
       "Tlaková energie se mění v kinetickou",
@@ -4708,7 +4708,7 @@
     "correctIndex": 0
   },
   {
-    "number": 429,
+    "number": "429",
     "question": "Co se děje v rychlostí páry v prostoru mezi lopatkami rotoru rovnotlaké parní turbíny?",
     "options": [
       "Klesá",
@@ -4719,7 +4719,7 @@
     "correctIndex": 1
   },
   {
-    "number": 430,
+    "number": "430",
     "question": "Co se děje v rychlostí páry v prostoru mezi lopatkami statoru přetlakové parní turbíny?",
     "options": [
       "Klesá",
@@ -4730,7 +4730,7 @@
     "correctIndex": 0
   },
   {
-    "number": 431,
+    "number": "431",
     "question": "Jak se nazývá zařízení, které nemá spalovací komoru ani turbokompresor?",
     "options": [
       "Expanzní turbína",
@@ -4741,7 +4741,7 @@
     "correctIndex": 1
   },
   {
-    "number": 432,
+    "number": "432",
     "question": "Jak se nazývá druh turbíny, u které má spalovací komora zároveň funkci výměníku?",
     "options": [
       "Spalovací turbína",
@@ -4752,7 +4752,7 @@
     "correctIndex": 0
   },
   {
-    "number": 433,
+    "number": "433",
     "question": "Jak se nazývá druh turbíny, u které spaliny vzniklé hořením proudí přímo na lopatky rotoru?",
     "options": [
       "Spalovací turbína",
@@ -4763,7 +4763,7 @@
     "correctIndex": 3
   },
   {
-    "number": 434,
+    "number": "434",
     "question": "Kterou z uvedených částí obvykle neobsahuje otevřený okruh?",
     "options": [
       "Kompresor",
@@ -4774,7 +4774,7 @@
     "correctIndex": 0
   },
   {
-    "number": 435,
+    "number": "435",
     "question": "Jaký smysl má umístění výměníku do okruhu spalovací turbíny?",
     "options": [
       "Zvýšení účinnosti",
@@ -4785,7 +4785,7 @@
     "correctIndex": 3
   },
   {
-    "number": 436,
+    "number": "436",
     "question": "Na obrázku je průběh tlaku a rychlosti páry v rovnotlaké parní turbíně. Která fáze (fialové označené svorkami) odpovídá průběhu mezi jejími statorovými lopatkami?",
     "options": [
       "A",
@@ -4796,7 +4796,7 @@
     "correctIndex": 2
   },
   {
-    "number": 437,
+    "number": "437",
     "question": "Na obrázku je průběh tlaku a rychlosti páry v přetlakové parní turbíně. Která fáze (fialové označené svorkami) odpovídá průběhu mezi jejími rotorovými lopatkami?",
     "options": [
       "A",
@@ -4807,7 +4807,7 @@
     "correctIndex": 0
   },
   {
-    "number": 438,
+    "number": "438",
     "question": "Jaká část a které parní turbíny se nachází na obrázku?",
     "options": [
       "Rotor rovnotlaké parní turbíny",
@@ -4818,7 +4818,7 @@
     "correctIndex": 1
   },
   {
-    "number": 439,
+    "number": "439",
     "question": "Pod kterým číslem na schématu přetlakové parní turbíny se nachází rovnotlaký stupeň?",
     "options": [
       "1",
@@ -4829,7 +4829,7 @@
     "correctIndex": 0
   },
   {
-    "number": 440,
+    "number": "440",
     "question": "Na obrázku je turbodmychadlo automobilu. O jaký okruh plynové turbíny se tedy jedná?",
     "options": [
       "Otevřený okruh bez výměníku",
@@ -4840,7 +4840,7 @@
     "correctIndex": 1
   },
   {
-    "number": 441,
+    "number": "441",
     "question": "Proč je potřeba přidávat palivo do parního kotle?",
     "options": [
       "Je to nosič chemické energie",
@@ -4851,7 +4851,7 @@
     "correctIndex": 0
   },
   {
-    "number": 442,
+    "number": "442",
     "question": "Která složka nevstupuje do parního kotle?",
     "options": [
       "Voda",
@@ -4862,7 +4862,7 @@
     "correctIndex": 3
   },
   {
-    "number": 443,
+    "number": "443",
     "question": "Co vzniká hořením paliva se vzduchem?",
     "options": [
       "Voda",
@@ -4873,7 +4873,7 @@
     "correctIndex": 1
   },
   {
-    "number": 444,
+    "number": "444",
     "question": "Jakou teplotu má zhruba u současných parních generátorů vystupující vodní pára?",
     "options": [
       "Kolem 250  °C",
@@ -4884,7 +4884,7 @@
     "correctIndex": 1
   },
   {
-    "number": 445,
+    "number": "445",
     "question": "Jaký tlak vodní páry se označuje jako \"kritický\"?",
     "options": [
       "2,21 MPa",
@@ -4895,7 +4895,7 @@
     "correctIndex": 2
   },
   {
-    "number": 446,
+    "number": "446",
     "question": "Do jakého tlaku přibližně se vodní pára používá k vytápění?",
     "options": [
       "Do 0,15 MPa",
@@ -4906,7 +4906,7 @@
     "correctIndex": 0
   },
   {
-    "number": 447,
+    "number": "447",
     "question": "Které ze zmíněných paliv NELZE zařadit mezi tuhá paliva?",
     "options": [
       "Hnědé uhlí",
@@ -4917,7 +4917,7 @@
     "correctIndex": 3
   },
   {
-    "number": 448,
+    "number": "448",
     "question": "Které ze zmíněných paliv NELZE zařadit mezi plynná paliva?",
     "options": [
       "Zemní plyn",
@@ -4928,7 +4928,7 @@
     "correctIndex": 2
   },
   {
-    "number": 449,
+    "number": "449",
     "question": "Který druh kotle se vyznačuje velkou trubkou se zvlněným povrchem, ve které hoří palivo?",
     "options": [
       "Plamencový kotel",
@@ -4939,7 +4939,7 @@
     "correctIndex": 1
   },
   {
-    "number": 450,
+    "number": "450",
     "question": "Který ze zmíněných kotlů má nejmenší účinnosť?",
     "options": [
       "Plamencový kotel",
@@ -4950,7 +4950,7 @@
     "correctIndex": 0
   },
   {
-    "number": 451,
+    "number": "451",
     "question": "Se kterým ze zmíněných kotlů lze dosáhnout největšího tlaku vystupující vodní páry?",
     "options": [
       "Plamencový kotel",
@@ -4961,7 +4961,7 @@
     "correctIndex": 3
   },
   {
-    "number": 452,
+    "number": "452",
     "question": "Jak se jmenuje místo parního generátoru, ve kterém dochází k mísení paliva se vzduchem?",
     "options": [
       "Ohniště",
@@ -4972,7 +4972,7 @@
     "correctIndex": 0
   },
   {
-    "number": 453,
+    "number": "453",
     "question": "Jak se jmenuje místo parního generátoru, ve kterém dochází k přeměně vody na páru?",
     "options": [
       "Kotlový buben",
@@ -4983,7 +4983,7 @@
     "correctIndex": 1
   },
   {
-    "number": 454,
+    "number": "454",
     "question": "Které z těchto druhů ohnišť využívaných pro parní generátory neexistuje?",
     "options": [
       "Roštové ohniště",
@@ -4994,7 +4994,7 @@
     "correctIndex": 3
   },
   {
-    "number": 455,
+    "number": "455",
     "question": "Co z uvedených NELZE zařadit do přípravy tuhého paliva před jeho použitím v parním generátoru?",
     "options": [
       "Drcení (mletí) paliva",
@@ -5005,7 +5005,7 @@
     "correctIndex": 3
   },
   {
-    "number": 456,
+    "number": "456",
     "question": "Schéma jakého základního typu parního kotle je na obrázku?",
     "options": [
       "Válcový",
@@ -5016,7 +5016,7 @@
     "correctIndex": 3
   },
   {
-    "number": 457,
+    "number": "457",
     "question": "Schéma jakého základního typu ohniště parních kotlů je na obrázku?",
     "options": [
       "Roštové",
@@ -5027,7 +5027,7 @@
     "correctIndex": 0
   },
   {
-    "number": 458,
+    "number": "458",
     "question": "Jak by se dal nejlépe nazvat celek (část parního kotle) na obrázku?",
     "options": [
       "Přehřívák páry",
@@ -5038,7 +5038,7 @@
     "correctIndex": 0
   },
   {
-    "number": 459,
+    "number": "459",
     "question": "Na obrázku je schéma vysokotlakého parního kotle s dvěma tahy. Jak se nazývá jeho část označená číslem 3 (umístěná na schématu vlevo nahoře)?",
     "options": [
       "Tangenciální hořák",
@@ -5049,7 +5049,7 @@
     "correctIndex": 2
   },
   {
-    "number": 460,
+    "number": "460",
     "question": "K jakému účelu slouží strojní celek na obrázku v souvislosti s parními generátory?",
     "options": [
       "K přípravě tuhého paliva",
@@ -5060,7 +5060,7 @@
     "correctIndex": 3
   },
   {
-    "number": 461,
+    "number": "461",
     "question": "Co je výhodou teplovodního vytápění?",
     "options": [
       "Systém nepotřebuje expanzní nádobu",
@@ -5071,7 +5071,7 @@
     "correctIndex": 3
   },
   {
-    "number": 462,
+    "number": "462",
     "question": "Co nepatří mezi výhody parního vytápění?",
     "options": [
       "Rychlý náběh topení",
@@ -5082,7 +5082,7 @@
     "correctIndex": 3
   },
   {
-    "number": 463,
+    "number": "463",
     "question": "Kde dochází v přeměně páry na vodu (kondenzaci) u parního vytápění?",
     "options": [
       "V rozvodovém potrubí",
@@ -5093,7 +5093,7 @@
     "correctIndex": 1
   },
   {
-    "number": 464,
+    "number": "464",
     "question": "Pokud je teplo pro celý objekt vyráběno v kotli umístěném například v jeho sklepě, pak se jedná o vytápění ...",
     "options": [
       "... lokální.",
@@ -5104,7 +5104,7 @@
     "correctIndex": 2
   },
   {
-    "number": 465,
+    "number": "465",
     "question": "U kterého druhu vytápění lze nejhůře regulovat teplotu z hlediska její rovnoměrnosti v objektu?",
     "options": [
       "Lokální vytápění",
@@ -5115,7 +5115,7 @@
     "correctIndex": 3
   },
   {
-    "number": 466,
+    "number": "466",
     "question": "Podle čeho se dimenzuje otopná soustava resp. výkon kotle?",
     "options": [
       "Podle tepelných ztrát z objektu",
@@ -5126,7 +5126,7 @@
     "correctIndex": 0
   },
   {
-    "number": 467,
+    "number": "467",
     "question": "Jakou jednotku má veličina \"tepelný tok\"?",
     "options": [
       "Watt",
@@ -5137,7 +5137,7 @@
     "correctIndex": 0
   },
   {
-    "number": 468,
+    "number": "468",
     "question": "Co je to \"konvektor\"?",
     "options": [
       "Otopné těleso",
@@ -5148,7 +5148,7 @@
     "correctIndex": 0
   },
   {
-    "number": 469,
+    "number": "469",
     "question": "Teplovodní otopná soustava je vybavena otevřenou expanzní nádobou. Kde se tato otevřená expanzní nádoba nachází?",
     "options": [
       "U teplovodního kotlee",
@@ -5159,7 +5159,7 @@
     "correctIndex": 1
   },
   {
-    "number": 470,
+    "number": "470",
     "question": "Pokud v místnosti otevřete okno, pak se jedná o větrání ...",
     "options": [
       "... přirozené.",
@@ -5170,7 +5170,7 @@
     "correctIndex": 0
   },
   {
-    "number": 471,
+    "number": "471",
     "question": "Co nepatří mezi výhody vysokotlaké klimatizace?",
     "options": [
       "Menší rozměry rozvodného potrubí",
@@ -5181,7 +5181,7 @@
     "correctIndex": 3
   },
   {
-    "number": 472,
+    "number": "472",
     "question": "Co je to tzv. výparné teplo?",
     "options": [
       "Teplo, které látka potřebuje ke změně svého skupenství",
@@ -5192,7 +5192,7 @@
     "correctIndex": 0
   },
   {
-    "number": 473,
+    "number": "473",
     "question": "Co musí splňovat chladící kapalina, aby byla vhodná pro použití do chladícího okruhu?",
     "options": [
       "Musí mít vysokou teplotu varu",
@@ -5203,7 +5203,7 @@
     "correctIndex": 0
   },
   {
-    "number": 474,
+    "number": "474",
     "question": "Co se děje ve výparníku chladícího oběhu?",
     "options": [
       "Chladivo je do něj přivedeno v kapalné formě a opouští ho v plynné formě",
@@ -5214,7 +5214,7 @@
     "correctIndex": 0
   },
   {
-    "number": 475,
+    "number": "475",
     "question": "Pokud kompresorový chladicí oběh principiálně využíváme k vytápění, pak se jedná o ...",
     "options": [
       "... tepelné čerpadlo.",
@@ -5225,7 +5225,7 @@
     "correctIndex": 0
   },
   {
-    "number": 476,
+    "number": "476",
     "question": "Jaký druh otopného tělesa se nachází na obrázku?",
     "options": [
       "Článkové",
@@ -5236,7 +5236,7 @@
     "correctIndex": 0
   },
   {
-    "number": 477,
+    "number": "477",
     "question": "K čemu u teplovodního vytápění slouží celek na obrázku?",
     "options": [
       "K zajištění přirozeného proudění vody topným okruhem",
@@ -5247,7 +5247,7 @@
     "correctIndex": 3
   },
   {
-    "number": 478,
+    "number": "478",
     "question": "O jaký druh vytápění se jedná, pokud se pro vytápění použije zdroj tepla na obrázku?",
     "options": [
       "Dálkové",
@@ -5258,7 +5258,7 @@
     "correctIndex": 2
   },
   {
-    "number": 479,
+    "number": "479",
     "question": "Na obrázku je schematicky zobrazen chladící okruh běžné ledničky s kompresorovým chlazením. Jak se nazývá část okruhu označena písmenem \"A\"?",
     "options": [
       "Varník",
@@ -5269,7 +5269,7 @@
     "correctIndex": 2
   },
   {
-    "number": 480,
+    "number": "480",
     "question": "Z jednotky tepelného čerpadla na obrázku vlevo vedou trubky pouze do vytápěného objektu, jak je znázorněno na schématu. O jaký druh tepelného čerpadla se jedná?",
     "options": [
       "Vzduch - vzduch",
@@ -5280,7 +5280,7 @@
     "correctIndex": 3
   },
   {
-    "number": 481,
+    "number": "481",
     "question": "Jakou energii získáváme z jaderného reaktoru?",
     "options": [
       "Tepelnou energii",
@@ -5291,7 +5291,7 @@
     "correctIndex": 0
   },
   {
-    "number": 482,
+    "number": "482",
     "question": "Čím se štěpí nuklid (atom) uranu?",
     "options": [
       "Volným neutronem",
@@ -5302,7 +5302,7 @@
     "correctIndex": 0
   },
   {
-    "number": 483,
+    "number": "483",
     "question": "V jádře atomu se nachází",
     "options": [
       "protony a neutrony.",
@@ -5313,7 +5313,7 @@
     "correctIndex": 0
   },
   {
-    "number": 484,
+    "number": "484",
     "question": "Co NEVZNIKNE štěpením nuklidu (atomu) uranu?",
     "options": [
       "Vodní pára",
@@ -5324,7 +5324,7 @@
     "correctIndex": 0
   },
   {
-    "number": 485,
+    "number": "485",
     "question": "Co má za úkol v jaderném reaktoru tzv. moderátor?",
     "options": [
       "Zpomalovat neutrony",
@@ -5335,7 +5335,7 @@
     "correctIndex": 0
   },
   {
-    "number": 486,
+    "number": "486",
     "question": "U kterého z těchto jaderných reaktorů NEHROZÍ nebezpečí neřízené reakce, štěpení a výbuchu?",
     "options": [
       "U fúzního reaktoru",
@@ -5346,7 +5346,7 @@
     "correctIndex": 0
   },
   {
-    "number": 487,
+    "number": "487",
     "question": "Který druh jaderného reaktoru je používán pro české jaderné elektrárny (Dukovany a Temelín)?",
     "options": [
       "Tlakovodní reaktor",
@@ -5357,7 +5357,7 @@
     "correctIndex": 0
   },
   {
-    "number": 488,
+    "number": "488",
     "question": "Jak se nazývá jaderný reaktor, který jako palivo používá plutonium?",
     "options": [
       "Množivý reaktor",
@@ -5368,7 +5368,7 @@
     "correctIndex": 0
   },
   {
-    "number": 489,
+    "number": "489",
     "question": "Který z těchto chemických vzorců NEOZNAČUJE látku používanou jako chladivo v jaderných reaktorech?",
     "options": [
       "H2O",
@@ -5379,7 +5379,7 @@
     "correctIndex": 3
   },
   {
-    "number": 490,
+    "number": "490",
     "question": "K čemu slouží v jaderném reaktoru tzv. reflektor?",
     "options": [
       "K odrážení neutronů",
@@ -5390,7 +5390,7 @@
     "correctIndex": 0
   },
   {
-    "number": 491,
+    "number": "491",
     "question": "V jakém skupenství se dopravuje palivo do jaderného reaktoru?",
     "options": [
       "V pevném skupenství",
@@ -5401,7 +5401,7 @@
     "correctIndex": 0
   },
   {
-    "number": 492,
+    "number": "492",
     "question": "Která z těchto druhů elektráren se NEŘADÍ mezi tepelné?",
     "options": [
       "Solární elektrárna",
@@ -5412,7 +5412,7 @@
     "correctIndex": 0
   },
   {
-    "number": 493,
+    "number": "493",
     "question": "Která z těchto druhů elektráren se NEŘADÍ mezi ty, které používají pro výrobu elektrické energie obnovitelný zdroj energie?",
     "options": [
       "Paroplynová elektrárna",
@@ -5423,7 +5423,7 @@
     "correctIndex": 0
   },
   {
-    "number": 494,
+    "number": "494",
     "question": "Jak dlouho po vyjmutí z jaderného reaktoru se skladuje (chladí a stíní) použité palivo ve vodě?",
     "options": [
       "Cca 10 let",
@@ -5434,7 +5434,7 @@
     "correctIndex": 0
   },
   {
-    "number": 495,
+    "number": "495",
     "question": "Co NEPATŘÍ mezi nevýhody solárních elektráren?",
     "options": [
       "Náročnost na údržbu",
@@ -5445,7 +5445,7 @@
     "correctIndex": 0
   },
   {
-    "number": 496,
+    "number": "496",
     "question": "Jakou zkratkou lze označit jaderný reaktor, jehož schéma je na obrázku?",
     "options": [
       "PWR",
@@ -5456,7 +5456,7 @@
     "correctIndex": 0
   },
   {
-    "number": 497,
+    "number": "497",
     "question": "Jak by se dal nejlépe nazvat jaderný reaktor, jehož schéma je na obrázku?",
     "options": [
       "Tlakovodní",
@@ -5467,7 +5467,7 @@
     "correctIndex": 2
   },
   {
-    "number": 498,
+    "number": "498",
     "question": "K čemu slouží v jaderné elektrárně tento celek?",
     "options": [
       "Ke skladování použitého paliva",
@@ -5478,7 +5478,7 @@
     "correctIndex": 0
   },
   {
-    "number": 499,
+    "number": "499",
     "question": "Na obrázku je výřez leteckého pohledu na jadernou elektrárnu Dukovany. K čemu dochází ve čtyřech šedých velkých objektech na obrázku?",
     "options": [
       "K chlazení použité chladící vody z kondenzátoru",
@@ -5489,7 +5489,7 @@
     "correctIndex": 0
   },
   {
-    "number": 500,
+    "number": "500",
     "question": "Na obrázku je schematicky zobrazeno štěpení jádra atomu uranu. Jak se nazývá prvek na schématu (nakreslený modrou barvou a označený červenou šipkou)?",
     "options": [
       "Moderátor",

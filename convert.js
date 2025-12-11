@@ -5,111 +5,78 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cesty k souborům
 const csvFile = path.join(__dirname, "database.csv");
 const outputSPS = path.join(__dirname, "src/questionsSPS.json");
 const outputSTT = path.join(__dirname, "src/questionsSTT.json");
 
-// Funkce pro parsování řádku CSV (oddělovač TABULÁTOR)
-function parseLine(line) {
-  // Rozdělí podle tabulátoru, odstraní uvozovky a mezery okolo
-  // Pokud by to nefungovalo, zkus místo "\t" vrátit původní ";"
-  return line.split("\t").map(val => val.trim().replace(/^"|"$/g, ''));
-}
-
 try {
-  // 1. Kontrola existence souboru
-  if (!fs.existsSync(csvFile)) {
-    throw new Error(`Soubor 'database.csv' nebyl nalezen v kořenové složce.`);
-  }
-
-  // 2. Načtení dat
-  const data = fs.readFileSync(csvFile, "utf-8");
-  // Rozdělení na řádky a odstranění prázdných
-  const lines = data.split("\n").filter(l => l.trim() !== "");
-
-  const questionsSPS = [];
-  const questionsSTT = [];
-  let skippedCount = 0;
-
-  console.log(`🔄 Zpracovávám ${lines.length} řádků...`);
-
-  // 3. Procházení řádků
-  lines.forEach((line, index) => {
-    // Přeskočení prázdných řádků
-    if (!line) return;
-
-    const cols = parseLine(line);
-
-    // Přeskočit záhlaví (pokud první sloupec zní jako "Předmět" nebo "Subject")
-    if (index === 0 && (cols[0].match(/^(Subject|Předmět|Predmet)/i))) {
-      return;
+    if (!fs.existsSync(csvFile)) {
+        throw new Error(`Soubor 'database.csv' nebyl nalezen.`);
     }
 
-    // Validace: Musí mít alespoň 8 sloupců (Obrázek je 9. a je nepovinný)
-    if (cols.length < 8) {
-      // Zkusíme detekovat, zda nejde o rozdělený řádek (někdy se to stává u copy-paste)
-      // Pokud je to jen část dat, přeskočíme, ale vypíšeme varování jen pokud to vypadá jako data
-      if (line.length > 10) { 
-          console.warn(`⚠️ Řádek ${index + 1} přeskočen (málo sloupců - nalezeno ${cols.length}): ${line.substring(0, 50)}...`);
-          skippedCount++;
-      }
-      return;
+    let data = fs.readFileSync(csvFile, "utf-8");
+
+    // Odstranění BOM (neviditelné znaky na začátku)
+    if (data.charCodeAt(0) === 0xFEFF) {
+        data = data.slice(1);
     }
 
-    // 4. Mapování sloupců
-    // [0] Předmět | [1] Číslo | [2] Otázka | [3] Správná | [4-7] Možnosti A-D | [8] Obrázek
-    const subject = cols[0].toUpperCase().trim();
-    const number = parseInt(cols[1], 10);
-    const questionText = cols[2];
-    const correctLetter = cols[3].toUpperCase().trim(); // A, B, C, D
-    const options = [cols[4], cols[5], cols[6], cols[7]];
+    // Rozdělení na řádky
+    const lines = data.split("\n").filter(l => l.trim() !== "");
 
-    // Převod písmene na index (0-3)
-    const letterMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
-    const correctIndex = letterMap[correctLetter];
+    const questionsSPS = [];
+    const questionsSTT = [];
 
-    // Validace dat
-    if (isNaN(number)) {
-      // Ignorujeme řádky, kde není číslo (často smetí v CSV)
-      return;
-    }
-    if (correctIndex === undefined) {
-      console.warn(`⚠️ Otázka ${number}: Neplatná odpověď '${cols[3]}' (očekáváno A, B, C, D).`);
-      skippedCount++;
-      return;
-    }
+    console.log(`🔄 Zpracovávám ${lines.length} řádků...`);
 
-    // Vytvoření objektu otázky
-    const questionObj = {
-      number: number,
-      question: questionText,
-      options: options,
-      correctIndex: correctIndex
-    };
+    lines.forEach((line, index) => {
+        // Jednoduché rozdělení podle tabulátoru a ořezání mezer
+        const cols = line.split("\t").map(c => c.trim());
 
-    // Rozřazení podle předmětu
-    if (subject === 'SPS') {
-      questionsSPS.push(questionObj);
-    } else if (subject === 'STT') {
-      questionsSTT.push(questionObj);
-    } else {
-      // Pokud předmět nesedí, ignorujeme (nebo můžeš přidat logiku)
-    }
-  });
+        // Kontrola, zda má řádek dostatek sloupců (SPS/STT, číslo, otázka, písmeno, 4 možnosti)
+        // Očekáváme min 8 sloupců: [Předmět, Číslo, Otázka, Písmeno, Odp1, Odp2, Odp3, Odp4]
+        if (cols.length < 8) return;
 
-  // 5. Uložení do JSON
-  fs.writeFileSync(outputSPS, JSON.stringify(questionsSPS, null, 2), "utf-8");
-  fs.writeFileSync(outputSTT, JSON.stringify(questionsSTT, null, 2), "utf-8");
+        const subject = cols[0];
+        const number = cols[1];
+        const questionText = cols[2];
+        const correctLetter = cols[3]; // A, B, C, D
 
-  // 6. Výpis výsledků
-  console.log("------------------------------------------------");
-  console.log(`✅ ÚSPĚŠNĚ DOKONČENO`);
-  console.log(`📘 SPS otázek: ${questionsSPS.length}`);
-  console.log(`📙 STT otázek: ${questionsSTT.length}`);
-  if (skippedCount > 0) console.log(`⚠️ Přeskočeno chybových řádků: ${skippedCount}`);
-  console.log("------------------------------------------------");
+        // Možnosti jsou v dalších sloupcích
+        const options = cols.slice(4, 8); 
+
+        // Pouze pokud je to SPS nebo STT
+        if (subject === "SPS" || subject === "STT") {
+
+            // Převod písmene na index (A=0, B=1...)
+            const letterMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+            const correctIndex = letterMap[correctLetter] !== undefined ? letterMap[correctLetter] : 0;
+
+            const questionObj = {
+                number: number,
+                question: questionText,
+                options: options,
+                correctIndex: correctIndex
+            };
+
+            if (subject === "SPS") {
+                questionsSPS.push(questionObj);
+            } else {
+                questionsSTT.push(questionObj);
+            }
+        }
+    });
+
+    // Uložení do souborů
+    fs.writeFileSync(outputSPS, JSON.stringify(questionsSPS, null, 2), "utf-8");
+    fs.writeFileSync(outputSTT, JSON.stringify(questionsSTT, null, 2), "utf-8");
+
+    console.log("------------------------------------------------");
+    console.log(`✅ HOTOVO!`);
+    console.log(`📘 SPS: ${questionsSPS.length} otázek`);
+    console.log(`📙 STT: ${questionsSTT.length} otázek`);
+    console.log("------------------------------------------------");
 
 } catch (error) {
-  console.error("\n❌ CHYBA:", error.message);
+    console.error("CHYBA SKRIPTU:", error.message);
 }
