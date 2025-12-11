@@ -8,7 +8,7 @@
   --color-text-secondary: #cbd5e1;
   --color-text-neutral: #94a3b8;
 
-  /* Glassmorphism / Karty */
+  /* Glassmorphism / Karty / Navigátor */
   --color-card-bg-start: rgba(30, 41, 59, 0.95);
   --color-card-bg-end: rgba(30, 41, 59, 0.8);
   --color-card-border: rgba(148, 163, 184, 0.15);
@@ -31,20 +31,20 @@
   --color-back-btn-border: rgba(148, 163, 184, 0.2);
   --color-menu-btn-shadow: rgba(59, 130, 246, 0.5);
 
-  /* Sekundární barvy */
+  /* Sekundární barvy (odvozené z gradientu) */
   --color-primary: #3b82f6;
   --color-secondary: #8b5cf6;
   --color-primary-light: #60a5fa;
   --color-success: #22c55e;
   --color-error: #ef4444;
-  --color-review-wrong: #fca5a5;
-  --color-review-correct: #a7f3d0;
+  --color-review-wrong: #fca5a5; /* Světlejší červená pro text v Review */
+  --color-review-correct: #a7f3d0; /* Světlejší zelená pro text v Review */
 }
 
-/* --- SVĚTLÝ MOTIV --- */
+/* --- SVĚTLÝ MOTIV (Přepíše proměnné) --- */
 body.light-mode {
   background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
-  color: #1e293b; /* Pevná barva pro lepší kontrast */
+  color: var(--color-text-main);
   background-attachment: fixed;
 
   --color-bg-start: #f0f4f8;
@@ -74,7 +74,7 @@ body.light-mode {
   --color-menu-btn-shadow: rgba(59, 130, 246, 0.3);
 }
 
-/* === GLOBALS === */
+/* === GLOBALS A RESETY === */
 * {
   margin: 0;
   padding: 0;
@@ -120,7 +120,7 @@ body {
   transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-/* Třída pro zablokování scrollu při otevřeném modálu */
+/* ZAJIŠTĚNÍ ZABLOKOVÁNÍ SCROLLU A KLIKŮ NA POZADÍ */
 body.modal-open {
     overflow: hidden !important;
 }
@@ -155,6 +155,11 @@ body.modal-open {
   100% { transform: translateY(-6px) scale(1.02); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
 /* === KONTEJNER === */
 .container {
   max-width: 960px;
@@ -166,25 +171,41 @@ body.modal-open {
   box-sizing: border-box;
 }
 
-/* Wrapper pro obsah kvízu - zarovnání */
+/* NOVÝ OMEZOVACÍ KONTEJNER PRO ZAROVNÁNÍ OBSAHU TESTU */
 .quizContentWrapper {
+  max-width: 960px; /* Širší pro PC */
   width: 100%;
-  max-width: 100%;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
+/* --- Pravidlo pro PC (nad 1024px) --- */
 @media (min-width: 1024px) {
     .quizContentWrapper {
-        max-width: 900px; /* Optimalizace pro větší obrazovky */
+        max-width: 960px; 
     }
 }
 
-/* === HEADER & NAVIGATION === */
+/* === HORNÍ LIŠTA (STICKY HEADER) === */
 .stickyHeader {
+  position: sticky; 
+  top: 0;
+  z-index: 100;
+  background: var(--color-bg-start);
+  /* Glassmorphism */
+  backdrop-filter: blur(15px);
+  background: rgba(10, 14, 39, 0.9);
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+body.light-mode .stickyHeader {
+    background: rgba(240, 244, 248, 0.9);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .topBarRight {
@@ -195,7 +216,6 @@ body.modal-open {
   gap: 1rem;
   margin-bottom: 0.5rem;
 }
-
 .topControls {
   display: flex;
   align-items: center;
@@ -204,6 +224,7 @@ body.modal-open {
   justify-content: flex-end;
 }
 
+/* === TITULEK === */
 .title {
   font-size: clamp(2rem, 8vw, 2.8rem);
   font-weight: 800;
@@ -242,9 +263,24 @@ body.modal-open {
   overflow: hidden;
 }
 
+.menuButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
 .menuButton:hover {
   transform: translateY(-3px);
   box-shadow: 0 15px 50px rgba(59, 130, 246, 0.7);
+}
+
+.menuButton:hover::before {
+  left: 100%;
 }
 
 .menuButton:active { 
@@ -276,6 +312,13 @@ body.modal-open {
   background: var(--color-back-btn-bg); 
   border-color: rgba(59, 130, 246, 0.4);
 }
+.light-mode .menuBackButton:hover {
+  background: rgba(203, 213, 225, 1);
+}
+
+.menuBackButton:active { 
+  animation: pulseBtn 0.3s ease;
+}
 
 /* === TLAČÍTKA === */
 .submitTopButton,
@@ -302,6 +345,10 @@ body.modal-open {
   box-shadow: 0 12px 35px rgba(59, 130, 246, 0.7);
 }
 
+.submitTopButton:active { 
+  animation: pulseBtn 0.3s ease;
+}
+
 .navButton {
   background: rgba(59, 130, 246, 0.15);
   color: var(--color-primary-light);
@@ -316,6 +363,13 @@ body.modal-open {
   border-color: rgba(59, 130, 246, 0.6);
   transform: translateY(-1px);
 }
+.light-mode .navButton:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.navButton:active { 
+  animation: pulseBtn 0.3s ease;
+}
 
 .navButton.primary {
   background: linear-gradient(135deg, var(--color-primary), #2563eb);
@@ -327,6 +381,10 @@ body.modal-open {
 .navButton.primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 35px rgba(59, 130, 246, 0.7);
+}
+
+.navButton.primary:active { 
+  animation: pulseBtn 0.3s ease;
 }
 
 .navButton:disabled {
@@ -347,6 +405,8 @@ body.modal-open {
   font-size: 0.95rem;
   border: 1px solid rgba(148, 163, 184, 0.15);
   backdrop-filter: blur(8px);
+  /* Důležité pro zobrazení: */
+  display: block; 
 }
 .light-mode .progress,
 .light-mode .timer {
@@ -358,6 +418,10 @@ body.modal-open {
 .progress {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(99, 102, 241, 0.08));
   border-color: rgba(59, 130, 246, 0.2);
+  margin-top: 0.5rem;
+}
+.light-mode .progress {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
 }
 
 .timer {
@@ -377,6 +441,11 @@ body.modal-open {
   transition: all 0.3s ease;
   cursor: default;
 }
+.light-mode .timer {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%);
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
 
 .timerWarning { 
   color: #fbbf24 !important; 
@@ -394,13 +463,11 @@ body.modal-open {
   animation: blink 0.8s infinite;
 }
 
-@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
-@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-
 /* === KARTA S OTÁZKOU === */
 .card {
   padding: clamp(1.2rem, 4vw, 1.8rem);
   border-radius: 24px;
+  /* Používá proměnné */
   background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
   backdrop-filter: blur(30px);
   border: 2px solid var(--color-card-border);
@@ -409,6 +476,7 @@ body.modal-open {
   margin-top: 1rem;
   overflow: visible;
   width: 100%;
+  max-width: 100%;
   display: block;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -417,6 +485,7 @@ body.modal-open {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
+/* === OTÁZKA + OBRÁZEK === */
 .questionHeader {
   display: flex;
   flex-direction: column;
@@ -444,6 +513,7 @@ body.modal-open {
 }
 .light-mode .questionImage {
   background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .imageWrapper {
@@ -481,11 +551,12 @@ body.modal-open {
 .optionButton {
   width: 100%;
   min-height: 60px;
-  border: 2px solid var(--color-option-border);
+  border: 2px solid var(--color-option-border); /* Používá proměnnou */
   border-radius: 14px;
   padding: 1.3rem 1.6rem;
+  /* Používá proměnné */
   background: linear-gradient(135deg, var(--color-option-bg-start) 0%, var(--color-option-bg-end) 100%);
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary); /* Používá proměnnou */
   text-align: left;
   font-size: clamp(1rem, 4.5vw, 1.1rem);
   cursor: pointer;
@@ -495,6 +566,7 @@ body.modal-open {
   outline: none;
 }
 
+/* NOVÉ: Lepší viditelnost při ovládání klávesnicí */
 .optionButton:focus-visible {
   outline: 3px solid var(--color-primary-light);
   outline-offset: 2px;
@@ -519,6 +591,26 @@ body.modal-open {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 
+/* Volitelné: Pro budoucí použití hintů kláves (A, B, C) */
+.keyHint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  margin-right: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--color-text-neutral);
+}
+.light-mode .keyHint {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* === NAVIGAČNÍ TLAČÍTKA === */
 .actionButtons {
   display: flex;
   gap: 1.2rem;
@@ -542,8 +634,22 @@ body.modal-open {
   padding: 0.6rem 0;
   scroll-behavior: smooth;
 }
+
+.navigatorWrapper.noAutoScroll {
+  scroll-behavior: auto;
+}
+
 .navigatorWrapper::-webkit-scrollbar { display: none; }
 .navigatorWrapper:active { cursor: grabbing; }
+
+.navigatorWrapper.dragging {
+  cursor: grabbing !important;
+  scroll-behavior: auto !important;
+}
+
+.navigatorWrapper.dragging .navNumber {
+  pointer-events: none;
+}
 
 .compactNavigator {
   display: flex;
@@ -557,6 +663,7 @@ body.modal-open {
   width: 52px;
   height: 52px;
   border-radius: 10px;
+  /* Používá proměnné */
   background: linear-gradient(135deg, var(--color-nav-num-bg-start) 0%, var(--color-nav-num-bg-end) 100%);
   color: var(--color-text-secondary);
   border: 2px solid var(--color-nav-num-border);
@@ -594,23 +701,9 @@ body.modal-open {
   color: white;
 }
 
-/* === REVIEW SEARCH === */
-.reviewSearchInput {
-    padding: 1rem;
-    width: 100%;
-    max-width: 600px;
-    margin: 1rem auto 2rem;
-    display: block;
-    border-radius: 12px;
-    border: 2px solid var(--color-nav-num-border);
-    background: var(--color-nav-num-bg-start);
-    color: var(--color-text-main);
-    font-size: 1.1rem;
-    transition: border-color 0.3s ease;
-}
-.reviewSearchInput:focus {
-    outline: none;
-    border-color: var(--color-primary-light);
+.navNumber.answered:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 /* === VÝSLEDKY === */
@@ -637,9 +730,17 @@ body.modal-open {
   font-weight: 700;
 }
 
+.timeSpent { 
+  color: var(--color-text-neutral); 
+  font-size: 1.5rem; 
+  margin-top: 1.5rem;
+  font-weight: 600;
+}
+
 .reviewList { margin-top: 2.5rem; }
 
 .reviewQuestion {
+  /* Používá proměnné */
   background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
   padding: 1.6rem;
   border-radius: 14px;
@@ -651,66 +752,94 @@ body.modal-open {
   transition: all 0.3s ease;
 }
 
+.reviewQuestion:hover {
+  transform: translateX(4px);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
 .reviewQuestion.correct { 
   border-left-color: var(--color-success);
+  border-top-color: rgba(34, 197, 94, 0.2);
   background: linear-gradient(135deg, var(--color-card-bg-start) 0%, rgba(34, 197, 94, 0.05) 100%);
 }
 
 .reviewQuestion.wrong { 
   border-left-color: var(--color-error);
+  border-top-color: rgba(239, 68, 68, 0.2);
   background: linear-gradient(135deg, var(--color-card-bg-start) 0%, rgba(239, 68, 68, 0.05) 100%);
 }
 
-/* === REVIEW CARD & GRID === */
-.reviewGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-  padding: 1rem;
+.reviewQuestion.unanswered { 
+  opacity: 0.8; 
+  border-left-color: var(--color-text-neutral);
 }
 
-.reviewCard {
-  background: linear-gradient(135deg, var(--color-card-bg-end) 0%, rgba(30, 41, 59, 0.6) 100%);
-  border: 2px solid var(--color-card-border);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.3s;
+.questionImage.small { 
+  height: 200px; 
+  width: auto; 
+  max-width: 100%; 
+  margin: 1rem auto; 
+  display: block; 
+  border-radius: 12px; 
+  cursor: zoom-in; 
+  object-fit: contain; 
+  border: 2px solid rgba(59, 130, 246, 0.2);
+  outline: none; 
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
 }
-.light-mode .reviewCard {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-}
-
-.reviewCard:hover {
-  transform: translateY(-6px);
-  border-color: rgba(59, 130, 246, 0.5);
-}
-
-.reviewHeader {
-  color: var(--color-primary-light);
-  font-weight: 700;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
+.light-mode .questionImage.small {
+  background: rgba(255, 255, 255, 0.8);
 }
 
-.reviewCard .reviewImage {
-    max-width: 100%;
-    max-height: 250px;
-    margin: 1rem auto;
-    display: block;
-    object-fit: contain;
-    border-radius: 8px;
-    border: 1px solid var(--color-option-border);
+
+.questionImage.small:hover {
+  transform: scale(1.02);
+  border-color: rgba(59, 130, 246, 0.4);
 }
 
-.reviewAnswer {
-    color: var(--color-text-secondary);
-    margin-top: 0.5rem;
+/* === FULLSCREEN OBRÁZEK === */
+.fullscreenOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.98);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  animation: fadeIn 0.3s ease-out;
 }
 
-.correctText { color: var(--color-review-correct); font-weight: 700; }
-.wrongText { color: var(--color-review-wrong); font-weight: 700; }
+.fullscreenImage { 
+  max-width: 100vw; 
+  max-height: 100dvh; 
+  object-fit: contain;
+}
 
+.closeFullscreen { 
+  position: absolute; 
+  top: 20px; 
+  right: 20px; 
+  font-size: 3rem; 
+  color: white; 
+  background: rgba(0, 0, 0, 0.5);
+  border: none; 
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.closeFullscreen:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
 
 /* === MODÁL === */
 .modalOverlay {
@@ -720,13 +849,14 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000; /* Musí být vyšší než vše ostatní */
+  z-index: 1000;
   backdrop-filter: blur(8px);
   padding: 1rem;
   animation: fadeIn 0.3s ease-out;
 }
 
 .modal {
+  /* Používá proměnné */
   background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
   padding: 2.5rem;
   border-radius: 20px;
@@ -735,7 +865,12 @@ body.modal-open {
   max-width: 420px;
   border: 2px solid rgba(148, 163, 184, 0.2);
   box-shadow: 0 25px 90px rgba(0, 0, 0, 0.8);
+  animation: fadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.light-mode .modal {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
 
 .modal h3 {
   font-size: 1.4rem;
@@ -744,21 +879,107 @@ body.modal-open {
 }
 
 .modal p {
+  font-size: 1rem;
   color: var(--color-text-secondary);
   line-height: 1.6;
 }
 
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-direction: column;
+}
 
-/* === MOBILNÍ ÚPRAVY === */
-@media (max-width: 480px) {
-  .container { padding: 1rem; }
-  .topBarRight { flex-direction: column; align-items: stretch; }
-  .topControls { justify-content: space-between; }
-  .actionButtons.spaced { flex-direction: row; gap: 0.8rem; }
-  .actionButtons.spaced button { flex: 1; padding: 1rem; }
-  .optionButton { min-height: 76px; padding: 1.5rem; }
-  .card { padding: 1.2rem; }
-  .reviewGrid { grid-template-columns: 1fr; }
+/* === REVIEW SEARCH & GRID === */
+.reviewSearchInput {
+    padding: 1rem;
+    width: 100%;
+    max-width: 600px;
+    margin: 1rem auto 2rem;
+    display: block;
+    border-radius: 12px;
+    border: 2px solid var(--color-nav-num-border);
+    background: var(--color-nav-num-bg-start);
+    color: var(--color-text-main);
+    font-size: 1.1rem;
+    transition: border-color 0.3s ease;
+}
+.reviewSearchInput:focus {
+    outline: none;
+    border-color: var(--color-primary-light);
+}
+
+.reviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.reviewCard {
+  /* Používá proměnné */
+  background: linear-gradient(135deg, var(--color-card-bg-end) 0%, rgba(30, 41, 59, 0.6) 100%);
+  border: 2px solid var(--color-card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.light-mode .reviewCard {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+}
+
+.reviewCard:hover {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.8) 100%);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-6px);
+  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.25);
+}
+.light-mode .reviewCard:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+}
+
+
+.reviewHeader {
+  color: var(--color-primary-light);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.05rem;
+}
+
+.reviewCard .reviewImage {
+    max-width: 400px;
+    height: auto;
+    margin: 1rem auto;
+    display: block;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--color-option-border);
+}
+
+.reviewAnswer {
+  color: var(--color-text-secondary);
+  margin-top: 0.75rem;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.correctText {
+  color: var(--color-review-correct);
+  font-weight: 700;
+}
+
+.highlightMark { 
+    background-color: rgba(255, 255, 0, 0.25); 
+    color: #fff; 
+    padding: 0 2px; 
+    border-radius: 2px; 
+    font-weight: bold; 
+}
+.light-mode .highlightMark { 
+    color: #000; 
 }
 
 /* === SUBJECT SELECTOR === */
@@ -769,8 +990,12 @@ body.modal-open {
   min-height: var(--vh);
   padding: 2rem;
 }
-/* ... zbytek stylů pro subject selector ... */
-.subjectContent { text-align: center; max-width: 600px; }
+
+.subjectContent {
+  text-align: center;
+  max-width: 600px;
+}
+
 .subjectTitle {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
@@ -779,24 +1004,98 @@ body.modal-open {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.subjectSubtitle { font-size: 1.2rem; color: var(--color-text-neutral); margin-bottom: 2rem; }
-.subjectGrid { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; width: 100%; max-width: 520px; }
+
+.subjectSubtitle {
+  font-size: 1.2rem;
+  color: var(--color-text-neutral);
+  margin-bottom: 2rem;
+}
+
+.subjectGrid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 520px;
+}
+
 .subjectButton {
-  width: 100%; padding: 1.8rem 1.4rem;
+  width: 100%;
+  padding: 1.8rem 1.4rem;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 50%, rgba(139, 92, 246, 0.1) 100%);
-  border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 16px;
-  cursor: pointer; transition: all 0.3s;
-  color: var(--color-text-main); font-weight: 600; font-size: 1.05rem;
+  border: 2px solid rgba(59, 130, 246, 0.3);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: var(--color-text-main);
+  font-weight: 600;
+  font-size: 1.05rem;
 }
 .light-mode .subjectButton {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.05) 50%, rgba(139, 92, 246, 0.05) 100%);
-    border: 2px solid rgba(59, 130, 246, 0.5); color: var(--color-text-main);
+    border: 2px solid rgba(59, 130, 246, 0.5);
+    color: var(--color-text-main);
 }
+
 .subjectButton:hover {
-  background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.6);
-  transform: translateY(-4px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
 }
-.subjectIcon { font-size: 3rem; margin-bottom: 0.5rem; display: block; }
-.subjectName { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
-.subjectDesc { font-size: 0.85rem; color: var(--color-text-neutral); }
-.uploadError { color: var(--color-error); margin: 1rem 0; padding: 0.5rem; border-radius: 8px; background: rgba(239, 68, 68, 0.1); }
+.light-mode .subjectButton:hover {
+    background: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.subjectButton.selected {
+  background: rgba(59, 130, 246, 0.3);
+  border-color: rgba(96, 165, 250, 0.8);
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.6);
+  transform: translateY(-6px) scale(1.03);
+  animation: selectPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.light-mode .subjectButton.selected {
+    background: rgba(59, 130, 246, 0.5);
+    border-color: rgba(96, 165, 250, 1);
+}
+
+.subjectIcon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.subjectName {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.subjectDesc {
+  font-size: 0.85rem;
+  color: var(--color-text-neutral);
+}
+
+.uploadError {
+  color: var(--color-error);
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.uploadHint {
+  color: var(--color-text-neutral);
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .subjectTitle { font-size: 1.8rem; }
+  .subjectSubtitle { font-size: 1rem; }
+  .subjectGrid { grid-template-columns: 1fr; }
+}
