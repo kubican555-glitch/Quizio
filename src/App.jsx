@@ -1,48 +1,49 @@
 import React, { useState, useEffect, useRef } from "react";
-
-// --- PŘÍMÝ IMPORT OTÁZEK ---
+// JSON importy pro otázky
 import QUESTIONS_SPS from "./questionsSPS.json"; 
 import QUESTIONS_STT from "./questionsSTT.json";
 import { SubjectSelector } from "./components/SubjectSelector.jsx";
 
 // ----------------------------------------------------------------------
-// Importy obrázků
-const images_sps = import.meta.glob("./images/images_sps/*.png", { eager: true, as: "url" });
-const images_stt = import.meta.glob("./images/images_stt/*.png", { eager: true, as: "url" });
-const images_custom = import.meta.glob("./images/*.png", { eager: true, as: "url" });
+// Importy obrázků (podpora více formátů)
+const images_sps = import.meta.glob("./images/images_sps/*.{png,jpg,jpeg,PNG,JPG}", { eager: true, as: "url" });
+const images_stt = import.meta.glob("./images/images_stt/*.{png,jpg,jpeg,PNG,JPG}", { eager: true, as: "url" });
+const images_custom = import.meta.glob("./images/*.{png,jpg,jpeg,PNG,JPG}", { eager: true, as: "url" });
 
 const allImagesMap = {
   SPS: images_sps,
   STT: images_stt,
   CUSTOM: images_custom,
   DEFAULT: images_custom, 
+  QUESTIONS: images_custom, 
 };
 // ----------------------------------------------------------------------
 
 /* ---------- Utilities ---------- */
 
 function formatTime(s) {
-  return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, "0")}`;
 }
 
 const getImageUrl = (subject, questionNumber) => {
   const effectiveSubject = subject && allImagesMap[subject] ? subject : 'DEFAULT';
   const numStr = String(questionNumber);
 
-  let pathPrefix;
-  if (effectiveSubject === 'SPS') {
-    pathPrefix = './images/images_sps/';
-  } else if (effectiveSubject === 'STT') {
-    pathPrefix = './images/images_stt/';
-  } else {
-    pathPrefix = './images/';
-  }
+  let map = allImagesMap[effectiveSubject];
+  if (!map) return null;
 
-  const imageKey = `${pathPrefix}${numStr}.png`;
-  return allImagesMap[effectiveSubject]?.[imageKey] || null;
+  const foundKey = Object.keys(map).find(key => {
+      const fileName = key.split('/').pop().split('.')[0];
+      return fileName === numStr;
+  });
+
+  return foundKey ? map[foundKey] : null;
 };
 
-// --- CHYTRÉ VYHLEDÁVÁNÍ ---
+// --- CHYTRÉ VYHLEDÁVÁNÍ A ZVÝRAZŇOVÁNÍ ---
+
 const removeAccents = (str) => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 };
@@ -79,64 +80,21 @@ const HighlightedText = ({ text, highlightRegex }) => {
 
 /* ---------- Small components ---------- */
 
-// --- OPRAVENÝ IMAGE MODAL (LIGHTBOX) ---
-const ImageModal = ({ src, onClose }) => {
-    if (!src) return null;
+// Komponenta pro podtitul s názvem předmětu
+const SubjectTitle = ({ subject }) => {
+    if (!subject) return null;
     return (
-        <div 
-            className="modalOverlay" // Odstranil jsem "fadeIn", aby nekolidoval s fixní pozicí
-            onClick={onClose} 
-            style={{ 
-                backgroundColor: 'rgba(0, 0, 0, 0.92)', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                zIndex: 9999, // Velmi vysoký Z-index
-                cursor: 'zoom-out', 
-                position: 'fixed',
-                top: 0, left: 0, right: 0, bottom: 0,
-                width: '100vw',
-                height: '100vh',
-                padding: '0'
-            }}
-        >
-            {/* Obrázek bez obalového divu pro maximální spolehlivost */}
-            <img 
-                src={src} 
-                alt="Fullscreen" 
-                style={{ 
-                    minWidth: '50vw', 
-                    maxWidth: '96vw', 
-                    maxHeight: '96vh', 
-                    objectFit: 'contain',
-                    borderRadius: '4px',
-                    boxShadow: '0 0 50px rgba(0,0,0,1)',
-                    backgroundColor: '#fff',
-                    cursor: 'default' // Aby uživatel věděl, že na obrázek se "nekliká" pro zavření (klikne se vedle)
-                }} 
-                // Zrušil jsem stopPropagation, aby i klik na obrázek zavřel modal (pokud to tak chcete),
-                // ALE lepší UX je, když klik na obrázek NIC neudělá a zavírá se jen okolím.
-                // Pokud chcete zavírat i klikem na obrázek, smažte tento řádek:
-                onClick={(e) => e.stopPropagation()} 
-            />
-
-            {/* Křížek pro explicitní zavření */}
-            <div 
-                onClick={onClose}
-                style={{
-                    position: 'absolute',
-                    top: '20px',
-                    right: '30px',
-                    color: 'white',
-                    fontSize: '40px',
-                    opacity: 0.8,
-                    cursor: 'pointer',
-                    zIndex: 10000
-                }}
-            >
-                &times;
-            </div>
-        </div>
+        <span style={{ 
+            display: 'block', 
+            fontSize: '0.6em', 
+            color: 'var(--color-primary-light)', 
+            marginTop: '0.5rem', 
+            fontWeight: '600',
+            opacity: 0.9,
+            letterSpacing: '1px'
+        }}>
+            {subject === "CUSTOM" ? "VLASTNÍ SADA" : subject}
+        </span>
     );
 };
 
@@ -154,6 +112,8 @@ const SubjectBadge = ({ subject, compact = false }) => {
             color: 'var(--color-primary-light)',
             fontWeight: '800',
             fontSize: compact ? '0.9rem' : '1rem',
+            letterSpacing: '0.5px',
+            boxShadow: '0 2px 10px rgba(59, 130, 246, 0.1)',
             whiteSpace: 'nowrap'
         }}>
             {subject === "CUSTOM" ? "Vlastní" : subject}
@@ -163,7 +123,7 @@ const SubjectBadge = ({ subject, compact = false }) => {
 
 function ConfirmModal({ title, message, onCancel, onConfirm, confirmText = "Ano, pokračovat", cancelText = "Zrušit" }) {
   return (
-    <div className="modalOverlay" onClick={onCancel} style={{zIndex: 5000}}> 
+    <div className="modalOverlay" onClick={onCancel}> 
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
         <p>{message}</p>
@@ -176,15 +136,29 @@ function ConfirmModal({ title, message, onCancel, onConfirm, confirmText = "Ano,
   );
 }
 
-function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, onBack, currentSubject, timeLeftAtSubmit, onZoom }) {
+function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, onBack, currentSubject, timeLeftAtSubmit }) {
   const list = mode === "training" ? questionSet.slice(0, maxSeenIndex + 1) : questionSet;
+  const backBtnRef = useRef(null);
+
+  useEffect(() => {
+    const handleResultKeys = (e) => {
+        if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+            e.preventDefault();
+            onBack();
+        }
+    };
+    window.addEventListener("keydown", handleResultKeys);
+    return () => window.removeEventListener("keydown", handleResultKeys);
+  }, [onBack]);
+
   return (
     <div className="resultScreen fadeIn">
-      <div style={{ marginBottom: '1rem' }}>
-        <SubjectBadge subject={currentSubject} />
-      </div>
+      <h2>
+        {mode === "mock" ? "Test dokončen!" : "Vyhodnocení tréninku"}
+        {/* Zobrazení předmětu pod nadpisem výsledků */}
+        <SubjectTitle subject={currentSubject} />
+      </h2>
 
-      <h2>{mode === "mock" ? "Test dokončen!" : "Vyhodnocení tréninku"}</h2>
       <p className="bigScore">{score.correct} / {score.total}</p>
       <p className="bigPercent">{score.total === 0 ? 0 : Math.round((score.correct / score.total) * 100)} % správně</p>
 
@@ -197,21 +171,17 @@ function ResultScreen({ mode, score, trainingTime, questionSet, maxSeenIndex, on
           return (
             <div key={i} className={`reviewQuestion ${q.userAnswer === q.correctIndex ? "correct" : q.userAnswer !== undefined ? "wrong" : "unanswered"}`}>
               <strong>{i + 1}. {q.question}</strong>
-              {imageUrl && (
-                  <div className="imageWrapper small" onClick={() => onZoom(imageUrl)} style={{cursor: 'zoom-in', marginTop: '0.5rem', display: 'inline-block'}}>
-                    <img src={imageUrl} alt="" className="questionImage small" />
-                  </div>
-              )}
-              <div style={{marginTop: '0.5rem'}}><strong>Správná odpověď:</strong> <span style={{color: 'var(--color-review-correct)'}}>{q.options[q.correctIndex]}</span></div>
+              {imageUrl && <img src={imageUrl} alt="" className="questionImage small" onClick={() => window.open(imageUrl, "_blank")} />}
+              <div><strong>Správná odpověď:</strong> {q.options[q.correctIndex]}</div>
               {q.userAnswer !== undefined && (
-                <div><strong>Tvá odpověď:</strong> <span style={{color: q.userAnswer === q.correctIndex ? 'var(--color-review-correct)' : 'var(--color-error)'}}>{q.options[q.userAnswer]}</span> {q.userAnswer === q.correctIndex ? "(správně)" : "(špatně)"}</div>
+                <div><strong>Tvá odpověď:</strong> {q.options[q.userAnswer]} {q.userAnswer === q.correctIndex ? "(správně)" : "(špatně)"}</div>
               )}
             </div>
           );
         })}
       </div>
 
-      <button className="navButton primary" style={{ marginTop: "2rem" }} onClick={onBack}>Zpět do menu</button>
+      <button ref={backBtnRef} className="navButton primary" style={{ marginTop: "2rem" }} onClick={onBack}>Zpět do menu (Enter)</button>
     </div>
   );
 }
@@ -271,8 +241,13 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
     <div
       ref={wrapperRef}
       className={`navigatorWrapper ${mode === "training" ? "noAutoScroll" : ""} ${dragStateRef.current.isDragging ? "dragging" : ""}`}
-      onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
-      onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="compactNavigator">
         {questionSet.map((_, i) => {
@@ -294,9 +269,10 @@ function Navigator({ questionSet, currentIndex, setCurrentIndex, mode, maxSeenIn
   );
 }
 
-function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled, isKeyboardMode, currentSubject, onZoom }) {
-  if (!currentQuestion || !currentQuestion.options) return <div>Načítání otázky...</div>;
-
+function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSelect, optionRefsForCurrent, disabled, isKeyboardMode, currentSubject }) {
+  if (!currentQuestion || !currentQuestion.options) {
+    return <div>Načítání otázky...</div>;
+  }
   const imageUrl = getImageUrl(currentSubject, currentQuestion.number); 
 
   return (
@@ -307,9 +283,9 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
           {currentQuestion.question}
         </h2>
         {imageUrl && (
-          <div className="imageWrapper" onClick={() => onZoom(imageUrl)} style={{ cursor: 'zoom-in' }}>
-            <img src={imageUrl} alt="Otázka" className="questionImage" />
-            <div className="fullscreenHint">🔍 Klikni pro zvětšení (klávesa F)</div>
+          <div className="imageWrapper">
+            <img src={imageUrl} alt="Otázka" className="questionImage" onClick={() => window.open(imageUrl, "_blank")} />
+            <div className="fullscreenHint">Klikni pro zvětšení</div>
           </div>
         )}
       </div>
@@ -355,8 +331,17 @@ function QuestionCard({ currentQuestion, mode, showResult, selectedAnswer, onSel
 }
 
 const ThemeToggle = ({ currentTheme, toggle }) => (
-    <button className="menuBackButton" onClick={toggle} style={{ fontSize: "1.2rem", padding: "0.5rem 0.8rem" }}>
-        {currentTheme === 'dark' ? '☀️' : '🌙'}
+    <button 
+        className="menuBackButton" 
+        onClick={toggle}
+        style={{ 
+            fontSize: "0.95rem", 
+            padding: "0.75rem 1.2rem", 
+            width: "auto", 
+            fontWeight: "600",
+        }}
+    >
+        {currentTheme === 'dark' ? '☀️ Světlý motiv' : '🌙 Tmavý motiv'}
     </button>
 );
 
@@ -381,23 +366,19 @@ export default function App() {
 
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [combo, setCombo] = useState(0); 
-  const [shake, setShake] = useState(false);
-
   const [timeLeft, setTimeLeft] = useState(0);
   const [finished, setFinished] = useState(false);
   const [maxSeenIndex, setMaxSeenIndex] = useState(0);
   const [trainingTime, setTrainingTime] = useState(0);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
   const [showConfirmExit, setShowConfirmExit] = useState(false);
-
-  // STATE PRO MODAL S OBRÁZKEM
   const [fullscreenImage, setFullscreenImage] = useState(null);
-
   const [timeLeftAtSubmit, setTimeLeftAtSubmit] = useState(0);
 
   const [isKeyboardMode, setIsKeyboardMode] = useState(false);
+
   const optionRefsForCurrent = useRef({});
+  const scrollRef = useRef(null);
   const cardRef = useRef(null);
 
   const toggleTheme = () => {
@@ -405,9 +386,10 @@ export default function App() {
   };
 
   useEffect(() => {
-    const isModalActive = showConfirmExit || showConfirmSubmit || fullscreenImage;
+    const isModalActive = showConfirmExit || showConfirmSubmit;
     document.body.className = `${theme === 'light' ? 'light-mode' : ''} ${isModalActive ? 'modal-open' : ''}`;
-  }, [theme, showConfirmExit, showConfirmSubmit, fullscreenImage]);
+  }, [theme, showConfirmExit, showConfirmSubmit]);
+
 
   useEffect(() => {
     if (Array.isArray(QUESTIONS_SPS)) QUESTIONS_SPS.forEach((q, i) => { q._localIndex = i; });
@@ -419,9 +401,11 @@ export default function App() {
       let base = [];
       if (subject === "SPS") base = QUESTIONS_SPS;
       else if (subject === "STT") base = QUESTIONS_STT;
+      else if (subject === "DEFAULT" || subject === "QUESTIONS") base = []; 
       else if (subject === "CUSTOM") base = Array.isArray(customQuestions) ? customQuestions : [];
       return base.map((q, idx) => ({ ...q, options: [...(q.options || [])], userAnswer: undefined, _localIndex: idx }));
     };
+
     const active = getActive();
     setActiveQuestionsCache(active);
   }, [subject, customQuestions]);
@@ -433,349 +417,476 @@ export default function App() {
     return () => window.removeEventListener("resize", setVH);
   }, []);
 
-  // --- HISTORY API ---
-  useEffect(() => {
-    if (!window.history.state) {
-        window.history.replaceState({ view: 'home' }, '');
-    }
-
-    const handlePopState = (event) => {
-        const state = event.state;
-
-        if (!state || state.view === 'home') {
-            setSubject(null);
-            setMode(null);
-            setQuestionSet([]);
-            setFinished(false);
-            setMenuSelection(0);
-        }
-        else if (state.view === 'menu') {
-            setSubject(state.subject);
-            setMode(null);
-            setQuestionSet([]);
-            setFinished(false);
-            setMenuSelection(0);
-        }
-        else if (state.view === 'quiz') {
-             setSubject(state.subject);
-             setMode(null);
-        }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  // --- ESC handler ---
-  useEffect(() => {
-      if (!fullscreenImage) return;
-      const handleEsc = (e) => {
-          if (e.key === "Escape") {
-              setFullscreenImage(null);
-              e.stopPropagation();
-          }
-      };
-      window.addEventListener('keydown', handleEsc, { capture: true });
-      return () => window.removeEventListener('keydown', handleEsc, { capture: true });
-  }, [fullscreenImage]);
-
-  // ---
-
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (Math.abs(e.movementX) > 0 || Math.abs(e.movementY) > 0) {
-        if (isKeyboardMode) setIsKeyboardMode(false);
+        if (isKeyboardMode) {
+          setIsKeyboardMode(false);
+          if (mode === "random" && !showResult) {
+            // keep selection
+          }
+        }
       }
     };
 
     const handleKeyDown = (e) => {
-      if (!isKeyboardMode) setIsKeyboardMode(true);
-
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "f", "F"].includes(e.key.toString())) {
-         e.preventDefault();
+      if (!isKeyboardMode) {
+        setIsKeyboardMode(true);
       }
-
       if (showConfirmExit || showConfirmSubmit) {
-          return;
-      }
-
-      // LOGIKA PRO F (POUZE V REŽIMU KVÍZU)
-      if (mode && (mode !== "review" && mode !== null)) {
-        const currentQ = questionSet[currentIndex];
-        const imageUrl = currentQ ? getImageUrl(subject, currentQ.number) : null;
-
-        if (e.key === 'f' || e.key === 'F') {
-            if (fullscreenImage) {
-                setFullscreenImage(null);
-                return;
-            } else if (imageUrl) {
-                setFullscreenImage(imageUrl);
-                return;
-            }
+        if (e.key === "Escape" || e.key === "Enter") {
+        } else if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key.toString())) {
+             e.preventDefault();
         }
       }
+    };
 
-      if (fullscreenImage) return;
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('keydown', handleKeyDown);
 
-      if (finished) {
-          if (["Backspace", "Enter", "ArrowLeft"].includes(e.key)) {
-              window.history.back();
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isKeyboardMode, mode, showResult, showConfirmExit, showConfirmSubmit]);
+
+  useEffect(() => {
+    if (mode !== "training") return;
+    if (currentIndex > maxSeenIndex) {
+      setMaxSeenIndex(currentIndex);
+    }
+  }, [currentIndex, mode]);
+
+  useEffect(() => {
+    if ((mode !== "mock" && mode !== "random") || !cardRef.current) return;
+    setTimeout(() => {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  }, [currentIndex, mode]);
+
+  useEffect(() => {
+    if (mode !== "random" || selectedAnswer === null || !isKeyboardMode) return;
+    const refs = optionRefsForCurrent.current?.[questionSet[currentIndex]?._localIndex] || [];
+    const selectedBtn = refs[selectedAnswer];
+
+    if (selectedBtn && cardRef.current) {
+      setTimeout(() => {
+        const btnRect = selectedBtn.getBoundingClientRect();
+        const headerOffset = 150;
+        if (btnRect.bottom > window.innerHeight) {
+          selectedBtn.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+        else if (btnRect.top < headerOffset) {
+          const scrollAmount = window.scrollY + btnRect.top - headerOffset - 20;
+          window.scrollTo({ top: scrollAmount, behavior: "smooth" });
+        }
+        selectedBtn.focus({ preventScroll: true });
+      }, 50);
+    }
+  }, [selectedAnswer, currentIndex, mode, questionSet, isKeyboardMode]);
+
+  useEffect(() => {
+    if (mode !== "training" || finished) return;
+    const t = setInterval(() => setTrainingTime((x) => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [mode, finished]);
+
+  useEffect(() => {
+    let intervalId = null;
+    if (mode === "mock" && !finished) {
+      intervalId = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+             clearInterval(intervalId);
+             return 0;
           }
-          return;
-      }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [mode, finished]);
 
+  useEffect(() => {
+    if (mode === "mock" && timeLeft === 0 && !finished) {
+      submitTest();
+    }
+  }, [timeLeft, mode, finished]);
+
+  useEffect(() => {
+    if (!mode || mode === "review") return;
+
+    const onKey = (e) => {
       const curQ = questionSet[currentIndex] || { options: [] };
       const opts = curQ.options.length;
 
-      if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
-        if (mode === "random" && !showResult) selectRandomAnswer(selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts);
-        else if (mode !== "random") handleAnswer(curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts);
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+        e.preventDefault();
       }
+
+      if (e.key === "w" || e.key === "W" || e.key === "ArrowUp") {
+        if (mode === "random" && !showResult) {
+          const newIdx = selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts;
+          selectRandomAnswer(newIdx);
+        } else if (mode !== "random") {
+          const newIdx = curQ.userAnswer === undefined ? opts - 1 : (curQ.userAnswer - 1 + opts) % opts;
+          handleAnswer(newIdx);
+        }
+      }
+
       if (e.key === "s" || e.key === "S" || e.key === "ArrowDown") {
-        if (mode === "random" && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
-        else if (mode !== "random") handleAnswer(curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts);
+        if (mode === "random" && !showResult) {
+          const newIdx = selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts;
+          selectRandomAnswer(newIdx);
+        } else if (mode !== "random") {
+          const newIdx = curQ.userAnswer === undefined ? 0 : (curQ.userAnswer + 1) % opts;
+          handleAnswer(newIdx);
+        }
       }
 
       if (e.key === "a" || e.key === "A" || e.key === "ArrowLeft") {
-        if (mode === "random" && showResult) {
-            nextRandomQuestion();
-        } else if (mode !== "random" && currentIndex === 0) {
-            tryReturnToMenu();
-        } else {
-            moveToQuestion(Math.max(0, currentIndex - 1));
+        if (mode === "random" && showResult) nextRandomQuestion();
+        else {
+          const newIdx = Math.max(0, currentIndex - 1);
+          moveToQuestion(newIdx);
         }
       }
 
       if (e.key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
-        if (mode === "random" && showResult) nextRandomQuestion();
-        else if (mode === "random" && !showResult) { if (selectedAnswer !== null) confirmRandomAnswer(); }
-        else moveToQuestion(currentIndex + 1);
+        if (mode === "random" && showResult) {
+          nextRandomQuestion();
+        }
+        else if (mode === "random" && !showResult) {
+          if (selectedAnswer !== null) confirmRandomAnswer();
+        }
+        else {
+          const newIdx = currentIndex + 1;
+          moveToQuestion(newIdx);
+        }
       }
+
       if (e.key === " ") {
         if (mode === "random" && showResult) nextRandomQuestion();
         else if (mode === "random" && !showResult && selectedAnswer !== null) confirmRandomAnswer();
         else if (!finished && (mode === "mock" || mode === "training")) setShowConfirmSubmit(true);
       }
+
       if (e.key === "Backspace") {
         if (curQ.userAnswer !== undefined && mode !== "random") clearAnswer();
         else tryReturnToMenu();
       }
+
       if (e.key === "Escape") {
-        if (mode === "random" && showResult) clearAnswer();
-        else tryReturnToMenu(); 
+        if (fullscreenImage) setFullscreenImage(null);
+        else if (showConfirmSubmit) setShowConfirmSubmit(false);
+        else if (showConfirmExit) setShowConfirmExit(false);
+        else if (mode === "random" && showResult) clearAnswer();
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [mode, questionSet, currentIndex, showResult, showConfirmSubmit, showConfirmExit, fullscreenImage, maxSeenIndex, finished, selectedAnswer, isKeyboardMode]);
 
-  const prepareQuestionSet = (baseQuestions) => baseQuestions.map((q, idx) => ({ ...q, options: [...(q.options || [])], userAnswer: undefined, _localIndex: idx }));
-
-  const handleSelectSubject = (subj) => {
-      const upperSubj = subj.toUpperCase();
-      setSubject(upperSubj);
-      window.history.pushState({ view: 'menu', subject: upperSubj }, '');
-  };
-
-  const handleStartMode = (startFn, modeName) => {
-      startFn();
-      window.history.pushState({ view: 'quiz', subject: subject, mode: modeName }, '');
+  const prepareQuestionSet = (baseQuestions) => {
+    return baseQuestions.map((q, idx) => ({ ...q, options: [...(q.options || [])], userAnswer: undefined, _localIndex: idx }));
   };
 
   const startRandomMode = () => {
     const pool = activeQuestionsCache || prepareQuestionSet(QUESTIONS_SPS);
     const shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
-    setQuestionSet(shuffled); setMode("random"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false);
-    setCombo(0); 
+    setQuestionSet(shuffled);
+    setMode("random");
+    setCurrentIndex(0);
+    setScore({ correct: 0, total: 0 });
+    setFinished(false);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    optionRefsForCurrent.current = {};
+    setIsKeyboardMode(false);
   };
 
   const startMockTest = () => {
     const pool = activeQuestionsCache || prepareQuestionSet(QUESTIONS_SPS);
     const sel = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(40, pool.length)).map((q, idx) => ({ ...q, _localIndex: idx }));
-    setQuestionSet(sel); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false);
+    setQuestionSet(sel);
+    setTimeLeft(1800);
+    setMode("mock");
+    setCurrentIndex(0);
+    setMaxSeenIndex(0);
+    setFinished(false);
+    optionRefsForCurrent.current = {};
+    setIsKeyboardMode(false);
   };
 
   const startTrainingMode = () => {
     const all = activeQuestionsCache || prepareQuestionSet(QUESTIONS_SPS);
-    setQuestionSet(all); setMode("training"); setCurrentIndex(0); setMaxSeenIndex(0); setTrainingTime(0); setFinished(false); setIsKeyboardMode(false);
+    setQuestionSet(all);
+    setMode("training");
+    setCurrentIndex(0);
+    setMaxSeenIndex(0);
+    setTrainingTime(0);
+    setFinished(false);
+    optionRefsForCurrent.current = {};
+    setIsKeyboardMode(false);
   };
 
   const startReviewMode = () => {
     const all = activeQuestionsCache || prepareQuestionSet(QUESTIONS_SPS);
-    setQuestionSet(all); setMode("review");
+    setQuestionSet(all);
+    setMode("review");
   };
 
-  const selectRandomAnswer = (idx) => { if (!finished && mode === "random" && !showResult) { setSelectedAnswer(idx); setIsKeyboardMode(true); } };
-
-  const clickRandomAnswer = (idx) => { 
-      if(finished || mode!=="random" || showResult) return;
-      const currentQ=questionSet[currentIndex];
-      const isCorrect = idx===currentQ.correctIndex;
-
-      setQuestionSet(prev=>{ const c=[...prev]; c[currentIndex]={...c[currentIndex], userAnswer:idx}; return c; });
-      setSelectedAnswer(idx); setShowResult(true);
-
-      if (isCorrect) {
-        setScore(s=>({correct:s.correct+1, total:s.total+1}));
-        setCombo(c => c + 1);
-      } else {
-        setScore(s=>({...s, total:s.total+1}));
-        if (combo >= 3) { 
-            setShake(true);
-            setTimeout(() => setShake(false), 500);
-        }
-        setCombo(0);
-      }
+  const selectRandomAnswer = (idx) => {
+    if (finished || mode !== "random" || showResult) return;
+    setSelectedAnswer(idx);
+    setIsKeyboardMode(true);
   };
 
-  const confirmRandomAnswer = () => { 
-      if(finished || mode!=="random" || showResult) return;
-      const currentQ=questionSet[currentIndex];
-      const ans=selectedAnswer!==null?selectedAnswer:-1;
-      const isCorrect = ans===currentQ.correctIndex;
+  const clickRandomAnswer = (idx) => {
+    if (finished || mode !== "random" || showResult) return;
+    const currentQ = questionSet[currentIndex];
+    if (!currentQ) return;
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      const q = { ...copy[currentIndex] };
+      q.userAnswer = idx;
+      copy[currentIndex] = q;
+      return copy;
+    });
+    setSelectedAnswer(idx);
+    setShowResult(true);
+    setScore((s) => {
+      let correct = s.correct;
+      let total = s.total;
+      if (idx === currentQ.correctIndex) correct += 1;
+      total += 1;
+      return { correct, total };
+    });
+  };
 
-      setQuestionSet(prev=>{ const c=[...prev]; c[currentIndex]={...c[currentIndex], userAnswer:ans}; return c; });
-      setShowResult(true);
+  const confirmRandomAnswer = () => {
+    if (finished || mode !== "random" || showResult) return;
+    const currentQ = questionSet[currentIndex];
+    if (!currentQ) return;
+    const answerToSave = selectedAnswer !== null ? selectedAnswer : -1;
 
-      if(ans!==-1) {
-          if (isCorrect) {
-              setScore(s=>({correct:s.correct+1, total:s.total+1}));
-              setCombo(c => c + 1);
-          } else {
-              setScore(s=>({correct:s.correct, total:s.total+1}));
-              if (combo >= 3) {
-                  setShake(true);
-                  setTimeout(() => setShake(false), 500);
-              }
-              setCombo(0);
-          }
-      } else {
-          setScore(s=>({...s, total:s.total+1}));
-          if (combo >= 3) {
-              setShake(true);
-              setTimeout(() => setShake(false), 500);
-          }
-          setCombo(0);
-      }
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      const q = { ...copy[currentIndex] };
+      q.userAnswer = answerToSave;
+      copy[currentIndex] = q;
+      return copy;
+    });
+    setShowResult(true);
 
-      if(selectedAnswer===null) setSelectedAnswer(-1);
+    if (answerToSave !== -1) {
+      setScore((s) => {
+        let correct = s.correct;
+        let total = s.total;
+        if (answerToSave === currentQ.correctIndex) correct += 1;
+        total += 1;
+        return { correct, total };
+      });
+    } else {
+      setScore((s) => ({ ...s, total: s.total + 1 }));
+    }
+
+    if (selectedAnswer === null) {
+      setSelectedAnswer(-1);
+    }
   };
 
   const handleAnswer = (idx) => {
     if (finished || mode === "review") return;
     setIsKeyboardMode(true);
-    setQuestionSet(prev => { const c=[...prev]; c[currentIndex].userAnswer=idx; return c; });
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      const q = { ...copy[currentIndex] };
+      q.userAnswer = idx;
+      copy[currentIndex] = q;
+      return copy;
+    });
   };
+
   const clearAnswer = () => {
-      setQuestionSet(prev=>{ const c=[...prev]; if(c[currentIndex]) c[currentIndex].userAnswer=undefined; return c; });
-      setSelectedAnswer(null); setShowResult(false);
+    setQuestionSet((prev) => {
+      const copy = [...prev];
+      if (!copy[currentIndex]) return prev;
+      copy[currentIndex] = { ...copy[currentIndex], userAnswer: undefined };
+      return copy;
+    });
+    setSelectedAnswer(null);
+    setShowResult(false);
   };
+
   const moveToQuestion = (newIdx) => {
-      const b=Math.max(0, Math.min(newIdx, questionSet.length-1));
-      if(mode==="training" && b>maxSeenIndex && b>currentIndex) setMaxSeenIndex(b);
-      setCurrentIndex(b); if(mode==="random") { setSelectedAnswer(null); setShowResult(false); }
+    const maxQuestion = questionSet.length - 1;
+    const boundedIdx = Math.max(0, Math.min(newIdx, maxQuestion));
+    if (mode === "training" && boundedIdx > maxSeenIndex && boundedIdx > currentIndex) {
+      setMaxSeenIndex(boundedIdx);
+    }
+    setCurrentIndex(boundedIdx);
+    if (mode === "random") {
+      setSelectedAnswer(null);
+      setShowResult(false);
+    }
   };
+
   const nextRandomQuestion = () => {
-      if(!questionSet.length)return;
-      let nextIdx, attempts=0;
-      do { nextIdx=Math.floor(Math.random()*questionSet.length); attempts++; } while(nextIdx===currentIndex && questionSet.length>1 && attempts<10);
-      setCurrentIndex(nextIdx); setSelectedAnswer(null); setShowResult(false);
+    if (!questionSet.length) return;
+    let nextIdx;
+    let attempts = 0;
+    do {
+      nextIdx = Math.floor(Math.random() * questionSet.length);
+      attempts++;
+    } while (nextIdx === currentIndex && questionSet.length > 1 && attempts < 10);
+
+    setCurrentIndex(nextIdx);
+    setSelectedAnswer(null);
+    setShowResult(false);
   };
 
   const confirmSubmit = () => setShowConfirmSubmit(true);
   const cancelSubmit = () => setShowConfirmSubmit(false);
+
   const submitTest = () => {
-      const qEval = mode==="training" ? questionSet.slice(0,maxSeenIndex+1) : questionSet;
-      const cor = qEval.filter(q=>q.userAnswer===q.correctIndex).length;
-      setScore({correct:cor, total:qEval.length}); setTimeLeftAtSubmit(timeLeft); setFinished(true); setShowConfirmSubmit(false);
-  };
-  const tryReturnToMenu = () => {
-      if((mode==="mock"||mode==="training") && !finished) setShowConfirmExit(true);
-      else window.history.back();
+    const questionsToEval = mode === "training" ? questionSet.slice(0, maxSeenIndex + 1) : questionSet;
+    const correct = questionsToEval.filter((q) => q.userAnswer === q.correctIndex).length;
+    setScore({ correct, total: questionsToEval.length });
+    setTimeLeftAtSubmit(timeLeft); 
+    setFinished(true);
+    setShowConfirmSubmit(false);
   };
 
-  const confirmExit = () => { 
-      setShowConfirmExit(false);
-      window.history.back();
+  const tryReturnToMenu = () => {
+    if ((mode === "mock" || mode === "training") && !finished) setShowConfirmExit(true);
+    else resetToMenu();
+  };
+
+  const confirmExit = () => { resetToMenu(); setShowConfirmExit(false); };
+
+  const resetToMenu = () => {
+    setMode(null);
+    setQuestionSet([]);
+    setCurrentIndex(0);
+    setFinished(false);
+    setFullscreenImage(null);
+    optionRefsForCurrent.current = {};
+    setScore({ correct: 0, total: 0 });
+    setShowResult(false);
+    setSelectedAnswer(null);
+    setMaxSeenIndex(0);
+    setIsKeyboardMode(false);
+    setMenuSelection(0); 
+    setTimeLeftAtSubmit(0);
+    setSearchTerm("");
   };
 
   const handleFileUpload = async (questions) => {
     if (!questions || !Array.isArray(questions)) return;
-    const normalized = questions.map((q, idx) => ({
-      number: q.number ?? idx + 1,
-      question: q.question ?? `Otázka ${idx + 1}`,
-      options: q.options || [],
-      correctIndex: typeof q.correctIndex === "number" ? q.correctIndex : 0,
-    }));
-    setCustomQuestions(normalized); 
+    const normalized = questions.map((q, idx) => {
+      if (!q.options || !Array.isArray(q.options)) q.options = [];
+      return {
+        number: q.number ?? idx + 1,
+        question: q.question ?? `Otázka ${idx + 1}`,
+        options: q.options,
+        correctIndex: typeof q.correctIndex === "number" ? q.correctIndex : 0,
+      };
+    });
+    setCustomQuestions(normalized);
     setSubject("CUSTOM");
-    window.history.pushState({ view: 'menu', subject: 'CUSTOM' }, '');
   };
 
-  // Navigace v menu klávesnicí
   useEffect(() => {
     if (mode) return;
+
     const handleMenuNav = (e) => {
-        const k=e.key.toLowerCase();
-        if(k==="w"||k==="arrowup"){ e.preventDefault(); setIsKeyboardMode(true); setMenuSelection(p=>(p-1+(subject?4:3))%(subject?4:3)); }
-        else if(k==="s"||k==="arrowdown"){ e.preventDefault(); setIsKeyboardMode(true); setMenuSelection(p=>(p+1)%(subject?4:3)); }
-        else if(k==="d"||k==="arrowright"||k==="enter"){
-             e.preventDefault(); setIsKeyboardMode(true);
-             if(!subject){
-                 if(menuSelection===0) handleSelectSubject("SPS");
-                 else if(menuSelection===1) handleSelectSubject("STT");
-                 else if(menuSelection===2) document.querySelector("input[type='file']")?.click();
-             } else {
-                 if(menuSelection===0) handleStartMode(startRandomMode, 'random'); 
-                 else if(menuSelection===1) handleStartMode(startMockTest, 'mock'); 
-                 else if(menuSelection===2) handleStartMode(startTrainingMode, 'training'); 
-                 else if(menuSelection===3) handleStartMode(startReviewMode, 'review');
-             }
+      const key = e.key.toLowerCase();
+
+      if (key === "w" || e.key === "ArrowUp") {
+        e.preventDefault();
+        setIsKeyboardMode(true);
+        if (!subject) setMenuSelection((prev) => (prev - 1 + 3) % 3);
+        else setMenuSelection((prev) => (prev - 1 + 4) % 4);
+      } else if (key === "s" || e.key === "S" || e.key === "ArrowDown") {
+        e.preventDefault();
+        setIsKeyboardMode(true);
+        if (!subject) setMenuSelection((prev) => (prev + 1) % 3);
+        else setMenuSelection((prev) => (prev + 1) % 4);
+      } else if (key === "d" || e.key === "D" || e.key === "ArrowRight" || e.key === "Enter") {
+        e.preventDefault();
+        setIsKeyboardMode(true);
+
+        if (!subject) {
+          if (menuSelection === 0) setSubject("SPS");
+          else if (menuSelection === 1) setSubject("STT");
+          else if (menuSelection === 2) {
+            const fileInput = document.querySelector("input[type='file']");
+            fileInput?.click();
+          }
+        } else {
+          if (menuSelection === 0) startRandomMode();
+          else if (menuSelection === 1) startMockTest();
+          else if (menuSelection === 2) startTrainingMode();
+          else if (menuSelection === 3) startReviewMode();
         }
-        else if(k==="a"||k==="arrowleft"||k==="backspace"){ 
-            e.preventDefault(); 
-            if(subject) window.history.back();
-        }
+      } else if (key === "a" || e.key === "A" || e.key === "ArrowLeft" || e.key === "Backspace") {
+        e.preventDefault();
+        if (subject) setSubject(null);
+      }
     };
+
     window.addEventListener("keydown", handleMenuNav);
     return () => window.removeEventListener("keydown", handleMenuNav);
   }, [mode, subject, menuSelection]);
 
+  useEffect(() => {
+    if (!mode && menuButtonsRef.current && menuButtonsRef.current[menuSelection]) {
+      setTimeout(() => {
+        menuButtonsRef.current[menuSelection]?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 0);
+    }
+  }, [menuSelection, mode]);
 
-  // === RENDER ===
   const isModalActive = showConfirmExit || showConfirmSubmit;
 
   if (!mode) {
     if (!subject) {
       return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{width:'100%', display:'flex', justifyContent:'flex-end', padding:'1rem 0'}}>
-              <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-          </div>
-          <SubjectSelector menuSelection={menuSelection} onSelectSubject={handleSelectSubject} onUploadFile={handleFileUpload} isKeyboardMode={isKeyboardMode} />
+          <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
+          <SubjectSelector
+            menuSelection={menuSelection}
+            onSelectSubject={(subj) => setSubject(subj.toUpperCase())}
+            onUploadFile={handleFileUpload}
+            isKeyboardMode={isKeyboardMode}
+          />
         </div>
       );
     }
 
     return (
       <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-        <div className="navbar" style={{width:'100%', maxWidth:'800px', marginBottom:'1rem'}}>
-             <div className="navbar-group">
-                <button className="menuBackButton" onClick={() => window.history.back()}>← Změnit předmět</button> 
-                <SubjectBadge subject={subject} compact />
-             </div>
-             <div className="navbar-group">
-                <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-             </div>
+
+        <div style={{ width: "100%", maxWidth: "520px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem"}}>
+            <button className="menuBackButton" onClick={() => setSubject(null)}>Změnit předmět</button> 
+            <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
         </div>
 
-        <h1 className="title">Trénink uzavřených otázek</h1>
+        <h1 className="title">
+          Trénink uzavřených otázek
+          {/* Zobrazení předmětu v hlavním menu */}
+          <SubjectTitle subject={subject} />
+        </h1>
 
         <div className="menuColumn">
-          <button ref={(el) => menuButtonsRef.current[0] = el} className={`menuButton ${menuSelection === 0 && isKeyboardMode ? "selected" : ""}`} onClick={() => handleStartMode(startRandomMode, 'random')}>Flashcards 🧠</button>
-          <button ref={(el) => menuButtonsRef.current[1] = el} className={`menuButton ${menuSelection === 1 && isKeyboardMode ? "selected" : ""}`} onClick={() => handleStartMode(startMockTest, 'mock')}>Test nanečisto ⏱️</button>
-          <button ref={(el) => menuButtonsRef.current[2] = el} className={`menuButton ${menuSelection === 2 && isKeyboardMode ? "selected" : ""}`} onClick={() => handleStartMode(startTrainingMode, 'training')}>Tréninkový režim 🏋️</button>
-          <button ref={(el) => menuButtonsRef.current[3] = el} className={`menuButton ${menuSelection === 3 && isKeyboardMode ? "selected" : ""}`} onClick={() => handleStartMode(startReviewMode, 'review')}>Prohlížení otázek 📚</button>
+          <button ref={(el) => menuButtonsRef.current[0] = el} className={`menuButton ${menuSelection === 0 && isKeyboardMode ? "selected" : ""}`} onClick={startRandomMode}>Flashcards 🧠</button>
+          <button ref={(el) => menuButtonsRef.current[1] = el} className={`menuButton ${menuSelection === 1 && isKeyboardMode ? "selected" : ""}`} onClick={startMockTest}>Test nanečisto ⏱️</button>
+          <button ref={(el) => menuButtonsRef.current[2] = el} className={`menuButton ${menuSelection === 2 && isKeyboardMode ? "selected" : ""}`} onClick={startTrainingMode}>Tréninkový režim 🏋️</button>
+          <button ref={(el) => menuButtonsRef.current[3] = el} className={`menuButton ${menuSelection === 3 && isKeyboardMode ? "selected" : ""}`} onClick={startReviewMode}>Prohlížení otázek 📚</button>
         </div>
 
         <div style={{ marginTop: "2rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6" }}>
@@ -786,160 +897,190 @@ export default function App() {
     );
   }
 
-  // --- RENDER PRO REVIEW MODE S MODALEM MIMO KONTEJNER ---
+  // Zbytek renderu... (Review a Quiz)
   if (mode === "review") {
-      const normalizedSearch = removeAccents(searchTerm);
-      const filteredQuestions = questionSet.filter(q => {
-          const normQ = removeAccents(q.question); const normNum = String(q.number); const normOptions = q.options.map(opt => removeAccents(opt));
-          return normQ.includes(normalizedSearch) || normNum.includes(normalizedSearch) || normOptions.some(opt => opt.includes(normalizedSearch));
-      });
-      const highlightRegex = getSmartRegex(searchTerm);
+    // FILTROVÁNÍ OTÁZEK - CHYTRÉ
+    const normalizedSearch = removeAccents(searchTerm);
+    const filteredQuestions = questionSet.filter(q => {
+        const normQ = removeAccents(q.question);
+        const normNum = String(q.number);
+        // Hledání i v možnostech
+        const normOptions = q.options.map(opt => removeAccents(opt));
 
-      return (
-        <>
-          {/* IMAGE MODAL MUSÍ BÝT ZDE, MIMO CONTAINER! */}
-          {fullscreenImage && <ImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />}
+        return normQ.includes(normalizedSearch) || 
+               normNum.includes(normalizedSearch) ||
+               normOptions.some(opt => opt.includes(normalizedSearch));
+    });
 
-          <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
-            <div className="navbar">
-                <div className="navbar-group">
-                    <button className="menuBackButton" onClick={tryReturnToMenu}>← Zpět</button>
-                    <SubjectBadge subject={subject} compact />
+    const highlightRegex = getSmartRegex(searchTerm);
+
+    return (
+      <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
+        <div className="topBarRight">
+            <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
+            <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
+        </div>
+        <h1 className="title">
+            Prohlížení otázek
+            {/* Zobrazení předmětu v režimu prohlížení */}
+            <SubjectTitle subject={subject} />
+        </h1>
+
+        {/* VYHLEDÁVACÍ POLE */}
+        <input 
+            type="text" 
+            placeholder="Hledat (např. 'čerpadlo', číslo)..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.stopPropagation()} 
+            className="reviewSearchInput"
+        />
+
+        <div className="reviewGrid">
+          {filteredQuestions.map((q) => {
+            const imageUrl = getImageUrl(subject, q.number); 
+            return (
+              <div key={q.number} className="reviewCard">
+                <div className="reviewHeader">
+                    <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
                 </div>
-                <div className="navbar-group">
-                    <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
+
+                {imageUrl && <img src={imageUrl} alt="" className="reviewImage" onClick={() => window.open(imageUrl, "_blank")} />}
+
+                {/* ZOBRAZENÍ VŠECH MOŽNOSTÍ S VYZNAČENÍM SPRÁVNÉ */}
+                <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                    {q.options.map((opt, idx) => (
+                        <div key={idx} style={{ 
+                            fontSize: '0.9rem', 
+                            color: idx === q.correctIndex ? 'var(--color-review-correct)' : 'var(--color-text-secondary)',
+                            fontWeight: idx === q.correctIndex ? 'bold' : 'normal',
+                            display: 'flex',
+                            gap: '0.5rem'
+                        }}>
+                            <span>{idx === q.correctIndex ? '✅' : '•'}</span>
+                            <span><HighlightedText text={opt} highlightRegex={highlightRegex} /></span>
+                        </div>
+                    ))}
                 </div>
-            </div>
-
-            <h1 className="title">Prohlížení otázek</h1>
-            <input type="text" placeholder="Hledat (např. 'čerpadlo', číslo)..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="reviewSearchInput" />
-
-            <div className="reviewGrid">
-              {filteredQuestions.map((q) => {
-                const imageUrl = getImageUrl(subject, q.number); 
-                return (
-                  <div key={q.number} className="reviewCard">
-                    <div className="reviewHeader"><strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} /></div>
-                    {/* Kliknutí na obrázek volá setFullscreenImage */}
-                    {imageUrl && <div className="imageWrapper" onClick={() => setFullscreenImage(imageUrl)} style={{cursor: 'zoom-in', marginTop: '0.5rem'}}><img src={imageUrl} alt="" className="reviewImage" /></div>}
-                    <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                        {q.options.map((opt, idx) => (
-                            <div key={idx} style={{ fontSize: '0.9rem', color: idx === q.correctIndex ? 'var(--color-review-correct)' : 'var(--color-text-secondary)', fontWeight: idx === q.correctIndex ? 'bold' : 'normal', display: 'flex', gap: '0.5rem' }}>
-                                <span>{idx === q.correctIndex ? '✅' : '•'}</span>
-                                <span><HighlightedText text={opt} highlightRegex={highlightRegex} /></span>
-                            </div>
-                        ))}
-                    </div>
-                  </div>
-                );
-              })}
-              {filteredQuestions.length === 0 && <p style={{textAlign: 'center', color: '#888', gridColumn: '1/-1'}}>Žádné otázky nenalezeny.</p>}
-            </div>
-          </div>
-        </>
-      );
+              </div>
+            );
+          })}
+          {filteredQuestions.length === 0 && <p style={{textAlign: 'center', color: 'var(--color-text-secondary)', gridColumn: '1/-1', marginTop: '2rem'}}>Žádné otázky nenalezeny.</p>}
+        </div>
+      </div>
+    );
   }
 
   const currentQuestion = questionSet[currentIndex] || { question: "", options: [], correctIndex: 0, number: 0, _localIndex: currentIndex };
 
-  let comboClass = "";
-  if (combo >= 10) comboClass = "combo-high";
-  else if (combo >= 5) comboClass = "combo-med";
-  else if (combo >= 3) comboClass = "combo-low";
-
-  // --- RENDER PRO OSTATNÍ MODY (TAKÉ S MODALEM MIMO KONTEJNER) ---
   return (
-    <>
-      {fullscreenImage && <ImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />}
+    <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
+      {showConfirmSubmit && <ConfirmModal title={mode === "training" ? "Ukončit trénink?" : "Odevzdat test?"} message="Jste si jisti, že chcete předčasně odevzdat?" onCancel={cancelSubmit} onConfirm={submitTest} confirmText={mode === "training" ? "Vyhodnotit" : "Odevzdat"} />}
+      {showConfirmExit && <ConfirmModal title="Ukončit režim?" message="Ztracené odpovědi v Mock testu nebo progres v tréninku nebudou uloženy." onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Opravdu ukončit" />}
 
-      <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
-        {showConfirmSubmit && <ConfirmModal title={mode === "training" ? "Ukončit trénink?" : "Odevzdat test?"} message="Jste si jisti, že chcete předčasně odevzdat?" onCancel={cancelSubmit} onConfirm={submitTest} confirmText={mode === "training" ? "Vyhodnotit" : "Odevzdat"} />}
-        {showConfirmExit && <ConfirmModal title="Ukončit režim?" message="Ztracené odpovědi v Mock testu nebo progres v tréninku nebudou uloženy." onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Opravdu ukončit" />}
+      {finished && (
+        <ResultScreen
+          mode={mode}
+          score={score}
+          trainingTime={trainingTime}
+          questionSet={questionSet}
+          maxSeenIndex={maxSeenIndex}
+          onBack={resetToMenu}
+          currentSubject={subject} 
+          timeLeftAtSubmit={timeLeftAtSubmit} 
+        />
+      )}
 
-        {finished && (
-          <ResultScreen mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} onBack={() => window.history.back()} currentSubject={subject} timeLeftAtSubmit={timeLeftAtSubmit} onZoom={setFullscreenImage} />
-        )}
+      {!finished && (
+        <>
+          <div className="stickyHeader">
+            <div className="topBarRight">
+              <button className="menuBackButton" onClick={tryReturnToMenu}>Zpět</button>
 
-        {!finished && (
-          <>
-            <div className="navbar">
-              <div className="navbar-group">
-                  <button className="menuBackButton" onClick={tryReturnToMenu}>← Zpět</button>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                   <SubjectBadge subject={subject} compact />
-              </div>
-              <div className="navbar-group">
-                  {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
-                  {mode === "training" && <div className="timer" style={{ color: "#a3a3a3" }}>{formatTime(trainingTime)}</div>}
-                  {(mode === "mock" || mode === "training") && <button className="submitTopButton" onClick={confirmSubmit}>{mode === "training" ? "Vyhodnotit" : "Odevzdat"}</button>}
                   <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
               </div>
-            </div>
 
-            <div className="quizContentWrapper">
-              <h1 className="title">
-                {mode === "random" ? "Flashcards" : mode === "mock" ? "Test nanečisto" : "Tréninkový režim"}
-              </h1>
-
-              {mode === "random" ? (
-                  <div className={`flashcardHeader ${comboClass}`}>
-                      <div className="statItem">
-                          <span className="statLabel">Úspěšnost</span>
-                          <span className="statValue">{score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0}%</span>
-                      </div>
-
-                      {combo >= 3 && (
-                          <div className="comboContainer">
-                              <div className="comboFlame">🔥</div>
-                              <div className="comboCount">{combo}x</div>
-                          </div>
-                      )}
-
-                      <div className="statItem">
-                          <span className="statLabel">Celkem</span>
-                          <span className="statValue">{score.total}</span>
-                      </div>
-                  </div>
-              ) : (
-                  <>
-                      <div className="progressBarContainer">
-                          <div className="progressBarFill" style={{ width: `${((currentIndex + 1) / (mode === "training" ? maxSeenIndex + 1 : questionSet.length)) * 100}%` }}></div>
-                      </div>
-                      <div className="progressText">
-                          Otázka {currentIndex + 1} / {mode === "training" ? maxSeenIndex + 1 : questionSet.length}
-                      </div>
-                  </>
-              )}
-
-              <div className={`card ${shake ? "shake" : ""}`} ref={cardRef}>
-                <QuestionCard
-                  currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} onSelect={(i) => mode === "random" ? clickRandomAnswer(i) : handleAnswer(i)}
-                  optionRefsForCurrent={optionRefsForCurrent} disabled={mode === "random" && showResult} isKeyboardMode={isKeyboardMode} currentSubject={subject} onZoom={setFullscreenImage}
-                />
-
-                {mode === "random" && !showResult && (
-                  <div className="actionButtons right"><button className="navButton primary" onClick={confirmRandomAnswer}>Potvrdit</button></div>
-                )}
-                {mode === "random" && showResult && (
-                  <div className="actionButtons right"><button className="navButton" onClick={nextRandomQuestion}>Další otázka</button></div>
-                )}
-
-                {(mode === "mock" || mode === "training") && (
-                  <>
-                    <div className="actionButtons spaced">
-                      <button className="navButton" onClick={() => moveToQuestion(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}>Předchozí</button>
-                      <button className="navButton" onClick={() => moveToQuestion(currentIndex + 1)} disabled={currentIndex >= questionSet.length - 1}>Další</button>
-                    </div>
-                    <div className="navigatorPlaceholder">
-                      <Navigator questionSet={questionSet} currentIndex={currentIndex} setCurrentIndex={moveToQuestion} mode={mode} maxSeenIndex={maxSeenIndex} />
-                    </div>
-                  </>
-                )}
+              <div className="topControls">
+                {mode === "mock" && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
+                {mode === "training" && <div className="timer" style={{ color: "#a3a3a3" }}>{formatTime(trainingTime)}</div>}
+                {(mode === "mock" || mode === "training") && <button className="submitTopButton" onClick={confirmSubmit}>{mode === "training" ? "Vyhodnotit" : "Odevzdat"}</button>}
               </div>
             </div>
-          </>
-        )}
-        <div className="footer"></div>
+
+            <div className="quizContentWrapper" style={{ paddingBottom: 0 }}>
+              <h1 className="title">
+                {mode === "random" ? "Flashcards" : mode === "mock" ? "Test nanečisto" : "Tréninkový režim"}
+                {/* Zobrazení předmětu v aktivním testu */}
+                <SubjectTitle subject={subject} />
+              </h1>
+
+              <div className="progress">
+                {mode === "random"
+                  ? `Pokusy: ${score.total} | Správně: ${score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0} %`
+                  : `Otázka ${currentIndex + 1} / ${mode === "training" ? maxSeenIndex + 1 : questionSet.length}`}
+              </div>
+            </div>
+          </div>
+
+          <div className="quizContentWrapper">
+            <div className="card" ref={cardRef}>
+              <QuestionCard
+                currentQuestion={currentQuestion}
+                mode={mode}
+                showResult={showResult}
+                selectedAnswer={selectedAnswer}
+                onSelect={(i) => mode === "random" ? clickRandomAnswer(i) : handleAnswer(i)}
+                optionRefsForCurrent={optionRefsForCurrent}
+                disabled={mode === "random" && showResult}
+                isKeyboardMode={isKeyboardMode}
+                currentSubject={subject} 
+              />
+
+              {mode === "random" && !showResult && (
+                <div className="actionButtons right">
+                  <button className="navButton primary" onClick={confirmRandomAnswer}>Potvrdit</button>
+                </div>
+              )}
+
+              {mode === "random" && showResult && (
+                <div className="actionButtons right">
+                  <button className="navButton" onClick={nextRandomQuestion}>Další otázka</button>
+                </div>
+              )}
+
+              {(mode === "mock" || mode === "training") && (
+                <>
+                  <div className="actionButtons spaced">
+                    <button className="navButton" onClick={() => {
+                      const newIdx = Math.max(0, currentIndex - 1);
+                      moveToQuestion(newIdx);
+                    }} disabled={currentIndex === 0}>Předchozí</button>
+                    <button className="navButton" onClick={() => {
+                      const newIdx = currentIndex + 1;
+                      moveToQuestion(newIdx);
+                    }} disabled={currentIndex >= questionSet.length - 1}>Další</button>
+                  </div>
+                  <div className="navigatorPlaceholder">
+                    <Navigator
+                      questionSet={questionSet}
+                      currentIndex={currentIndex}
+                      setCurrentIndex={moveToQuestion}
+                      mode={mode}
+                      maxSeenIndex={maxSeenIndex}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="footer">
       </div>
-    </>
+
+    </div>
   );
 }
