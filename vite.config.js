@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: 5000
+    port: 5000,
+    allowedHosts: true, // Tímto povolíme běh na libovolné adrese v Replitu
   }
 })

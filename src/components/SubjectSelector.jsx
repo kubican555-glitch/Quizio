@@ -35,7 +35,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
       const options = optionHeaders.map(h => parts[headers.indexOf(h)] || '').filter(o => o);
 
       if (options.length < 2) {
-        throw new Error(`Otázka ${i} musí mít alespoň 2 možnosti odpovědi (option0, option1, ...)`);
+        throw new Error(`Otázka ${i} musí mít alespoň 2 možnosti odpovědi.`);
       }
 
       questions.push({
@@ -46,7 +46,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
       });
     }
 
-    if (questions.length === 0) throw new Error("Žádné otázky nenalezeny v CSV souboru");
+    if (questions.length === 0) throw new Error("Žádné otázky nenalezeny");
     return questions;
   };
 
@@ -71,9 +71,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
         let questions = [];
         if (isJSON) {
           const json = JSON.parse(event.target.result);
-          if (!Array.isArray(json)) {
-            throw new Error("JSON musí být pole otázek.");
-          }
+          if (!Array.isArray(json)) throw new Error("JSON musí být pole otázek.");
           questions = json;
         } else if (isCSV) {
           questions = parseCSV(event.target.result);
@@ -91,17 +89,12 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
   return (
     <div className="subjectSelectorContainer fadeIn">
       <div className="subjectContent">
-        <h1 className="subjectTitle">Trénink uzavřených otázek</h1>
-        <p className="subjectSubtitle">Vyber předmět, který chceš procvičovat</p>
-
+        
         <div className="subjectGrid">
           <button
             ref={(el) => subjectButtonsRef.current[0] = el}
             className={`subjectButton ${menuSelection === 0 && isKeyboardMode ? "selected" : ""}`}
-            onClick={() => {
-              setIsKeyboardMode(false);
-              onSelectSubject("sps");
-            }}
+            onClick={() => { setIsKeyboardMode(false); onSelectSubject("sps"); }}
           >
             <div className="subjectIcon">📚</div>
             <div className="subjectName">SPS</div>
@@ -111,10 +104,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
           <button
             ref={(el) => subjectButtonsRef.current[1] = el}
             className={`subjectButton ${menuSelection === 1 && isKeyboardMode ? "selected" : ""}`}
-            onClick={() => {
-              setIsKeyboardMode(false);
-              onSelectSubject("stt");
-            }}
+            onClick={() => { setIsKeyboardMode(false); onSelectSubject("stt"); }}
           >
             <div className="subjectIcon">⚙️</div>
             <div className="subjectName">STT</div>
@@ -138,27 +128,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
           </label>
         </div>
 
-        {uploadError && (
-          <div className="uploadError">{uploadError}</div>
-        )}
-
-        <div className="uploadHint">
-            <details style={{ textAlign: 'left', color: 'var(--color-text-neutral)', fontSize: '0.9rem', cursor: 'pointer' }}>
-                <summary style={{ marginBottom: '0.5rem', fontWeight: '600' }}>❓ Jak vytvořit vlastní soubor otázek?</summary>
-                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '10px', marginTop: '0.5rem', lineHeight: '1.6' }}>
-                    <p style={{marginBottom:'0.5rem'}}>Aplikace podporuje formát <strong>CSV</strong> (oddělovač čárka). Soubor musí obsahovat záhlaví:</p>
-                    <code style={{display:'block', padding:'0.5rem', background:'rgba(0,0,0,0.3)', borderRadius:'5px', wordBreak:'break-all', fontSize:'0.85rem'}}>
-                        number,question,correctIndex,option0,option1,option2,option3
-                    </code>
-                    <p style={{marginTop:'0.5rem'}}>
-                        <strong>number:</strong> Číslo otázky<br/>
-                        <strong>question:</strong> Text otázky<br/>
-                        <strong>correctIndex:</strong> Index správné odpovědi (0=A, 1=B, 2=C, 3=D)<br/>
-                        <strong>optionX:</strong> Texty odpovědí
-                    </p>
-                </div>
-            </details>
-        </div>
+        {uploadError && <div className="uploadError">{uploadError}</div>}
       </div>
     </div>
   );

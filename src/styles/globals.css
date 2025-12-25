@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* --- BAREVNÁ PALETA --- */
   /* Dark Mode Defaults */
@@ -8,7 +12,7 @@
   --color-text-secondary: #cbd5e1;
   --color-text-neutral: #94a3b8;
 
-  /* Glassmorphism / Karty / Navigátor */
+  /* Glassmorphism / Karty */
   --color-card-bg-start: rgba(30, 41, 59, 0.95);
   --color-card-bg-end: rgba(30, 41, 59, 0.8);
   --color-card-border: rgba(148, 163, 184, 0.15);
@@ -31,28 +35,32 @@
   --color-back-btn-border: rgba(148, 163, 184, 0.2);
   --color-menu-btn-shadow: rgba(59, 130, 246, 0.5);
 
-  /* Sekundární barvy (odvozené z gradientu) */
+  /* Sekundární barvy */
   --color-primary: #3b82f6;
   --color-secondary: #8b5cf6;
   --color-primary-light: #60a5fa;
   --color-success: #22c55e;
   --color-error: #ef4444;
-  --color-review-wrong: #fca5a5; /* Světlejší červená pro text v Review */
-  --color-review-correct: #a7f3d0; /* Světlejší zelená pro text v Review */
+  --color-review-wrong: #fca5a5;
+  --color-review-correct: #a7f3d0;
+  --color-warning: #fbbf24;
+
+  /* COMBO BARVY */
+  --color-combo-low: #fbbf24;   /* Žlutá */
+  --color-combo-med: #f97316;   /* Oranžová */
+  --color-combo-high: #ef4444;  /* Červená */
+  --color-combo-god: #a855f7;   /* Fialová */
+
+  --vh: 100vh;
 }
 
-/* --- SVĚTLÝ MOTIV (Přepíše proměnné) --- */
+/* --- SVĚTLÝ MOTIV --- */
 body.light-mode {
   background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
-  color: var(--color-text-main);
-  background-attachment: fixed;
+  color: #1e293b;
 
-  --color-bg-start: #f0f4f8;
-  --color-bg-mid: #e2e8f0;
-  --color-bg-end: #cbd5e1;
-  --color-text-main: #1e293b;
-  --color-text-secondary: #475569;
-  --color-text-neutral: #64748b;
+  --color-bg-start: #f0f4f8; --color-bg-mid: #e2e8f0; --color-bg-end: #cbd5e1;
+  --color-text-main: #1e293b; --color-text-secondary: #475569; --color-text-neutral: #64748b;
 
   --color-card-bg-start: rgba(255, 255, 255, 0.9);
   --color-card-bg-end: rgba(255, 255, 255, 0.8);
@@ -74,1028 +82,725 @@ body.light-mode {
   --color-menu-btn-shadow: rgba(59, 130, 246, 0.3);
 }
 
-/* === GLOBALS A RESETY === */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+body.light-mode .menuButton.list-style {
+    background: var(--color-card-bg-start); 
+    border-color: var(--color-card-border); 
+    color: var(--color-text-main); 
 }
 
-#root {
-  width: 100%;
-  min-height: 100dvh;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: transparent;
-  padding-top: env(safe-area-inset-top);
-}
-
-html {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
-  background-attachment: fixed;
-  background-size: cover;
-  background-repeat: no-repeat;
-  scroll-padding-top: 140px; 
-}
-
-body {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  min-height: 100dvh;
-  min-height: 100vh;
-  overflow-x: hidden;
-  background: transparent;
-  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-  color: var(--color-text-main);
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  transition: background-color 0.4s ease, color 0.4s ease;
-}
-
-/* ZAJIŠTĚNÍ ZABLOKOVÁNÍ SCROLLU A KLIKŮ NA POZADÍ */
-body.modal-open {
-    overflow: hidden !important;
-}
-
-/* === ANIMACE === */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.fadeIn { animation: fadeIn 0.5s ease-out forwards; }
-
-@keyframes slideIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.slideIn { animation: slideIn 0.15s ease-out forwards; }
-
-@keyframes pulseBtn {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
-  50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.6); }
-}
-
-@keyframes selectPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: translateY(-6px) scale(1.02); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
-}
-
-/* === KONTEJNER === */
-.container {
-  max-width: 960px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 1rem 1rem 1rem;
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  min-height: 100dvh;
-  box-sizing: border-box;
-}
-
-/* NOVÝ OMEZOVACÍ KONTEJNER PRO ZAROVNÁNÍ OBSAHU TESTU */
-.quizContentWrapper {
-  max-width: 960px; /* Širší pro PC */
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-/* --- Pravidlo pro PC (nad 1024px) --- */
-@media (min-width: 1024px) {
-    .quizContentWrapper {
-        max-width: 960px; 
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    body.light-mode .menuButton.list-style:hover {
+        background: #f1f5f9; 
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
 }
 
-/* === HORNÍ LIŠTA (STICKY HEADER) === */
-.stickyHeader {
-  position: sticky; 
-  top: 0;
-  z-index: 100;
-  background: var(--color-bg-start);
-  /* Glassmorphism */
-  backdrop-filter: blur(15px);
-  background: rgba(10, 14, 39, 0.9);
-  padding-bottom: 0.5rem;
-  padding-top: 0.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-body.light-mode .stickyHeader {
-    background: rgba(240, 244, 248, 0.9);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+body.light-mode .menuButton.list-style span {
+    color: var(--color-text-main); 
 }
 
-.topBarRight {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
+/* Vzhled Opravna chyb (Danger) */
+body.light-mode .menuButton.list-style.danger-style {
+    background: rgba(255, 230, 230, 0.8); 
+    border-color: var(--color-error); 
 }
-.topControls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+body.light-mode .menuButton.list-style.danger-style span {
+    color: var(--color-text-main); 
+}
+body.light-mode .menuButton.list-style.danger-style .list-icon {
+    color: var(--color-error); 
+}
+
+body.light-mode .test-details {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Stacked Card Light Mode */
+body.light-mode .stacked-card {
+    background: #ffffff;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.1),
+        0 20px 0 -12px #f1f5f9, 
+        0 20px 1px -12px #94a3b8,
+        0 40px 0 -24px #e2e8f0,
+        0 40px 1px -24px #94a3b8;
+    border-color: #e2e8f0;
+    border-radius: 32px; 
+}
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    body.light-mode .stacked-card:hover {
+        box-shadow: 
+            0 15px 40px rgba(0, 0, 0, 0.15),
+            0 25px 0 -12px #f1f5f9, 
+            0 25px 1px -12px #94a3b8,
+            0 50px 0 -24px #e2e8f0,
+            0 50px 1px -24px #94a3b8;
+    }
+}
+
+body.light-mode .stacked-card.stack-level-0 {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 32px !important;
+}
+
+body.light-mode .stacked-card.stack-level-1 {
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.1),
+        0 20px 0 -12px #f1f5f9, 
+        0 20px 1px -12px #94a3b8 !important;
+    border-radius: 32px !important;
+}
+
+/* Light mode navbar override */
+body.light-mode .top-navbar, body.light-mode .navbar, body.light-mode .appHeader { 
+    background: rgba(255, 255, 255, 0.85); /* Více neprůhledné */
+    border-color: rgba(0,0,0,0.05); 
+}
+
+/* === ADMIN PANEL LIGHT MODE FIXES (PŘIDÁNO) === */
+body.light-mode .admin-toolbar { background: #f1f5f9; border: 1px solid #e2e8f0; }
+body.light-mode .admin-toolbar input[type="text"] { background: #ffffff; color: #1e293b; border-color: #cbd5e1; }
+body.light-mode .admin-card { background: #ffffff; border-color: #e2e8f0; color: #1e293b; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    body.light-mode .admin-card:hover { background: #f8fafc; }
+    body.light-mode .btn-icon:hover { background: #e2e8f0; color: #1e293b; }
+    body.light-mode .admin-toolbar .navButton:hover { background: #f1f5f9; }
+}
+
+body.light-mode .admin-badge.badge-num { background: #e2e8f0; color: #475569; border-color: #cbd5e1; }
+body.light-mode .question-text { color: #1e293b; }
+body.light-mode .btn-icon { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
+
+body.light-mode .form-input-style { background: #ffffff; color: #1e293b; border-color: #cbd5e1; }
+body.light-mode .form-input-style:focus { background: #ffffff; border-color: var(--color-primary); }
+
+body.light-mode .admin-toolbar .navButton { background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; }
+
+body.light-mode .admin-toolbar .navButton.primary { background: var(--color-primary); color: #fff; border: none; }
+body.light-mode .logoText { color: #1e293b; } 
+body.light-mode .backArrowBtn { color: #1e293b; } 
+
+
+/* === GLOBALS === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+  background-attachment: fixed; background-size: cover;
+  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+  color: var(--color-text-main);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  user-select: none; -webkit-user-select: none; cursor: default;
+  /* DŮLEŽITÉ PRO IPHONE - ZABRÁNÍ BÍLÝM PRUHŮM */
+  background-color: var(--color-bg-start); 
+
+  /* --- OPRAVY PRO MOBILNÍ DOTYKOVÉ CHOVÁNÍ --- */
+  overscroll-behavior: none;        /* Zabrání "gumovému" efektu při přetažení stránky */
+  -webkit-touch-callout: none;      /* Zabrání vyvolání kontextového menu na iOS (lupa) */
+  -webkit-tap-highlight-color: transparent; /* Odstraní šedé podbarvení při kliknutí */
+}
+
+/* Zabránění přetahování obrázků (ghost image) */
+img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input, textarea { user-select: text; -webkit-user-select: text; cursor: text; }
+
+#root { 
+    width: 100%; 
+    height: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    /* DŮLEŽITÉ: ZMĚNA - Odstraněn padding-top z rootu, aby pozadí šlo pod notch */
+    padding-top: 0; 
+}
+
+body.modal-open { overflow: hidden !important; }
+
+/* === REŽIM KLÁVESNICE (SKRYTÍ KURZORU) === */
+body.keyboard-mode-active,
+body.keyboard-mode-active * {
+    cursor: none !important;
+}
+
+body.keyboard-mode-active :focus-visible {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 2px;
+    pointer-events: auto !important;
+}
+
+/* === KONTEJNER (Scrollovací oblast) === */
+.container { 
+  max-width: 960px; width: 100%; margin: 0 auto; 
+  padding: 1rem;
+  /* PŘIDÁNO: Padding pro safe-area přesunut sem */
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
+  height: 100%; overflow-y: auto; scrollbar-width: none; 
+}
+.container::-webkit-scrollbar { display: none; }
+
+.quizContentWrapper { max-width: 960px; width: 100%; margin: 0 auto; padding: 0 1rem; }
+
+/* === ANIMACE === */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fadeIn { animation: fadeIn 0.5s ease-out forwards; }
+@keyframes pulseBtn { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); } 50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.6); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px) rotate(-2deg); } 40% { transform: translateX(8px) rotate(2deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+.shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--color-error) !important; box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important; }
+@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes flameFlicker { 0% { transform: scale(1) rotate(-3deg); opacity: 0.8; } 100% { transform: scale(1.1) rotate(3deg); opacity: 1; } }
+@keyframes pump { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+/* === MODAL OVERLAY === */
+.modalOverlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; align-items: center; justify-content: center; z-index: 5000; backdrop-filter: blur(8px); }
+.modal { background: var(--color-card-bg-start); border: 1px solid var(--color-card-border); border-radius: 18px; padding: 2rem; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); animation: fadeIn 0.3s ease-out; }
+.modal h3 { margin-bottom: 1rem; font-size: 1.5rem; }
+.modal p { color: var(--color-text-secondary); margin-bottom: 2rem; }
+.modalButtons { display: flex; justify-content: space-around; gap: 1rem; }
+.modalButtons .navButton { flex: 1; min-width: 120px; }
+
+/* === NAVBAR === */
+.top-navbar, .navbar, .appHeader {
+    width: 100%;
+    max-width: 960px;
+
+    /* ZMĚNA: Relative místo Sticky */
+    position: relative; 
+    z-index: 1000;    /* Stále vysoký index pro překrytí */
+
+    margin: 0 auto 1rem auto; 
+    padding: 0.8rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    /* ZMĚNA: Plnější pozadí, aby neprosvítal glow */
+    background: rgba(10, 14, 39, 0.95); /* Tmavá poloprůhledná pro Dark Mode */
+
+    border-radius: 12px; /* Vráceno zaoblení, když není sticky */
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+    border: none; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Light mode override pro Navbar */
+body.light-mode .top-navbar, 
+body.light-mode .navbar, 
+body.light-mode .appHeader { 
+    background: rgba(255, 255, 255, 0.95); /* Světlá neprůhledná */
+    border-color: rgba(0,0,0,0.05); 
+}
+
+/* Skupina vlevo a vpravo */
+.navbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
 }
 
 /* === TITULEK === */
-.title {
-  font-size: clamp(2rem, 8vw, 2.8rem);
-  font-weight: 800;
-  text-align: center;
-  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary), #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0.3rem 0 0.5rem;
-  letter-spacing: -1px;
+.title { font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 800; text-align: center; background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0.3rem 0 0.5rem; letter-spacing: -1px; }
+
+/* === MENU GRID === */
+/* OPRAVA: Rozdělení stylů pro subjectGrid a menuColumn pro odstranění mezery dole */
+.subjectGrid { 
+    display: grid; 
+    gap: 1.5rem; 
+    width: 100%; 
+    max-width: 800px; 
+    margin: 2.5rem auto; 
 }
 
-/* === MENU === */
-.menuColumn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 2.5rem;
+.menuColumn { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    width: 100%; 
+    max-width: 700px; 
+    gap: 0.5rem; 
+    margin: 0 auto; /* ZMĚNA: Reset marginů (odstraněno 2.5rem dole) */
 }
 
-.menuButton {
-  width: 100%;
-  max-width: 520px;
-  border: none;
-  border-radius: 18px;
-  padding: 1.8rem 1.4rem;
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--color-primary), #6366f1 50%, var(--color-secondary) 100%);
-  color: #fff;
-  font-size: 1.15rem;
-  font-weight: 700;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 10px 40px var(--color-menu-btn-shadow);
-  position: relative;
-  overflow: hidden;
+.menuButton { width: 100%; border: none; border-radius: 18px; padding: 1.8rem 1.4rem; cursor: pointer; background: linear-gradient(135deg, var(--color-primary), #6366f1 50%, var(--color-secondary) 100%); color: #fff; font-size: 1.15rem; font-weight: 700; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 10px 40px var(--color-menu-btn-shadow); position: relative; overflow: hidden; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; z-index: 1; }
+.menuButton::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s ease; }
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .menuButton:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(59, 130, 246, 0.7); }
+    .menuButton:hover::before { left: 100%; }
+}
+.menuButton.selected { background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 50%, var(--color-secondary) 100%); box-shadow: 0 0 30px rgba(96, 165, 250, 0.8); transform: translateY(-6px) scale(1.02); }
+
+.menuButton.list-style { aspect-ratio: auto; padding: 1rem 1.5rem; font-size: 1.1rem; display: flex; justify-content: flex-start; align-items: center; width: 100%; margin-top: 8px; background: #252a41; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .menuButton.list-style:hover { background: #363d5a; transform: translateY(-1px); }
 }
 
-.menuButton::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
+.list-icon { font-size: 1.6rem; margin-right: 1.5rem; min-width: 25px; text-align: center; align-self: flex-start; padding-top: 5px; }
+
+.menuButton.primary-style { aspect-ratio: auto !important; min-height: 100px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 1.5rem 2rem; }
+.test-icon-container { position: absolute; top: 50%; right: 20px; transform: translateY(-50%); font-size: 2.5rem; color: var(--color-success); filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.5)); }
+.test-details { display: flex; gap: 1.5rem; margin-top: 0.5rem; font-size: 0.95rem; color: rgba(255, 255, 255, 0.8); font-weight: 500; }
+.test-details span { display: flex; align-items: center; gap: 0.3rem; }
+
+.menuButton.danger-style { background: #442a30; border-color: var(--color-error); color: var(--color-error); justify-content: space-between; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .menuButton.danger-style:hover { background: #503038; }
 }
 
-.menuButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 50px rgba(59, 130, 246, 0.7);
+.menuButton.danger-style span:not(.list-icon) { color: var(--color-text-main); }
+.menuButton.danger-style .list-icon { color: var(--color-error); }
+.clearMistakesIcon { opacity: 0.7; transition: opacity 0.2s, transform 0.2s; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .clearMistakesIcon:hover { opacity: 1; transform: scale(1.1); }
 }
 
-.menuButton:hover::before {
-  left: 100%;
+/* === BUTTONS & CONTROLS === */
+.menuBackButton { background: transparent; border: 1px solid var(--border-color, rgba(255,255,255,0.2)); color: var(--text-primary); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .menuBackButton:hover { background: var(--hover-bg, rgba(255,255,255,0.1)); }
 }
 
-.menuButton:active { 
-  animation: pulseBtn 0.3s ease;
-  transform: scale(0.97);
+.logout-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; opacity: 0.8; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; cursor: pointer; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .logout-btn:hover { opacity: 1; background: rgba(239, 68, 68, 0.2); }
 }
 
-.menuButton.selected {
-  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 50%, var(--color-secondary) 100%);
-  box-shadow: 0 0 30px rgba(96, 165, 250, 0.8);
-  transform: translateY(-6px) scale(1.02);
-  animation: selectPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+.theme-toggle-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 0.2rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .theme-toggle-btn:hover { transform: scale(1.1); }
 }
 
-.menuBackButton {
-  border: none;
-  border-radius: 12px;
-  padding: 0.75rem 1.2rem;
-  background: var(--color-back-btn-bg);
-  color: var(--color-back-btn-color);
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  border: 1px solid var(--color-back-btn-border);
-  cursor: pointer;
+.submitTopButton, .navButton { border: none; border-radius: 14px; padding: 0.9rem 1.8rem; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); min-height: 48px; position: relative; overflow: hidden; }
+.submitTopButton { background: linear-gradient(135deg, var(--color-primary), #2563eb); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); padding: 0.7rem 1.5rem; font-size: 0.95rem; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .submitTopButton:hover { transform: translateY(-2px); }
 }
 
-.menuBackButton:hover {
-  background: var(--color-back-btn-bg); 
-  border-color: rgba(59, 130, 246, 0.4);
-}
-.light-mode .menuBackButton:hover {
-  background: rgba(203, 213, 225, 1);
+.navButton { background: rgba(59, 130, 246, 0.15); color: var(--color-primary-light); border: 2px solid rgba(59, 130, 246, 0.3); }
+body.light-mode .navButton { background: rgba(59, 130, 246, 0.1); }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .navButton:hover { background: rgba(59, 130, 246, 0.25); border-color: rgba(59, 130, 246, 0.6); transform: translateY(-1px); }
 }
 
-.menuBackButton:active { 
-  animation: pulseBtn 0.3s ease;
+.navButton.primary { background: linear-gradient(135deg, var(--color-primary), #2563eb); color: white; border: none; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+.navButton:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* Smart settings modal */
+.settingsModal { max-width: 500px; }
+.smartGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.smartOptionButton { background: var(--color-card-bg-start); border: 2px solid var(--color-card-border); border-radius: 12px; padding: 1rem; color: var(--color-text-main); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .smartOptionButton:hover { border-color: var(--color-primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
 }
 
-/* === TLAČÍTKA === */
-.submitTopButton,
-.navButton {
-  border: none;
-  border-radius: 14px;
-  padding: 0.9rem 1.8rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  min-height: 48px;
-  position: relative;
-  overflow: hidden;
+/* === PROGRESS & TIMER === */
+.progressBarContainer { width: 100%; height: 8px; background: rgba(255, 255, 255, 0.15); border-radius: 10px; margin: 1rem 0 0.5rem 0; overflow: hidden; position: relative; }
+body.light-mode .progressBarContainer { background: rgba(0, 0, 0, 0.1); }
+.progressBarFill { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
+.progressText { text-align: right; font-size: 0.8rem; color: var(--color-text-neutral); font-weight: 500; margin-bottom: 0.5rem; }
+
+.timer { font-weight: 700; background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%); border: 2px solid rgba(59, 130, 246, 0.5); color: var(--color-primary-light); padding: 0.6rem 1.2rem; border-radius: 12px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; }
+body.light-mode .timer { background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%); }
+.timerWarning { color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.5) !important; animation: pulse 1.5s infinite; }
+.timerDanger { color: #ff6b6b !important; border-color: rgba(239, 68, 68, 0.6) !important; animation: blink 0.8s infinite; }
+
+/* === FLASHCARDS STATS (COMBO) === */
+.flashcardHeader { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.15); backdrop-filter: blur(8px); border-radius: 16px; padding: 0.8rem 1.5rem; margin-bottom: 1rem; transition: all 0.3s ease; }
+body.light-mode .flashcardHeader { background: rgba(255, 255, 255, 0.6); border-color: rgba(0,0,0,0.05); }
+
+.statItem { display: flex; flex-direction: column; align-items: center; }
+.statLabel { font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-neutral); font-weight: 700; letter-spacing: 0.5px; }
+.statValue { font-size: 1.4rem; font-weight: 800; color: var(--color-text-main); }
+
+.comboContainer { display: flex; align-items: center; gap: 0.5rem; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.comboFlame { font-size: 1.8rem; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); animation: flameFlicker 1s infinite alternate; transform-origin: center bottom; }
+.comboCount { font-size: 1.6rem; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: italic; }
+
+.combo-med .comboFlame { font-size: 2.2rem; filter: drop-shadow(0 0 15px rgba(249, 115, 22, 0.6)); animation: pump 0.8s infinite; }
+.combo-med .comboCount { background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 2rem; text-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
+
+.combo-high .comboFlame { font-size: 2.8rem; filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8)); animation: pump 0.4s infinite; }
+.combo-high .comboCount { background: linear-gradient(135deg, #ef4444, #a855f7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; animation: pump 0.4s infinite; }
+
+/* === KARTA OTÁZKY === */
+.card { 
+    /* ZVĚTŠENÍ ZAOBLENÍ NA 32px PRO ZACHOVÁNÍ KULATOSTI I VZADU */
+    padding: clamp(1.5rem, 4vw, 2.2rem); 
+    border-radius: 32px; 
+    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%); 
+    backdrop-filter: blur(30px); 
+    border: 1px solid var(--color-card-border); 
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); 
+    margin-bottom: 1.5rem; 
+    margin-top: 1rem; 
+    overflow: hidden; /* DŮLEŽITÉ: Ořízne obsah (obrázky), aby nepřetékaly přes rohy */
+}
+body.light-mode .card { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); }
+
+.questionHeader { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem; }
+.questionText { font-size: clamp(1.2rem, 5vw, 1.6rem); font-weight: 700; line-height: 1.5; letter-spacing: -0.5px; }
+.imageWrapper { position: relative; cursor: zoom-in; width: 100%; }
+.questionImage { width: 100%; height: 200px; object-fit: contain; border-radius: 12px; border: 2px solid rgba(59, 130, 246, 0.2); background: rgba(0,0,0,0.2); transition: all 0.3s ease; }
+body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .imageWrapper:hover .questionImage { border-color: rgba(59, 130, 246, 0.5); transform: scale(1.01); }
 }
 
-.submitTopButton {
-  background: linear-gradient(135deg, var(--color-primary), #2563eb);
-  color: white;
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+@media (min-width: 768px) {
+  .questionHeader { flex-direction: row; align-items: flex-start; gap: 2rem; }
+  .questionText { flex: 1; }
+  .imageWrapper { flex: 0 0 40%; max-width: 400px; }
+  .questionImage { height: auto; max-height: 300px; }
 }
 
-.submitTopButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.7);
+.fullscreenHint { position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.7); color: white; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; pointer-events: none; }
+
+.options { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.2rem; }
+.optionButton { width: 100%; min-height: 60px; border: 1px solid var(--color-option-border); border-radius: 14px; padding: 1.2rem 1.6rem; background: linear-gradient(135deg, var(--color-option-bg-start) 0%, var(--color-option-bg-end) 100%); color: var(--color-text-secondary); text-align: left; font-size: 1.05rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); font-weight: 500; outline: none; }
+.optionButton:focus-visible { outline: 3px solid var(--color-primary-light); outline-offset: 2px; border-color: var(--color-primary-light); }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .optionButton:hover { background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%); border-color: rgba(59, 130, 246, 0.5); transform: translateX(4px); }
 }
 
-.submitTopButton:active { 
-  animation: pulseBtn 0.3s ease;
-}
+.optionButton:active { transform: scale(0.98); }
 
-.navButton {
-  background: rgba(59, 130, 246, 0.15);
-  color: var(--color-primary-light);
-  border: 2px solid rgba(59, 130, 246, 0.3);
-}
-.light-mode .navButton {
-  background: rgba(59, 130, 246, 0.1);
-}
-
-.navButton:hover {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: rgba(59, 130, 246, 0.6);
-  transform: translateY(-1px);
-}
-.light-mode .navButton:hover {
-  background: rgba(59, 130, 246, 0.2);
-}
-
-.navButton:active { 
-  animation: pulseBtn 0.3s ease;
-}
-
-.navButton.primary {
-  background: linear-gradient(135deg, var(--color-primary), #2563eb);
-  color: white;
-  border: none;
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
-}
-
-.navButton.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.7);
-}
-
-.navButton.primary:active { 
-  animation: pulseBtn 0.3s ease;
-}
-
-.navButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* === INFO PANELY === */
-.progress,
-.timer {
-  text-align: center;
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.5);
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  font-size: 0.95rem;
-  border: 1px solid rgba(148, 163, 184, 0.15);
-  backdrop-filter: blur(8px);
-  /* Důležité pro zobrazení: */
-  display: block; 
-}
-.light-mode .progress,
-.light-mode .timer {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  color: var(--color-text-main);
-}
-
-.progress {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(99, 102, 241, 0.08));
-  border-color: rgba(59, 130, 246, 0.2);
-  margin-top: 0.5rem;
-}
-.light-mode .progress {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
-}
-
-.timer {
-  font-weight: 700;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
-  border: 2px solid rgba(59, 130, 246, 0.5);
-  color: var(--color-primary-light);
-  padding: 0.9rem 1.8rem;
-  border-radius: 14px;
-  min-height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-  transition: all 0.3s ease;
-  cursor: default;
-}
-.light-mode .timer {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
-}
-
-
-.timerWarning { 
-  color: #fbbf24 !important; 
-  border-color: rgba(251, 191, 36, 0.5) !important;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 146, 60, 0.05) 100%) !important;
-  box-shadow: 0 0 25px rgba(251, 191, 36, 0.3) !important;
-  animation: pulse 1.5s infinite;
-}
-
-.timerDanger { 
-  color: #ff6b6b !important; 
-  border-color: rgba(239, 68, 68, 0.6) !important;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%) !important;
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important;
-  animation: blink 0.8s infinite;
-}
-
-/* === KARTA S OTÁZKOU === */
-.card {
-  padding: clamp(1.2rem, 4vw, 1.8rem);
-  border-radius: 24px;
-  /* Používá proměnné */
-  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
-  backdrop-filter: blur(30px);
-  border: 2px solid var(--color-card-border);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-  margin-bottom: 1.5rem;
-  margin-top: 1rem;
-  overflow: visible;
-  width: 100%;
-  max-width: 100%;
-  display: block;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-.light-mode .card {
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-/* === OTÁZKA + OBRÁZEK === */
-.questionHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
-}
-
-.questionText {
-  font-size: clamp(1.2rem, 5vw, 1.5rem);
-  font-weight: 700;
-  line-height: 1.65;
-  letter-spacing: -0.5px;
-}
-
-.questionImage {
-  width: 100%;
-  height: 200px;
-  object-fit: contain;
-  border-radius: 12px;
-  border: 2px solid rgba(59, 130, 246, 0.2);
-  outline: none;
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
-  transition: all 0.3s ease;
-  background: rgba(0,0,0,0.2);
-}
-.light-mode .questionImage {
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.imageWrapper {
-  position: relative;
-  cursor: zoom-in;
-}
-
-.imageWrapper:hover .questionImage {
-  border-color: rgba(59, 130, 246, 0.4);
-  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.25);
-  transform: scale(1.02);
-}
-
-.fullscreenHint {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  pointer-events: none;
-  backdrop-filter: blur(8px);
-}
-
-/* === ODPOVĚDI === */
-.options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  margin-top: 1.2rem;
-}
-
-.optionButton {
-  width: 100%;
-  min-height: 60px;
-  border: 2px solid var(--color-option-border); /* Používá proměnnou */
-  border-radius: 14px;
-  padding: 1.3rem 1.6rem;
-  /* Používá proměnné */
-  background: linear-gradient(135deg, var(--color-option-bg-start) 0%, var(--color-option-bg-end) 100%);
-  color: var(--color-text-secondary); /* Používá proměnnou */
-  text-align: left;
-  font-size: clamp(1rem, 4.5vw, 1.1rem);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  touch-action: manipulation;
-  font-weight: 500;
-  outline: none;
-}
-
-/* NOVÉ: Lepší viditelnost při ovládání klávesnicí */
-.optionButton:focus-visible {
-  outline: 3px solid var(--color-primary-light);
-  outline-offset: 2px;
-  background: rgba(59, 130, 246, 0.2);
-  border-color: var(--color-primary-light);
-  transform: translateX(6px);
-}
-.light-mode .optionButton:focus-visible {
-  outline: 3px solid var(--color-primary);
-}
-
-.optionButton:hover {
-  background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%);
-  border-color: rgba(59, 130, 246, 0.5);
-  transform: translateX(6px);
-}
-
-.optionButton:active {
-  transform: scale(0.97);
-  background: rgba(59, 130, 246, 0.4);
-  border-color: var(--color-primary-light);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-}
-
-/* Volitelné: Pro budoucí použití hintů kláves (A, B, C) */
-.keyHint {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 6px;
-  font-size: 0.75rem;
-  margin-right: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
-  color: var(--color-text-neutral);
-}
-.light-mode .keyHint {
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* === NAVIGAČNÍ TLAČÍTKA === */
-.actionButtons {
-  display: flex;
-  gap: 1.2rem;
-  margin-top: 1.5rem;
-  margin-bottom: 0.6rem;
-  flex-wrap: wrap;
-}
+.percentIndicator { display: inline-block; margin-left: 1rem; font-weight: 700; color: var(--color-text-main); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem; background: rgba(255, 255, 255, 0.1); }
+.actionButtons { display: flex; gap: 1.2rem; margin-top: 2rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
 .actionButtons.spaced { justify-content: space-between; }
 .actionButtons.right { justify-content: flex-end; }
 
-/* === NAVIGÁTOR === */
-.navigatorWrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
-  cursor: grab;
-  user-select: none;
-  scrollbar-width: none;
-  margin-top: 0.4rem;
-  margin-bottom: 1rem;
-  padding: 0.6rem 0;
-  scroll-behavior: smooth;
+/* === NAVIGÁTOR (DRAG & SCROLL FIX) === */
+.navigatorWrapper { width: 100%; display: flex; justify-content: center; overflow: hidden; padding: 0; margin-top: 0.5rem; }
+.compactNavigator { display: flex; gap: 8px; padding: 15px 10px; overflow-x: auto; overflow-y: hidden; max-width: 100%; touch-action: pan-x; scrollbar-width: none; cursor: grab; user-select: none; -webkit-user-select: none; }
+.compactNavigator::-webkit-scrollbar { display: none; }
+.compactNavigator.grabbing { cursor: grabbing; scroll-behavior: auto; }
+.compactNavigator.grabbing .navNumber { pointer-events: none; transform: scale(1); }
+
+.navNumber { width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; background: var(--color-nav-num-bg-start); color: var(--color-text-secondary); border: 1px solid var(--color-nav-num-border); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; touch-action: none; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .navNumber:hover { border-color: var(--color-primary-light); transform: translateY(-3px) scale(1.05); z-index: 10; }
 }
 
-.navigatorWrapper.noAutoScroll {
-  scroll-behavior: auto;
+.navNumber.current { background: var(--color-primary); color: white; border-color: var(--color-primary-light); transform: scale(1.15); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5); z-index: 5; }
+.navNumber.answered { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: var(--color-primary-light); }
+
+/* === VÝSLEDKY A REVIEW === */
+.resultScreen { text-align: center; padding: 2rem 1rem; animation: fadeIn 0.6s ease-out; max-width: 800px; margin: 0 auto; width: 100%; }
+.score-circle-container { position: relative; width: 200px; height: 200px; margin: 0 auto 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
+.score-circle-inner { width: 170px; height: 170px; border-radius: 50%; background: var(--color-bg-start); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+body.light-mode .score-circle-inner { background: #f0f4f8; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+.score-percentage { font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+.score-fraction { font-size: 1rem; color: var(--color-text-neutral); margin-top: 0.5rem; font-weight: 600; }
+
+.review-header-title { text-align: left; margin-bottom: 1.5rem; font-size: 1.4rem; font-weight: 800; color: var(--color-text-main); display: flex; align-items: center; gap: 0.5rem; }
+.reviewList { display: flex; flex-direction: column; gap: 1rem; margin-top: 0; }
+.review-item { background: var(--color-card-bg-end); border: 1px solid var(--color-card-border); border-radius: 16px; padding: 1.2rem; text-align: left; position: relative; overflow: hidden; transition: transform 0.2s ease; border-left: 5px solid transparent; }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .review-item:hover { transform: translateY(-2px); border-color: rgba(148, 163, 184, 0.4); }
 }
 
-.navigatorWrapper::-webkit-scrollbar { display: none; }
-.navigatorWrapper:active { cursor: grabbing; }
+.review-item-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.review-number { font-size: 0.9rem; font-weight: 700; color: var(--color-text-neutral); margin-bottom: 0.3rem; display: block; }
+.review-question-text { font-size: 1.1rem; font-weight: 600; color: var(--color-text-main); line-height: 1.4; }
+.review-status-icon { font-size: 1.5rem; margin-left: 1rem; flex-shrink: 0; }
+.review-answers-grid { display: grid; grid-template-columns: 1fr; gap: 0.5rem; background: rgba(0,0,0,0.1); padding: 1rem; border-radius: 12px; }
+body.light-mode .review-answers-grid { background: rgba(0,0,0,0.03); }
+.review-answer-row { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; }
+.label-correct { color: var(--color-success); font-weight: 700; min-width: 70px; }
+.label-wrong { color: var(--color-error); font-weight: 700; min-width: 70px; }
+.text-val { color: var(--color-text-secondary); }
+.text-val.highlight { color: var(--color-text-main); font-weight: 600; }
 
-.navigatorWrapper.dragging {
-  cursor: grabbing !important;
-  scroll-behavior: auto !important;
-}
+.reviewSearchInput { padding: 1rem; width: 100%; max-width: 600px; margin: 1rem auto 2rem; display: block; border-radius: 12px; border: 1px solid var(--color-nav-num-border); background: rgba(0,0,0,0.2); color: var(--color-text-main); font-size: 1.1rem; }
+body.light-mode .reviewSearchInput { background: rgba(255,255,255,0.6); }
+.reviewGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; padding: 1rem; }
+.reviewCard { background: var(--color-card-bg-end); border: 1px solid var(--color-card-border); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease; }
 
-.navigatorWrapper.dragging .navNumber {
-  pointer-events: none;
-}
-
-.compactNavigator {
-  display: flex;
-  gap: 10px;
-  padding: 0 1rem;
-  min-width: max-content;
-  justify-content: flex-start;
-}
-
-.navNumber {
-  width: 52px;
-  height: 52px;
-  border-radius: 10px;
-  /* Používá proměnné */
-  background: linear-gradient(135deg, var(--color-nav-num-bg-start) 0%, var(--color-nav-num-bg-end) 100%);
-  color: var(--color-text-secondary);
-  border: 2px solid var(--color-nav-num-border);
-  font-weight: 700;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  flex-shrink: 0;
-  cursor: pointer;
-}
-.light-mode .navNumber {
-  color: var(--color-text-main);
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .reviewCard:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 }
 
-.navNumber:hover {
-  border-color: rgba(59, 130, 246, 0.4);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
-  transform: translateY(-3px);
-}
-
-.navNumber.current {
-  background: linear-gradient(135deg, var(--color-primary), #6366f1);
-  border-color: var(--color-primary-light);
-  color: white;
-  transform: scale(1.3) translateY(-2px);
-  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.8);
-  animation: glow 2s infinite;
-}
-
-.navNumber.answered {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-  border-color: var(--color-primary-light);
-  color: white;
-}
-
-.navNumber.answered:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-}
-
-/* === VÝSLEDKY === */
-.resultScreen { 
-  text-align: center; 
-  padding: clamp(2rem, 8vw, 4rem) 1rem;
-  animation: fadeIn 0.6s ease-out;
-}
-
-.bigScore { 
-  font-size: clamp(3.5rem, 12vw, 4.8rem); 
-  font-weight: 900; 
-  background: linear-gradient(135deg, #86efac, #4ade80);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 1.5rem 0;
-  letter-spacing: -2px;
-}
-
-.bigPercent { 
-  font-size: clamp(1.8rem, 7vw, 2.6rem); 
-  color: var(--color-text-secondary);
-  font-weight: 700;
-}
-
-.timeSpent { 
-  color: var(--color-text-neutral); 
-  font-size: 1.5rem; 
-  margin-top: 1.5rem;
-  font-weight: 600;
-}
-
-.reviewList { margin-top: 2.5rem; }
-
-.reviewQuestion {
-  /* Používá proměnné */
-  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
-  padding: 1.6rem;
-  border-radius: 14px;
-  margin-bottom: 1.5rem;
-  border-left: 5px solid transparent;
-  font-size: 0.95rem;
-  animation: fadeIn 0.5s ease-out;
-  border: 2px solid rgba(148, 163, 184, 0.1);
-  transition: all 0.3s ease;
-}
-
-.reviewQuestion:hover {
-  transform: translateX(4px);
-  border-color: rgba(148, 163, 184, 0.2);
-}
-
-.reviewQuestion.correct { 
-  border-left-color: var(--color-success);
-  border-top-color: rgba(34, 197, 94, 0.2);
-  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, rgba(34, 197, 94, 0.05) 100%);
-}
-
-.reviewQuestion.wrong { 
-  border-left-color: var(--color-error);
-  border-top-color: rgba(239, 68, 68, 0.2);
-  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, rgba(239, 68, 68, 0.05) 100%);
-}
-
-.reviewQuestion.unanswered { 
-  opacity: 0.8; 
-  border-left-color: var(--color-text-neutral);
-}
-
-.questionImage.small { 
-  height: 200px; 
-  width: auto; 
-  max-width: 100%; 
-  margin: 1rem auto; 
-  display: block; 
-  border-radius: 12px; 
-  cursor: zoom-in; 
-  object-fit: contain; 
-  border: 2px solid rgba(59, 130, 246, 0.2);
-  outline: none; 
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-.light-mode .questionImage.small {
-  background: rgba(255, 255, 255, 0.8);
-}
-
-
-.questionImage.small:hover {
-  transform: scale(1.02);
-  border-color: rgba(59, 130, 246, 0.4);
-}
-
-/* === FULLSCREEN OBRÁZEK === */
-.fullscreenOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.98);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-  animation: fadeIn 0.3s ease-out;
-}
-
-.fullscreenImage { 
-  max-width: 100vw; 
-  max-height: 100dvh; 
-  object-fit: contain;
-}
-
-.closeFullscreen { 
-  position: absolute; 
-  top: 20px; 
-  right: 20px; 
-  font-size: 3rem; 
-  color: white; 
-  background: rgba(0, 0, 0, 0.5);
-  border: none; 
-  cursor: pointer;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-}
-
-.closeFullscreen:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: scale(1.1);
-}
-
-/* === MODÁL === */
-.modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.92);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(8px);
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.modal {
-  /* Používá proměnné */
-  background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
-  padding: 2.5rem;
-  border-radius: 20px;
-  text-align: center;
-  width: 90%;
-  max-width: 420px;
-  border: 2px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 25px 90px rgba(0, 0, 0, 0.8);
-  animation: fadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.light-mode .modal {
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-
-.modal h3 {
-  font-size: 1.4rem;
-  margin-bottom: 0.8rem;
-  font-weight: 800;
-}
-
-.modal p {
-  font-size: 1rem;
-  color: var(--color-text-secondary);
-  line-height: 1.6;
-}
-
-.modalButtons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  flex-direction: column;
-}
-
-/* === REVIEW SEARCH & GRID === */
-.reviewSearchInput {
-    padding: 1rem;
-    width: 100%;
-    max-width: 600px;
-    margin: 1rem auto 2rem;
-    display: block;
-    border-radius: 12px;
-    border: 2px solid var(--color-nav-num-border);
-    background: var(--color-nav-num-bg-start);
-    color: var(--color-text-main);
-    font-size: 1.1rem;
-    transition: border-color 0.3s ease;
-}
-.reviewSearchInput:focus {
-    outline: none;
-    border-color: var(--color-primary-light);
-}
-
-.reviewGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
-  padding: 1rem;
-}
-
-.reviewCard {
-  /* Používá proměnné */
-  background: linear-gradient(135deg, var(--color-card-bg-end) 0%, rgba(30, 41, 59, 0.6) 100%);
-  border: 2px solid var(--color-card-border);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.light-mode .reviewCard {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
-}
-
-.reviewCard:hover {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.8) 100%);
-  border-color: rgba(59, 130, 246, 0.5);
-  transform: translateY(-6px);
-  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.25);
-}
-.light-mode .reviewCard:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 100%);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
-}
-
-
-.reviewHeader {
-  color: var(--color-primary-light);
-  font-weight: 700;
-  margin-bottom: 1rem;
-  font-size: 1.05rem;
-}
-
-.reviewCard .reviewImage {
-    max-width: 400px;
-    height: auto;
-    margin: 1rem auto;
-    display: block;
-    object-fit: contain;
-    border-radius: 8px;
-    border: 1px solid var(--color-option-border);
-}
-
-.reviewAnswer {
-  color: var(--color-text-secondary);
-  margin-top: 0.75rem;
-  line-height: 1.7;
-  font-size: 0.95rem;
-}
-
-.correctText {
-  color: var(--color-review-correct);
-  font-weight: 700;
-}
-
-.highlightMark { 
-    background-color: rgba(255, 255, 0, 0.25); 
-    color: #fff; 
-    padding: 0 2px; 
-    border-radius: 2px; 
-    font-weight: bold; 
-}
-.light-mode .highlightMark { 
-    color: #000; 
-}
+.reviewHeader { color: var(--color-primary-light); font-weight: 700; margin-bottom: 1rem; font-size: 1.05rem; }
+.reviewImage { width: 100%; height: 200px; object-fit: contain; border-radius: 12px; margin: 1rem 0; border: 1px solid rgba(59, 130, 246, 0.15); }
+.reviewAnswer { color: var(--color-text-secondary); margin-top: 0.75rem; line-height: 1.7; font-size: 0.95rem; }
+.correctText { color: var(--color-review-correct); font-weight: 700; }
+.wrongText { color: var(--color-review-wrong); }
 
 /* === SUBJECT SELECTOR === */
-.subjectSelectorContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--vh);
-  padding: 2rem;
+/* OPRAVA: Odstraněno height: 100vh a overflow: hidden, které způsobovaly ořezání */
+.subjectSelectorContainer { 
+    display: flex; 
+    flex-direction: column; /* Změna na column pro lepší layout */
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100%; /* Místo fixní výšky */
+    width: 100%; 
+    padding: 2rem 1rem; /* Upraven padding */
+    padding-bottom: 4rem; /* Místo 20vh, což bylo moc */
 }
 
-.subjectContent {
-  text-align: center;
-  max-width: 600px;
+.subjectContent { text-align: center; width: 100%; max-width: 1200px; }
+.subjectTitle { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+.subjectSubtitle { font-size: 1.2rem; color: var(--color-text-neutral); margin-bottom: 3rem; }
+.subjectGrid { display: grid; width: 100%; justify-content: center; padding-bottom: 2rem; grid-template-columns: 1fr; gap: 1.5rem; max-width: 500px; margin: 0 auto; }
+.subjectButton { width: 100%; height: 100%; min-height: 220px; padding: 2rem 1rem; background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.3)); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: var(--color-text-main); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
+.subjectButton::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 60%); opacity: 0; transition: opacity 0.4s ease; }
+body.light-mode .subjectButton { background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)); border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .subjectButton:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); border-color: rgba(59, 130, 246, 0.4); }
+    .subjectButton:hover::before { opacity: 1; }
+    .subjectButton:hover .subjectIcon { transform: scale(1.1) rotate(5deg); }
 }
 
-.subjectTitle {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, var(--color-primary), #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.subjectButton.selected { border-color: var(--color-primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3), 0 20px 40px rgba(0,0,0,0.4); transform: translateY(-8px); }
+.subjectIcon { font-size: 3.5rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); transition: transform 0.4s ease; }
+
+.subjectName { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
+.subjectDesc { font-size: 0.95rem; color: var(--color-text-secondary); line-height: 1.5; opacity: 0.9; max-width: 90%; }
+.subjectButton.uploadButton { background: rgba(30, 41, 59, 0.3); border: 2px dashed rgba(148, 163, 184, 0.3); box-shadow: none; }
+.subjectButton.uploadButton::before { background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent 60%); }
+body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.3); border-color: rgba(148, 163, 184, 0.4); }
+
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .subjectButton.uploadButton:hover { border-color: var(--color-secondary); background: rgba(139, 92, 246, 0.05); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(139, 92, 246, 0.1); }
 }
 
-.subjectSubtitle {
-  font-size: 1.2rem;
-  color: var(--color-text-neutral);
-  margin-bottom: 2rem;
+.uploadError { margin: 1.5rem auto 0; padding: 0.8rem 1.2rem; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; color: var(--color-error); max-width: 500px; animation: shake 0.4s ease-in-out; }
+
+@media (min-width: 950px) {
+  .subjectGrid { grid-template-columns: repeat(3, 1fr); max-width: 100%; gap: 2rem; }
+  .subjectButton { min-height: 320px; padding: 2.5rem 1.5rem; }
+  .subjectIcon { font-size: 4.5rem; margin-bottom: 1.5rem; }
+  .subjectName { font-size: 1.8rem; }
+  .subjectDesc { font-size: 1rem; }
 }
 
-.subjectGrid {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  width: 100%;
-  max-width: 520px;
+/* === MOBILE SPECIFIC ADJUSTMENTS (<= 600px) === */
+@media (max-width: 600px) {
+  /* Fix for safe area and spacing on mobile */
+  .subjectSelectorContainer { 
+      align-items: flex-start; 
+      padding-top: max(1rem, env(safe-area-inset-top)); /* Respect safe area */
+      height: auto; 
+  }
+
+  .container {
+      padding: 0.5rem;
+      padding-top: env(safe-area-inset-top); /* Ensure content starts below notch */
+  }
+
+  .top-navbar {
+      margin-top: 0; /* Remove extra margin on mobile */
+      margin-bottom: 0.5rem;
+  }
+
+  .quizContentWrapper {
+      padding-top: 0;
+  }
+
+  .card {
+      margin-top: 0; /* Pull card up */
+  }
+
+  .title {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+  }
+
+  .appHeader { border-radius: 0; }
+  .admin-card { flex-direction: column; align-items: flex-start; }
+  .admin-actions { width: 100%; justify-content: flex-end; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+
+  .subject-menu-header { flex-direction: column; align-items: flex-start; padding: 0.5rem; gap: 0.8rem; }
+
+  .mobile-hide-text { display: none; }
+  .desktop-name { display: none; }
+  .mobile-name { display: inline; }
+  .mobile-hidden { display: none !important; }
+
+  .logout-text { display: none; }
+  .logout-icon { display: inline-block; font-size: 1.2rem; font-weight: bold; line-height: 1; }
+  .logout-btn { padding: 0 !important; width: 32px; height: 32px; justify-content: center; }
+  .navbar-group { gap: 0.4rem !important; }
+
+  .subjectButton { flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; min-height: auto; padding: 1.2rem 1.5rem; gap: 1.5rem; }
+  .subjectIcon { margin-bottom: 0; font-size: 2.5rem; flex-shrink: 0; }
+  .subjectName { font-size: 1.3rem; margin-bottom: 0.1rem; }
+  .subjectDesc { font-size: 0.85rem; }
+  .subjectButton.uploadButton { justify-content: flex-start; }
 }
 
-.subjectButton {
-  width: 100%;
-  padding: 1.8rem 1.4rem;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.1) 50%, rgba(139, 92, 246, 0.1) 100%);
-  border: 2px solid rgba(59, 130, 246, 0.3);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.3s;
-  color: var(--color-text-main);
-  font-weight: 600;
-  font-size: 1.05rem;
-}
-.light-mode .subjectButton {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.05) 50%, rgba(139, 92, 246, 0.05) 100%);
-    border: 2px solid rgba(59, 130, 246, 0.5);
-    color: var(--color-text-main);
+/* === EFEKT BALÍČKU KARET (Flashcards / Smart Mode) === */
+.stacked-card {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 5rem !important; 
+
+  /* Plné, neprůhledné pozadí pro hlavní kartu (Dark Mode) */
+  background: #1e293b; 
+  border: 1px solid rgba(148, 163, 184, 0.2);
+
+  /* PŘIDÁNO: Explicitní zaoblení pro jistotu */
+  border-radius: 32px;
+
+  box-shadow: 
+    /* Hlavní stín */
+    0 10px 20px rgba(0,0,0,0.3),
+
+    /* 1. Karta pod (Posun 15px, Zmenšení o 10px) - Barva karty */
+    0 20px 0 -12px #1e293b, 
+    /* 1. Karta pod - Její okraj/stín */
+    0 20px 1px -12px rgba(148, 163, 184, 0.4), 
+
+    /* 2. Karta pod (Posun 30px, Zmenšení o 20px) - Barva karty */
+    0 40px 0 -24px #1e293b,
+    /* 2. Karta pod - Její okraj/stín */
+    0 40px 1px -24px rgba(148, 163, 184, 0.4);
+
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.subjectButton:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.6);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-}
-.light-mode .subjectButton:hover {
-    background: rgba(59, 130, 246, 0.25);
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+body.light-mode .stacked-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  border-radius: 32px; /* Pro jistotu i zde */
+
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 20px 0 -12px #f1f5f9, 
+    0 20px 1px -12px #94a3b8,
+    0 40px 0 -24px #e2e8f0,
+    0 40px 1px -24px #94a3b8;
 }
 
-.subjectButton.selected {
-  background: rgba(59, 130, 246, 0.3);
-  border-color: rgba(96, 165, 250, 0.8);
-  box-shadow: 0 0 30px rgba(96, 165, 250, 0.6);
-  transform: translateY(-6px) scale(1.03);
-  animation: selectPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.light-mode .subjectButton.selected {
-    background: rgba(59, 130, 246, 0.5);
-    border-color: rgba(96, 165, 250, 1);
+/* ZMĚNA: Hover jen pro myš */
+@media (hover: hover) {
+    .stacked-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 
+            0 15px 30px rgba(0,0,0,0.3),
+            0 25px 0 -12px #1e293b,
+            0 25px 1px -12px rgba(148, 163, 184, 0.4),
+            0 50px 0 -24px #1e293b,
+            0 50px 1px -24px rgba(148, 163, 184, 0.4);
+    }
+
+    body.light-mode .stacked-card:hover {
+        box-shadow: 
+            0 15px 40px rgba(0, 0, 0, 0.15),
+            0 25px 0 -12px #f1f5f9, 
+            0 25px 1px -12px #94a3b8,
+            0 50px 0 -24px #e2e8f0,
+            0 50px 1px -24px #94a3b8;
+    }
 }
 
-.subjectIcon {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-  display: block;
+/* Dynamické skrývání vrstev */
+.stacked-card.stack-level-0 {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
+  margin-bottom: 1.5rem !important;
+  border-radius: 32px !important; /* Vynucení zaoblení */
+}
+body.light-mode .stacked-card.stack-level-0 {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 32px !important; /* Vynucení zaoblení */
 }
 
-.subjectName {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
+.stacked-card.stack-level-1 {
+  box-shadow: 
+    0 10px 20px rgba(0,0,0,0.2),
+    0 20px 0 -12px #1e293b,
+    0 20px 1px -12px rgba(148, 163, 184, 0.4) !important;
+  margin-bottom: 3rem !important;
+  border-radius: 32px !important; /* Vynucení zaoblení */
+}
+body.light-mode .stacked-card.stack-level-1 {
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 20px 0 -12px #f1f5f9, 
+    0 20px 1px -12px #94a3b8 !important;
+  border-radius: 32px !important; /* Vynucení zaoblení */
 }
 
-.subjectDesc {
-  font-size: 0.85rem;
-  color: var(--color-text-neutral);
+/* === ANIMACE PŘÍLETU KARTY (Slide In - ZPRAVA / DEFAULT) === */
+.card-enter-animation {
+  animation: slideInCard 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* Zrychleno na 0.15s */
 }
 
-.uploadError {
-  color: var(--color-error);
-  margin: 1rem 0;
-  padding: 0.5rem;
-  border-radius: 8px;
-  background: rgba(239, 68, 68, 0.1);
+@keyframes slideInCard {
+  from { opacity: 0; transform: translateX(40px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
 }
 
-.uploadHint {
-  color: var(--color-text-neutral);
-  font-size: 0.85rem;
-  margin-top: 1rem;
-  line-height: 1.5;
+/* === ANIMACE PŘÍLETU KARTY (Slide In - ZLEVA) === */
+.card-enter-left {
+  animation: slideInCardLeft 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* Zrychleno na 0.15s */
 }
 
-@media (max-width: 640px) {
-  .subjectTitle { font-size: 1.8rem; }
-  .subjectSubtitle { font-size: 1rem; }
-  .subjectGrid { grid-template-columns: 1fr; }
+@keyframes slideInCardLeft {
+  from { opacity: 0; transform: translateX(-40px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* === ANIMACE ODLETU KARTY (Swipe Exit) === */
+.card-exit-left {
+    animation: cardExitLeft 0.15s ease-in forwards; /* Zrychleno na 0.15s */
+}
+
+.card-exit-right {
+    animation: cardExitRight 0.15s ease-in forwards; /* Zrychleno na 0.15s */
+}
+
+@keyframes cardExitLeft {
+    to { opacity: 0; transform: translateX(-120%) rotate(-15deg); }
+}
+
+@keyframes cardExitRight {
+    to { opacity: 0; transform: translateX(120%) rotate(15deg); }
 }
