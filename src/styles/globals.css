@@ -260,7 +260,11 @@ body.keyboard-mode-active :focus-visible {
 @keyframes glow { 0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); } 50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.6); } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px) rotate(-2deg); } 40% { transform: translateX(8px) rotate(2deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
 .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--color-error) !important; box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important; }
-@keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* OPRAVA: Zahrnutí translate do animace popIn */
+@keyframes popIn { 
+    from { transform: translate(-50%, -50%) scale(0); opacity: 0; } 
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+}
 @keyframes flameFlicker { 0% { transform: scale(1) rotate(-3deg); opacity: 0.8; } 100% { transform: scale(1.1) rotate(3deg); opacity: 1; } }
 @keyframes pump { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
@@ -438,14 +442,38 @@ body.light-mode .timer { background: linear-gradient(135deg, rgba(59, 130, 246, 
 .timerDanger { color: #ff6b6b !important; border-color: rgba(239, 68, 68, 0.6) !important; animation: blink 0.8s infinite; }
 
 /* === FLASHCARDS STATS (COMBO) === */
-.flashcardHeader { display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(148, 163, 184, 0.15); backdrop-filter: blur(8px); border-radius: 16px; padding: 0.8rem 1.5rem; margin-bottom: 1rem; transition: all 0.3s ease; }
+.flashcardHeader { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background: rgba(15, 23, 42, 0.4); 
+    border: 1px solid rgba(148, 163, 184, 0.15); 
+    backdrop-filter: blur(8px); 
+    border-radius: 16px; 
+    padding: 0.8rem 1.5rem; 
+    margin-bottom: 1rem; 
+    transition: all 0.3s ease; 
+    position: relative; /* DŮLEŽITÉ: Rodič pro absolutní pozici comba */
+}
 body.light-mode .flashcardHeader { background: rgba(255, 255, 255, 0.6); border-color: rgba(0,0,0,0.05); }
 
 .statItem { display: flex; flex-direction: column; align-items: center; }
 .statLabel { font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-neutral); font-weight: 700; letter-spacing: 0.5px; }
 .statValue { font-size: 1.4rem; font-weight: 800; color: var(--color-text-main); }
 
-.comboContainer { display: flex; align-items: center; gap: 0.5rem; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.comboContainer { 
+    /* DŮLEŽITÉ: Přidáno pro vycentrování */
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 0.5rem; 
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+}
 .comboFlame { font-size: 1.8rem; filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.4)); animation: flameFlicker 1s infinite alternate; transform-origin: center bottom; }
 .comboCount { font-size: 1.6rem; font-weight: 900; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-style: italic; }
 
@@ -674,133 +702,8 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
   .subjectName { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .subjectDesc { font-size: 0.85rem; }
   .subjectButton.uploadButton { justify-content: flex-start; }
-}
 
-/* === EFEKT BALÍČKU KARET (Flashcards / Smart Mode) === */
-.stacked-card {
-  position: relative;
-  z-index: 10;
-  margin-bottom: 5rem !important; 
-
-  /* Plné, neprůhledné pozadí pro hlavní kartu (Dark Mode) */
-  background: #1e293b; 
-  border: 1px solid rgba(148, 163, 184, 0.2);
-
-  /* PŘIDÁNO: Explicitní zaoblení pro jistotu */
-  border-radius: 32px;
-
-  box-shadow: 
-    /* Hlavní stín */
-    0 10px 20px rgba(0,0,0,0.3),
-
-    /* 1. Karta pod (Posun 15px, Zmenšení o 10px) - Barva karty */
-    0 20px 0 -12px #1e293b, 
-    /* 1. Karta pod - Její okraj/stín */
-    0 20px 1px -12px rgba(148, 163, 184, 0.4), 
-
-    /* 2. Karta pod (Posun 30px, Zmenšení o 20px) - Barva karty */
-    0 40px 0 -24px #1e293b,
-    /* 2. Karta pod - Její okraj/stín */
-    0 40px 1px -24px rgba(148, 163, 184, 0.4);
-
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-body.light-mode .stacked-card {
-  background: #ffffff;
-  border-color: #cbd5e1;
-  border-radius: 32px; /* Pro jistotu i zde */
-
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.1),
-    0 20px 0 -12px #f1f5f9, 
-    0 20px 1px -12px #94a3b8,
-    0 40px 0 -24px #e2e8f0,
-    0 40px 1px -24px #94a3b8;
-}
-
-/* ZMĚNA: Hover jen pro myš */
-@media (hover: hover) {
-    .stacked-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 
-            0 15px 30px rgba(0,0,0,0.3),
-            0 25px 0 -12px #1e293b,
-            0 25px 1px -12px rgba(148, 163, 184, 0.4),
-            0 50px 0 -24px #1e293b,
-            0 50px 1px -24px rgba(148, 163, 184, 0.4);
-    }
-
-    body.light-mode .stacked-card:hover {
-        box-shadow: 
-            0 15px 40px rgba(0, 0, 0, 0.15),
-            0 25px 0 -12px #f1f5f9, 
-            0 25px 1px -12px #94a3b8,
-            0 50px 0 -24px #e2e8f0,
-            0 50px 1px -24px #94a3b8;
-    }
-}
-
-/* Dynamické skrývání vrstev */
-.stacked-card.stack-level-0 {
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2) !important;
-  margin-bottom: 1.5rem !important;
-  border-radius: 32px !important; /* Vynucení zaoblení */
-}
-body.light-mode .stacked-card.stack-level-0 {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-  border-radius: 32px !important; /* Vynucení zaoblení */
-}
-
-.stacked-card.stack-level-1 {
-  box-shadow: 
-    0 10px 20px rgba(0,0,0,0.2),
-    0 20px 0 -12px #1e293b,
-    0 20px 1px -12px rgba(148, 163, 184, 0.4) !important;
-  margin-bottom: 3rem !important;
-  border-radius: 32px !important; /* Vynucení zaoblení */
-}
-body.light-mode .stacked-card.stack-level-1 {
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.1),
-    0 20px 0 -12px #f1f5f9, 
-    0 20px 1px -12px #94a3b8 !important;
-  border-radius: 32px !important; /* Vynucení zaoblení */
-}
-
-/* === ANIMACE PŘÍLETU KARTY (Slide In - ZPRAVA / DEFAULT) === */
-.card-enter-animation {
-  animation: slideInCard 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* Zrychleno na 0.15s */
-}
-
-@keyframes slideInCard {
-  from { opacity: 0; transform: translateX(40px) scale(0.95); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
-}
-
-/* === ANIMACE PŘÍLETU KARTY (Slide In - ZLEVA) === */
-.card-enter-left {
-  animation: slideInCardLeft 0.15s cubic-bezier(0.16, 1, 0.3, 1); /* Zrychleno na 0.15s */
-}
-
-@keyframes slideInCardLeft {
-  from { opacity: 0; transform: translateX(-40px) scale(0.95); }
-  to { opacity: 1; transform: translateX(0) scale(1); }
-}
-
-/* === ANIMACE ODLETU KARTY (Swipe Exit) === */
-.card-exit-left {
-    animation: cardExitLeft 0.15s ease-in forwards; /* Zrychleno na 0.15s */
-}
-
-.card-exit-right {
-    animation: cardExitRight 0.15s ease-in forwards; /* Zrychleno na 0.15s */
-}
-
-@keyframes cardExitLeft {
-    to { opacity: 0; transform: translateX(-120%) rotate(-15deg); }
-}
-
-@keyframes cardExitRight {
-    to { opacity: 0; transform: translateX(120%) rotate(15deg); }
+  .flashcardHeader {
+    padding: 0;
+  }
 }

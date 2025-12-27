@@ -11,6 +11,7 @@ import { CustomImageModal } from "./components/CustomImageModal.jsx";
 import { HighlightedText } from "./components/HighlightedText.jsx";
 import { MainMenu } from "./components/MainMenu.jsx";
 import { ScheduledTestsList } from "./components/ScheduledTestsList.jsx";
+import { RealTestMode } from "./components/RealTestMode.jsx";
 
 // --- IMPORTY Z UTILS ---
 import { 
@@ -51,6 +52,10 @@ export default function App() {
     const [customQuestions, setCustomQuestions] = useState(null);
     const [mistakes, setMistakes] = useState({});
     const [history, setHistory] = useState([]);
+
+    // Statistiky procvičování testů { "test_id": [true, false, true, ...] }
+    const [testPracticeStats, setTestPracticeStats] = useState({});
+
     const [theme, setTheme] = useState(
         () => localStorage.getItem("quizio_theme") || "dark",
     );
@@ -91,7 +96,11 @@ export default function App() {
 
     const [scheduledTests, setScheduledTests] = useState([]);
     const [activeTest, setActiveTest] = useState(null);
-    const [cheatScore, setCheatScore] = useState(0);
+
+    const [completedTestIds, setCompletedTestIds] = useState([]);
+
+    // State pro modal před spuštěním testu
+    const [testToStart, setTestToStart] = useState(null);
 
     const optionRefsForCurrent = useRef({});
     const cardRef = useRef(null);
@@ -152,35 +161,82 @@ export default function App() {
         };
     }, [user, dbId]); 
 
+    // --- FETCH FUNCTIONS ---
+    const fetchScheduledTests = async () => {
+        if (!subject || subject === 'CUSTOM') return;
+        setSyncing(true);
+        const { data } = await supabase.from('scheduled_tests').select('*').eq('subject', subject).order('close_at', { ascending: true });
+        if (data) setScheduledTests(data);
+        setTimeout(() => setSyncing(false), 500);
+    };
+
+    const fetchCompletedTests = async () => {
+        if (!user || !dbId) {
+            setCompletedTestIds([]);
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('test_results')
+            .select('test_id')
+            .eq('user_id', dbId);
+
+        if (data) {
+            const ids = [...new Set(data.map(item => item.test_id))];
+            setCompletedTestIds(ids);
+        }
+    };
+
     // --- REALTIME TEST FETCHING ---
     useEffect(() => {
         if (!subject || subject === 'CUSTOM') return;
-        const fetchScheduledTests = async () => {
-            const { data } = await supabase.from('scheduled_tests').select('*').eq('subject', subject).order('close_at', { ascending: true });
-            if (data) setScheduledTests(data);
-        };
+
         fetchScheduledTests();
         const subscription = supabase.channel('tests_update').on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_tests' }, fetchScheduledTests).subscribe();
+
         return () => supabase.removeChannel(subscription);
     }, [subject]);
 
-    // --- ANTI-CHEAT LISTENERS ---
+    // --- FETCH COMPLETED TESTS (S OPRAVOU PRO DELETE) ---
     useEffect(() => {
-        if (mode !== 'real_test') return;
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                setCheatScore(prev => prev + 1);
-                alert("⚠️ Opuštění okna testu bylo zaznamenáno!");
-            }
-        };
-        const handleBlur = () => setCheatScore(prev => prev + 1);
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('blur', handleBlur);
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('blur', handleBlur);
-        };
-    }, [mode]);
+        if (!user || !dbId) {
+            setCompletedTestIds([]);
+            return;
+        }
+
+        fetchCompletedTests();
+
+        const sub = supabase.channel('my_results_update')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'test_results', filter: `user_id=eq.${dbId}` }, 
+            (payload) => {
+                setCompletedTestIds(prev => [...prev, payload.new.test_id]);
+            })
+            // Poslouchání DELETE pro aktualizaci, když učitel smaže pokus
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'test_results' }, 
+            () => {
+                fetchCompletedTests();
+            })
+            .subscribe();
+
+        return () => supabase.removeChannel(sub);
+    }, [user, dbId]);
+
+    // --- MANUAL REFRESH HANDLER ---
+    const handleManualRefresh = async () => {
+        setSyncing(true);
+        await Promise.all([
+            fetchScheduledTests(),
+            fetchCompletedTests()
+        ]);
+        setTimeout(() => setSyncing(false), 500);
+    };
+
+    const handleTestCompletion = (testId) => {
+        setCompletedTestIds(prev => {
+            if (prev.includes(testId)) return prev;
+            return [...prev, testId];
+        });
+    };
 
     const triggerHaptic = (type) => {
         if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -237,10 +293,22 @@ export default function App() {
             let { data: profileData } = await supabase.from("profiles").select("*").eq("username", identifiedUser).single();
 
             if (profileData) {
-                setDbId(profileData.id); setMistakes(profileData.mistakes || {}); setHistory(profileData.history || []); setTotalTimeMap(profileData.subject_times || {}); setTotalQuestionsMap(profileData.question_counts || {}); setUser(identifiedUser);
+                setDbId(profileData.id); 
+                setMistakes(profileData.mistakes || {}); 
+                setHistory(profileData.history || []); 
+                setTotalTimeMap(profileData.subject_times || {}); 
+                setTotalQuestionsMap(profileData.question_counts || {}); 
+                setTestPracticeStats(profileData.test_practice_stats || {}); 
+                setUser(identifiedUser);
             } else {
-                const { data: newData } = await supabase.from("profiles").insert([{ username: identifiedUser, mistakes: {}, history: [], subject_times: {}, question_counts: {} }]).select().single();
-                setDbId(newData.id); setMistakes({}); setHistory([]); setTotalTimeMap({}); setTotalQuestionsMap({}); setUser(identifiedUser);
+                const { data: newData } = await supabase.from("profiles").insert([{ username: identifiedUser, mistakes: {}, history: [], subject_times: {}, question_counts: {}, test_practice_stats: {} }]).select().single();
+                setDbId(newData.id); 
+                setMistakes({}); 
+                setHistory([]); 
+                setTotalTimeMap({}); 
+                setTotalQuestionsMap({}); 
+                setTestPracticeStats({});
+                setUser(identifiedUser);
             }
             localStorage.setItem("quizio_user_code", enteredCode);
         } catch (err) { alert("Chyba přihlášení: " + err.message); } finally { setLoading(false); }
@@ -251,23 +319,40 @@ export default function App() {
         if (savedCode && !user && !loading) handleCloudLogin(savedCode);
     }, []);
 
-    const saveDataToCloud = async (newMistakes, newHistory, timeToAdd = 0, questionsToAdd = 0) => {
+    const saveDataToCloud = async (newMistakes, newHistory, timeToAdd = 0, questionsToAdd = 0, newTestStats = null) => {
         if (!dbId) return;
         setSyncing(true);
-        const updates = { mistakes: newMistakes !== undefined ? newMistakes : mistakes, history: newHistory !== undefined ? newHistory : history };
+
+        const updates = {};
+
+        if (newMistakes !== undefined) updates.mistakes = newMistakes;
+        if (newHistory !== undefined) updates.history = newHistory;
+
         if (timeToAdd > 0 && subject) {
             const currentSubjectTime = totalTimeMap[subject] || 0;
             const newSubjectTime = currentSubjectTime + timeToAdd;
             const newTimeMap = { ...totalTimeMap, [subject]: newSubjectTime };
-            updates.subject_times = newTimeMap; setTotalTimeMap(newTimeMap); setSessionTime(0); 
+            updates.subject_times = newTimeMap; 
+            setTotalTimeMap(newTimeMap); 
+            setSessionTime(0); 
         }
+
         if (questionsToAdd > 0 && subject) {
             const currentCount = totalQuestionsMap[subject] || 0;
             const newCount = currentCount + questionsToAdd;
             const newQMap = { ...totalQuestionsMap, [subject]: newCount };
-            updates.question_counts = newQMap; setTotalQuestionsMap(newQMap); setSessionQuestionsCount(0);
+            updates.question_counts = newQMap; 
+            setTotalQuestionsMap(newQMap); 
+            setSessionQuestionsCount(0);
         }
-        await supabase.from("profiles").update(updates).eq("id", dbId);
+
+        if (newTestStats !== null) {
+            updates.test_practice_stats = newTestStats;
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await supabase.from("profiles").update(updates).eq("id", dbId);
+        }
         setSyncing(false);
     };
 
@@ -281,10 +366,14 @@ export default function App() {
         if (!dbId) return;
         setSyncing(true); 
         try {
-            const { data: profileData, error } = await supabase.from("profiles").select("history, subject_times, question_counts, mistakes").eq("id", dbId).single();
+            const { data: profileData, error } = await supabase.from("profiles").select("history, subject_times, question_counts, mistakes, test_practice_stats").eq("id", dbId).single();
             if (error) throw error;
             if (profileData) {
-                setHistory(profileData.history || []); setTotalTimeMap(profileData.subject_times || {}); setTotalQuestionsMap(profileData.question_counts || {}); setMistakes(profileData.mistakes || {});
+                setHistory(profileData.history || []); 
+                setTotalTimeMap(profileData.subject_times || {}); 
+                setTotalQuestionsMap(profileData.question_counts || {}); 
+                setMistakes(profileData.mistakes || {});
+                setTestPracticeStats(profileData.test_practice_stats || {});
             }
         } catch (err) { console.error("Chyba při aktualizaci historie:", err); } finally { setSyncing(false); }
     };
@@ -292,13 +381,15 @@ export default function App() {
     const updateMistakes = (newValOrFn) => {
         setMistakes((prev) => {
             const next = typeof newValOrFn === "function" ? newValOrFn(prev) : newValOrFn;
-            saveDataToCloud(next, history); return next;
+            saveDataToCloud(next, history); 
+            return next;
         });
     };
     const updateHistory = (newValOrFn) => {
         setHistory((prev) => {
             const next = typeof newValOrFn === "function" ? newValOrFn(prev) : newValOrFn;
-            saveDataToCloud(mistakes, next); return next;
+            saveDataToCloud(mistakes, next); 
+            return next;
         });
     };
     const handleLogout = () => {
@@ -320,7 +411,7 @@ export default function App() {
     }, [isAfk]);
 
     useEffect(() => {
-        if (!mode || mode === 'review' || mode === 'history' || mode === 'admin' || mode === 'teacher_manager' || mode === 'scheduled_list' || mode === 'no_mistakes' || isSessionBlocked) return;
+        if (!mode || mode === 'review' || mode === 'history' || mode === 'admin' || mode === 'teacher_manager' || mode === 'scheduled_list' || mode === 'no_mistakes' || mode === 'real_test' || isSessionBlocked) return;
         const interval = setInterval(() => {
             const now = Date.now();
             if (now - lastActivityRef.current > 60000) { if (!isAfk) setIsAfk(true); } else { setSessionTime(prev => prev + 1); }
@@ -354,7 +445,8 @@ export default function App() {
             setIsLoadingQuestions(true);
             const minDelay = new Promise(resolve => setTimeout(resolve, 500));
             try {
-                const queryPromise = supabase.from("questions").select("*").eq("subject", subject).order("number", { ascending: true });
+                // ÚPRAVA: Přidán filtr .eq("is_active", true)
+                const queryPromise = supabase.from("questions").select("*").eq("subject", subject).eq("is_active", true).order("number", { ascending: true });
                 const [_, result] = await Promise.all([minDelay, queryPromise]);
                 const { data, error } = result;
                 if (error) throw error;
@@ -377,29 +469,30 @@ export default function App() {
         setQuestionSet(shuffled); setMode("test_practice"); setActiveTest(test); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setCombo(0);
     };
 
-    const startGradedTest = (test) => {
+    const startGradedTest = async (test) => {
         const now = new Date();
+        // Pokud nejsou data (null), považujeme test za "připravuje se" a nelze spustit.
+        if (!test.open_at || !test.close_at) {
+            alert("Tento test nemá stanovený termín a nelze jej spustit.");
+            return;
+        }
+
         if (now < new Date(test.open_at)) { alert("Test ještě není otevřen."); return; }
         if (now > new Date(test.close_at)) { alert("Test je již uzavřen."); return; }
+
+        if (completedTestIds.includes(test.id)) {
+            alert("Tento test jste již vypracovali a odevzdali.");
+            return;
+        }
+
         if (!confirm(`Spustit test "${test.title}"? \n\n⚠️ POZOR: Opuštění okna se zaznamenává!`)) return;
+
         const pool = activeQuestionsCache.filter(q => q.number >= test.topic_range_start && q.number <= test.topic_range_end);
         const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, test.question_count).map((q, idx) => ({ ...q, _localIndex: idx }));
-        setQuestionSet(shuffled); setMode("real_test"); setActiveTest(test); setCurrentIndex(0); setTimeLeft(test.time_limit * 60); setFinished(false); setCheatScore(0); setSelectedAnswer(null);
-        try { document.documentElement.requestFullscreen().catch(e => console.log(e)); } catch(e){}
-    };
 
-    const submitGradedTest = async () => {
-        if (!activeTest) return;
-        const qEval = questionSet;
-        const cor = qEval.filter((q) => q.userAnswer === q.correctIndex).length;
-        const finalScore = { correct: cor, total: qEval.length };
-        const answersToSave = questionSet.map(q => ({ qNum: q.number, user: q.userAnswer, correct: q.correctIndex }));
-        setLoading(true);
-        await supabase.from('test_results').insert([{ test_id: activeTest.id, student_name: user, user_id: dbId, score_correct: cor, score_total: qEval.length, answers: answersToSave, time_spent: (activeTest.time_limit * 60) - timeLeft, cheat_score: cheatScore }]);
-        setLoading(false);
-        setScore(finalScore); setFinished(true);
-        try { document.exitFullscreen().catch(e=>console.log(e)); } catch(e){}
-        alert("Test odeslán! Výsledek uložen.");
+        setQuestionSet(shuffled); 
+        setActiveTest(test); 
+        setMode("real_test"); 
     };
 
     // --- MODES START ---
@@ -450,10 +543,7 @@ export default function App() {
     const handleAnswer = (idx) => {
         if (finished || mode === "review") return;
         setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active");
-        if (mode === 'real_test') {
-            setQuestionSet((prev) => { const c = [...prev]; if (c[currentIndex]) c[currentIndex] = { ...c[currentIndex], userAnswer: idx }; return c; });
-            setTimeout(() => { if (currentIndex < questionSet.length - 1) moveToQuestion(currentIndex + 1); }, 200); return;
-        }
+
         setQuestionSet((prev) => { const c = [...prev]; if (c[currentIndex]) c[currentIndex] = { ...c[currentIndex], userAnswer: idx }; return c; });
         if (idx !== questionSet[currentIndex].correctIndex) { triggerHaptic('error'); addMistake(questionSet[currentIndex].number); } else { triggerHaptic('success'); triggerFakeSync(); }
     };
@@ -465,6 +555,18 @@ export default function App() {
         const newSet = [...questionSet];
         if (newSet[currentIndex]) newSet[currentIndex] = { ...newSet[currentIndex], userAnswer: idx };
         setQuestionSet(newSet); setSelectedAnswer(idx); setShowResult(true); setSessionQuestionsCount(prev => prev + 1);
+
+        if (mode === 'test_practice' && activeTest) {
+            setTestPracticeStats(prev => {
+                const currentStats = prev[activeTest.id] || [];
+                const newStats = [...currentStats, isCorrect].slice(-20);
+                const updated = { ...prev, [activeTest.id]: newStats };
+                // Voláme save s undefined pro mistakes/history, aby se nepřepsaly
+                saveDataToCloud(undefined, undefined, 0, 0, updated);
+                return updated;
+            });
+        }
+
         if (isCorrect) {
             triggerHaptic('success'); setScore((s) => ({ correct: s.correct + 1, total: s.total + 1 })); setCombo((c) => c + 1);
             if (mode === "mistakes") removeMistake(currentQ.number); else triggerFakeSync();
@@ -498,6 +600,7 @@ export default function App() {
         const b = Math.max(0, Math.min(newIdx, questionSet.length - 1));
         if (b < currentIndex) setDirection("left"); else setDirection("right");
         setCurrentIndex(b);
+        setSelectedAnswer(null);
     };
 
     const handleSwipe = (dir) => {
@@ -546,7 +649,7 @@ export default function App() {
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "f", "F"].includes(e.key)) e.preventDefault();
             if (showConfirmExit || showConfirmSubmit || showSmartSettings || showClearMistakesConfirm || recordToDelete || reportModalOpen) return;
 
-            if (mode && mode !== "review" && mode !== "admin" && mode !== "scheduled_list" && mode !== "teacher_manager") {
+            if (mode && mode !== "review" && mode !== "admin" && mode !== "scheduled_list" && mode !== "teacher_manager" && mode !== "real_test") {
                 const currentQ = questionSet[currentIndex];
                 const imageUrl = currentQ ? getImageUrl(subject, currentQ.number) : null;
                 if (e.key === "f" || e.key === "F") { if (fullscreenImage) setFullscreenImage(null); else if (imageUrl) setFullscreenImage(imageUrl); return; }
@@ -584,24 +687,28 @@ export default function App() {
                 } else if (k === "a" || k === "arrowleft" || k === "backspace") { if (subject) setSubject(null); }
                 return;
             }
-            if (!mode) return;
+            if (!mode || mode === 'real_test') return; // V real_test si klávesnici řídí komponenta sama
             const opts = questionSet[currentIndex]?.options?.length || 4;
+
+            const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
+
             if (e.key === "w" || e.key === "ArrowUp") {
-                if (isFlashcardStyle(mode) && !showResult) selectRandomAnswer(selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts);
-                else if (!isFlashcardStyle(mode)) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? opts - 1 : (questionSet[currentIndex].userAnswer - 1 + opts) % opts);
+                if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts);
+                else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? opts - 1 : (questionSet[currentIndex].userAnswer - 1 + opts) % opts);
             }
             if (e.key === "s" || e.key === "ArrowDown") {
-                if (isFlashcardStyle(mode) && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
-                else if (!isFlashcardStyle(mode)) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? 0 : (questionSet[currentIndex].userAnswer + 1) % opts);
+                if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
+                else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? 0 : (questionSet[currentIndex].userAnswer + 1) % opts);
             }
             if (e.key === "a" || e.key === "ArrowLeft") {
-                if (isFlashcardStyle(mode) && showResult) nextFlashcardQuestion(); else moveToQuestion(currentIndex - 1);
+                if (isFlashcardInput) return; // Změna: Vypnuto pro flashcards/practice
+                moveToQuestion(currentIndex - 1);
             }
             if (e.key === "d" || e.key === "ArrowRight" || e.key === "Enter") {
-                if (isFlashcardStyle(mode)) { if (showResult) nextFlashcardQuestion(); else confirmFlashcardAnswer(); } else moveToQuestion(currentIndex + 1);
+                if (isFlashcardInput) { if (showResult) nextFlashcardQuestion(); else confirmFlashcardAnswer(); } else moveToQuestion(currentIndex + 1);
             }
             if (e.key === " ") {
-                if (isFlashcardStyle(mode) && !showResult) confirmFlashcardAnswer();
+                if (isFlashcardInput && !showResult) confirmFlashcardAnswer();
                 else if (!finished && mode === "mock") setShowConfirmSubmit(true); 
             }
             if (e.key === "Backspace") clearAnswer();
@@ -609,19 +716,19 @@ export default function App() {
         };
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [mode, questionSet, currentIndex, showResult, selectedAnswer, showConfirmSubmit, showConfirmExit, finished, menuSelection, subject, user, fullscreenImage, reportModalOpen, isSessionBlocked]);
+    }, [mode, questionSet, currentIndex, showResult, selectedAnswer, showConfirmSubmit, showConfirmExit, finished, menuSelection, subject, user, fullscreenImage, reportModalOpen, isSessionBlocked, testToStart]);
 
     useEffect(() => {
         if (finished || (mode !== "mock" && mode !== "smart" && mode !== "mistakes")) return;
         const interval = setInterval(() => {
-            if (mode === "mock" || mode === "real_test") setTimeLeft((p) => Math.max(0, p - 1));
+            if (mode === "mock") setTimeLeft((p) => Math.max(0, p - 1)); // REAL TEST UŽ MÁ VLASTNÍ TIMER
             else setTrainingTime((t) => t + 1);
         }, 1000);
         return () => clearInterval(interval);
     }, [mode, finished]);
     useEffect(() => {
-        if ((mode === "mock" || mode === "real_test") && timeLeft === 0 && !finished) {
-            if (mode === 'real_test') submitGradedTest(); else submitTest();
+        if ((mode === "mock") && timeLeft === 0 && !finished) {
+            submitTest();
         }
     }, [timeLeft, mode, finished]);
 
@@ -644,16 +751,63 @@ export default function App() {
 
     if (mode === 'scheduled_list') {
         return (
-            <ScheduledTestsList 
-                scheduledTests={scheduledTests}
-                onBack={() => setMode(null)}
-                subject={subject}
+            <>
+                <ScheduledTestsList 
+                    scheduledTests={scheduledTests}
+                    onBack={() => setMode(null)}
+                    subject={subject}
+                    user={user}
+                    syncing={syncing}
+                    theme={theme}
+                    toggleTheme={toggleTheme}
+                    onStartGradedTest={startGradedTest}
+                    onStartPractice={startTestPractice}
+                    completedTestIds={completedTestIds}
+                    testPracticeStats={testPracticeStats}
+                    onRefresh={handleManualRefresh}
+                />
+
+                {/* Modal pro potvrzení spuštění testu */}
+                {testToStart && (
+                    <ConfirmModal 
+                        title={`Spustit test "${testToStart.title}"?`}
+                        message={
+                            <div style={{ textAlign: 'left' }}>
+                                <p style={{ marginBottom: '1rem' }}>Chystáte se spustit ostrý test.</p>
+                                <ul style={{ paddingLeft: '1.2rem', color: 'var(--color-text-secondary)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                                    <li>Do testu lze vstoupit <strong>pouze jednou</strong>.</li>
+                                    <li>Jakmile test spustíte, začne běžet časový limit ({testToStart.time_limit} min).</li>
+                                    <li>Test nelze přerušit ani se k němu vrátit později.</li>
+                                    <li>Ujistěte se, že máte stabilní připojení k internetu.</li>
+                                </ul>
+                            </div>
+                        }
+                        onCancel={() => setTestToStart(null)} 
+                        onConfirm={confirmStartTest} 
+                        confirmText="Spustit test" 
+                        danger={false}
+                    />
+                )}
+            </>
+        );
+    }
+
+    if (mode === 'real_test') {
+        return (
+            <RealTestMode
+                test={activeTest}
+                initialQuestions={questionSet}
                 user={user}
-                syncing={syncing}
-                theme={theme}
-                toggleTheme={toggleTheme}
-                onStartGradedTest={startGradedTest}
-                onStartPractice={startTestPractice}
+                userId={dbId}
+                onExit={() => setMode(null)}
+                onFinish={() => {
+                    setMode(null); // nebo přesměrovat na nějakou "děkujeme" obrazovku
+                }}
+                theme={theme} 
+                toggleTheme={toggleTheme} 
+                syncing={syncing} 
+                onReport={handleReportClick}
+                onTestCompleted={handleTestCompletion}
             />
         );
     }
@@ -664,7 +818,15 @@ export default function App() {
                 {!isLoadingQuestions && (
                     <div className="top-navbar">
                         <div className="navbar-group">
-                            <button className="menuBackButton" onClick={() => { flushSessionStats(); setSubject(null); }}>← <span className="mobile-hide-text">Změnit předmět</span></button>
+                            {user === 'admin' && (
+                                <button 
+                                    className="menuBackButton" 
+                                    onClick={handleAdminTools}
+                                    title="Admin Panel"
+                                >
+                                    🛠️ Admin
+                                </button>
+                            )}
                             <SubjectBadge subject={subject} compact />
                         </div>
                         <div className="navbar-group">
@@ -728,6 +890,7 @@ export default function App() {
                     ) : (
                         <MainMenu
                             scheduledTests={scheduledTests}
+                            completedTestIds={completedTestIds} // PŘEDÁVÁME SEZNAM HOTOVÝCH
                             menuSelection={menuSelection}
                             isKeyboardMode={isKeyboardMode}
                             isTeacher={isTeacher}
@@ -844,7 +1007,7 @@ export default function App() {
             })()}
 
             <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
-                {showConfirmSubmit && <ConfirmModal title={mode==='real_test'?"Odevzdat test?":"Odevzdat?"} message={mode==='real_test'?"Po odevzdání už nepůjde odpovědi změnit.":"Opravdu odevzdat?"} onCancel={() => setShowConfirmSubmit(false)} onConfirm={mode==='real_test'?submitGradedTest:submitTest} confirmText={mode==='real_test'?"ODEVZDAT":"Ano"} danger={mode==='real_test'} />}
+                {showConfirmSubmit && <ConfirmModal title={mode==='real_test'?"Odevzdat test?":"Odevzdat?"} message={mode==='real_test'?"Po odevzdání už nepůjde odpovědi změnit.":"Opravdu odevzdat?"} onCancel={() => setShowConfirmSubmit(false)} onConfirm={mode==='real_test'?()=>{}:submitTest} confirmText={mode==='real_test'?"ODEVZDAT":"Ano"} danger={mode==='real_test'} />}
                 {showConfirmExit && <ConfirmModal title="Ukončit?" message="Ztracené odpovědi nebudou uloženy." onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Ukončit" />}
 
                 {finished && (
@@ -861,7 +1024,7 @@ export default function App() {
                                 <div className="mobile-hidden"><SubjectBadge subject={subject} compact /></div>
                             </div>
                             <div className="navbar-group">
-                                {(mode === "mock" || mode === "real_test") && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
+                                {(mode === "mock") && <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>{formatTime(timeLeft)}</div>}
                                 {(mode === "training" || mode === "smart" || mode === "mistakes") && <div className="timer">{formatTime(trainingTime)}</div>}
                                 <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile={true} />
                                 <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
@@ -873,10 +1036,56 @@ export default function App() {
                             </h1>
 
                             {isFlashcardStyle(mode) || mode === 'test_practice' ? (
-                                <div className={`flashcardHeader ${comboClass}`}>
-                                    <div className="statItem"><span className="statLabel">Zbývá</span><span className="statValue">{questionSet.length}</span></div>
-                                    <div className="statItem"><span className="statLabel">Úspěšnost</span><span className="statValue">{score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0}%</span></div>
-                                    {combo >= 3 && <div className="comboContainer"><div className="comboFlame">🔥</div><div className="comboCount">{combo}x</div></div>}
+                                <div className={`flashcardHeader ${comboClass}`} 
+                                    // ODSTRANĚNY INLINE STYLY PRO POZICI A ZAROVNÁNÍ
+                                >
+
+                                    {/* ZMĚNA: Zobrazujeme pouze pokud to není test_practice */}
+                                    {mode !== 'test_practice' && (
+                                        <div className="statItem">
+                                            <span className="statLabel">
+                                                {/* Pokud je random, ukazujeme "Zodpovězeno", jinak "Zbývá" */}
+                                                {mode === "random" ? "Zodpovězeno" : "Zbývá"}
+                                            </span>
+                                            <span className="statValue">
+                                                {(() => {
+                                                    if (mode === "random") {
+                                                        // V režimu Random se jen posouváme, takže currentIndex = počet zodpovězených
+                                                        return currentIndex;
+                                                    }
+                                                    // Pro smart/mistakes (ubývající)
+                                                    return questionSet.length - 1;
+                                                })()}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {/* COMBO (pokud je) */}
+                                    {combo >= 3 && (
+                                        <div 
+                                            className="comboContainer" 
+                                            // ODSTRANĚNY INLINE STYLY PRO ABSOLUTNÍ POZICI (je v CSS)
+                                        >
+                                            <div className="comboFlame">🔥</div>
+                                            <div className="comboCount">{combo}x</div>
+                                        </div>
+                                    )}
+
+                                    {/* PRAVÁ STRANA: ÚSPĚŠNOST */}
+                                    <div className="statItem" style={{ textAlign: 'right', marginLeft: 'auto' }}>
+                                        <span className="statLabel">Úspěšnost</span>
+                                        <span className="statValue">
+                                            {mode === 'test_practice' && activeTest ? (() => {
+                                                const stats = testPracticeStats[activeTest.id] || [];
+                                                if (stats.length === 0) return "0%";
+                                                const correct = stats.filter(Boolean).length;
+                                                return Math.round((correct / stats.length) * 100) + "%";
+                                            })() : (
+                                                (score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0) + "%"
+                                            )}
+                                        </span>
+                                    </div>
+
                                 </div>
                             ) : (
                                 <>
@@ -914,7 +1123,7 @@ export default function App() {
                                         </div>
                                         <div className="navigatorPlaceholder">
                                             <Navigator questionSet={questionSet} currentIndex={currentIndex} setCurrentIndex={moveToQuestion} mode={mode} maxSeenIndex={mode === 'real_test' ? questionSet.length : maxSeenIndex} />
-                                            {(mode === "mock" || mode === "real_test") && (
+                                            {(mode === "mock") && (
                                                 <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center" }}>
                                                     <button className="navButton primary" style={{ padding: "10px 30px", fontSize: "0.95rem", minWidth: "150px" }} onClick={() => setShowConfirmSubmit(true)}>Odevzdat test</button>
                                                 </div>

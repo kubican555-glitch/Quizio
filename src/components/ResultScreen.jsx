@@ -3,6 +3,7 @@ import { SubjectBadge } from './SubjectBadge';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 import { formatTime } from '../utils/formatting';
 import { getImageUrl } from '../utils/images';
+import { HighlightedText } from './HighlightedText';
 
 export const ResultScreen = ({
     mode,
@@ -16,9 +17,60 @@ export const ResultScreen = ({
     onZoom,
     user,
     syncing,
-    onReport // NOVÁ PROP
+    onReport
 }) => {
-    // Určíme, které otázky zobrazit
+    if (mode === 'real_test') {
+        const percentage = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+
+        let scoreColor = '#3b82f6';
+        if (percentage >= 85) scoreColor = '#22c55e';
+        else if (percentage >= 50) scoreColor = '#fbbf24';
+        else scoreColor = '#ef4444';
+
+        const circleStyle = {
+            background: `conic-gradient(${scoreColor} ${percentage * 3.6}deg, rgba(255,255,255,0.1) 0deg)`
+        };
+
+        return (
+            <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="resultScreen" style={{ maxWidth: '600px', width: '100%', marginTop: 0 }}>
+                    <h1 className="title" style={{ marginBottom: '2rem' }}>Výsledek testu</h1>
+
+                    <div className="score-circle-container" style={circleStyle}>
+                        <div className="score-circle-inner">
+                            <span className="score-percentage" style={{ color: scoreColor }}>{percentage}%</span>
+                            <span className="score-fraction">{score.correct} / {score.total}</span>
+                        </div>
+                    </div>
+
+                    <div style={{ 
+                        marginTop: '2rem', 
+                        padding: '1.5rem', 
+                        background: 'var(--color-card-bg)', 
+                        border: '1px solid var(--color-card-border)', 
+                        borderRadius: '16px',
+                        textAlign: 'center'
+                    }}>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '1rem', fontWeight: 'bold' }}>
+                            Test byl úspěšně odeslán.
+                        </p>
+                        <p style={{ color: 'var(--color-text-secondary)' }}>
+                            Zbývající čas: <strong>{formatTime(timeLeftAtSubmit || 0)}</strong>
+                        </p>
+                    </div>
+
+                    <button 
+                        className="navButton primary" 
+                        onClick={onBack} 
+                        style={{ width: '100%', marginTop: '2rem', padding: '1rem' }}
+                    >
+                        Zpět do menu
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     const list =
         mode === "training"
             ? questionSet.slice(0, maxSeenIndex + 1)
@@ -123,7 +175,9 @@ export const ResultScreen = ({
 
                 <div className="reviewList">
                     {list.map((q, i) => {
-                        const imageUrl = getImageUrl(currentSubject, q.number);
+                        // ÚPRAVA: Priorita Base64 obrázku
+                        const displayImage = q.image_base64 || getImageUrl(currentSubject, q.number);
+
                         const isCorrect = q.userAnswer === q.correctIndex;
                         const isUnanswered = q.userAnswer === undefined;
 
@@ -157,8 +211,6 @@ export const ResultScreen = ({
                                         <div style={{ flex: 1 }}>
                                             <span className="review-number">
                                                 Otázka {i + 1} <span style={{ opacity: 0.7, fontWeight: 'normal' }}>(#{q.number})</span>
-
-                                                {/* Tlačítko nahlášení v seznamu */}
                                                 <button
                                                     onClick={() => onReport(q.number)}
                                                     className="report-btn-inline"
@@ -177,23 +229,26 @@ export const ResultScreen = ({
                                                     🏳️
                                                 </button>
                                             </span>
-                                            <div className="review-question-text">{q.question}</div>
+                                            <div className="review-question-text">
+                                                <HighlightedText text={q.question} />
+                                            </div>
                                         </div>
                                         <div className="review-status-icon" style={{ color: statusColor }}>
                                             {statusIcon}
                                         </div>
                                     </div>
 
-                                    {imageUrl && (
+                                    {displayImage && (
                                         <div
                                             className="imageWrapper small"
-                                            onClick={() => onZoom(imageUrl)}
+                                            onClick={() => onZoom(displayImage)}
                                             style={{ marginBottom: '1rem' }}
                                         >
                                             <img
-                                                src={imageUrl}
+                                                src={displayImage}
                                                 alt=""
                                                 className="questionImage small"
+                                                loading="lazy"
                                             />
                                         </div>
                                     )}
@@ -202,7 +257,7 @@ export const ResultScreen = ({
                                         <div className="review-answer-row">
                                             <span className="label-correct">Správně:</span>
                                             <span className="text-val highlight">
-                                                {q.options[q.correctIndex]}
+                                                <HighlightedText text={q.options[q.correctIndex]} />
                                             </span>
                                         </div>
 
@@ -213,7 +268,7 @@ export const ResultScreen = ({
                                                     {isUnanswered ? (
                                                         <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Neodpovězeno</span>
                                                     ) : (
-                                                        q.options[q.userAnswer]
+                                                        <HighlightedText text={q.options[q.userAnswer]} />
                                                     )}
                                                 </span>
                                             </div>

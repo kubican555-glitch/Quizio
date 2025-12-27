@@ -1,7 +1,10 @@
 import React, { useRef, useEffect } from 'react';
-import { getImageUrl } from '../utils/images';
 import { isFlashcardStyle } from '../utils/formatting';
 
+/**
+ * QuestionCard - Komponenta pro zobrazení jedné otázky
+ * Verze: EXKLUZIVNĚ PRO DATABÁZOVÉ OBRÁZKY (Base64)
+ */
 export function QuestionCard({
     currentQuestion,
     mode,
@@ -15,7 +18,8 @@ export function QuestionCard({
     onSwipe,
     score,
     onReport,
-    isExiting 
+    isExiting,
+    optionRefsForCurrent 
 }) {
     if (!currentQuestion || !currentQuestion.options)
         return (
@@ -24,18 +28,28 @@ export function QuestionCard({
             </div>
         );
 
-    const imageUrl = getImageUrl(currentSubject, currentQuestion.number);
-    const isFlashcard = isFlashcardStyle(mode);
+    // --- VÝBĚR OBRÁZKU ---
+    // Nyní bereme POUZE obrázek z databáze (Base64). 
+    // Žádný fallback na lokální public složku už neexistuje.
+    const displayImage = currentQuestion.image_base64;
 
-    // Reference pro hlavní kontejner karty
+    const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
     const cardContainerRef = useRef(null);
-
-    // Ukládáme souřadnice pro výpočet směru
     const touchStart = useRef({ x: 0, y: 0 });
     const touchCurrent = useRef({ x: 0, y: 0 });
     const minSwipeDistance = 50;
 
-    // Připojení non-passive event listeneru pro plynulejší swipe bez scrollu
+    // Scroll na vybranou odpověď (pro klávesnici)
+    useEffect(() => {
+        if (selectedAnswer !== null && optionRefsForCurrent && optionRefsForCurrent.current && optionRefsForCurrent.current[selectedAnswer]) {
+            optionRefsForCurrent.current[selectedAnswer].scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+            });
+        }
+    }, [selectedAnswer, optionRefsForCurrent]);
+
+    // Touch eventy pro swipe gesta
     useEffect(() => {
         const element = cardContainerRef.current;
         if (!element) return;
@@ -50,23 +64,18 @@ export function QuestionCard({
 
         const handleTouchMove = (e) => {
             if (!touchStart.current.x) return;
-
             const clientX = e.targetTouches[0].clientX;
             const clientY = e.targetTouches[0].clientY;
-
             touchCurrent.current = { x: clientX, y: clientY };
 
             const diffX = Math.abs(clientX - touchStart.current.x);
             const diffY = Math.abs(clientY - touchStart.current.y);
 
-            // Pokud je pohyb více horizontální než vertikální a větší než malý práh,
-            // zablokujeme scrollování stránky
             if (diffX > diffY && diffX > 10) {
                 if (e.cancelable) e.preventDefault();
             }
         };
 
-        // passive: false je klíčové pro fungování e.preventDefault()
         element.addEventListener('touchstart', handleTouchStart, { passive: true });
         element.addEventListener('touchmove', handleTouchMove, { passive: false });
 
@@ -76,30 +85,24 @@ export function QuestionCard({
         };
     }, []);
 
-    // Vyhodnocení gesta na konci dotyku
     const handleTouchEnd = () => {
         if (!touchStart.current.x) return;
-
         const distanceX = touchCurrent.current.x - touchStart.current.x;
         const distanceY = touchCurrent.current.y - touchStart.current.y;
-
-        // Reset
         touchStart.current = { x: 0, y: 0 };
 
-        // Pokud byl pohyb spíše vertikální, ignorujeme (byl to scroll)
         if (Math.abs(distanceY) > Math.abs(distanceX)) return;
 
-        if (distanceX > minSwipeDistance) onSwipe("right"); // Swipe doprava (předchozí)
-        else if (distanceX < -minSwipeDistance) onSwipe("left"); // Swipe doleva (další)
+        if (distanceX > minSwipeDistance) onSwipe("right");
+        else if (distanceX < -minSwipeDistance) onSwipe("left");
     };
 
     return (
         <div
             ref={cardContainerRef}
-            style={{ position: 'relative', touchAction: 'pan-y' }} // pan-y je fallback
+            style={{ position: 'relative', touchAction: 'pan-y' }}
             onTouchEnd={handleTouchEnd}
         >
-            {/* Tlačítko nahlášení - jen pro Flashcards po zobrazení výsledku */}
             {isFlashcard && showResult && !isExiting && (
                 <button
                     onClick={(e) => {
@@ -107,14 +110,15 @@ export function QuestionCard({
                         onReport(currentQuestion.number);
                     }}
                     title="Nahlásit chybu"
+                    className="report-btn-flash"
                     style={{
                         position: 'absolute',
-                        top: '-15px',    
-                        right: '-15px',  
+                        top: '-15px',     
+                        right: '-15px',   
                         background: 'transparent',
                         border: 'none',
                         padding: 0,
-                        width: '40px',   
+                        width: '40px',    
                         height: '40px',
                         display: 'flex',
                         alignItems: 'center',
@@ -125,8 +129,6 @@ export function QuestionCard({
                         opacity: 0.9,
                         transition: 'opacity 0.2s'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = 1}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = 0.9}
                 >
                     🏳️
                 </button>
@@ -137,19 +139,23 @@ export function QuestionCard({
                     {isFlashcard && `#${currentQuestion.number} `}
                     {currentQuestion.question}
                 </h2>
-                {imageUrl && (
+
+                {/* Zobrazení obrázku z DB (Base64) */}
+                {displayImage && (
                     <div
                         className="imageWrapper"
-                        onClick={() => onZoom(imageUrl)}
+                        onClick={() => onZoom(displayImage)}
                     >
                         <img
-                            src={imageUrl}
+                            src={displayImage}
                             alt="Otázka"
                             className="questionImage"
+                            decoding="async"
                         />
                     </div>
                 )}
             </div>
+
             <div className="options">
                 {(currentQuestion.options || []).map((opt, i) => {
                     let style = {};
@@ -160,17 +166,14 @@ export function QuestionCard({
                                 background: "rgba(34,197,94,0.35)",
                                 borderColor: "#22c55e",
                             };
-                        if (
-                            selectedAnswer === i &&
-                            i !== currentQuestion.correctIndex
-                        )
+                        if (selectedAnswer === i && i !== currentQuestion.correctIndex)
                             style = {
                                 background: "rgba(239,68,68,0.35)",
                                 borderColor: "#ef4444",
                             };
                     } 
                     else if (
-                        ((mode === "mock" || mode === "training") && currentQuestion.userAnswer === i) ||
+                        ((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === i) ||
                         (isFlashcard && selectedAnswer === i && !showResult)
                     ) {
                         style = {
@@ -182,6 +185,11 @@ export function QuestionCard({
                     return (
                         <button
                             key={i}
+                            ref={(el) => {
+                                if (optionRefsForCurrent && optionRefsForCurrent.current) {
+                                    optionRefsForCurrent.current[i] = el;
+                                }
+                            }}
                             className="optionButton"
                             style={style}
                             onClick={() => !disabled && onSelect(i)}

@@ -2,6 +2,7 @@ import React from "react";
 
 export const MainMenu = ({
     scheduledTests,
+    completedTestIds = [], // Defaultní hodnota pro jistotu
     menuSelection,
     isKeyboardMode,
     isTeacher,
@@ -16,12 +17,24 @@ export const MainMenu = ({
     onClearMistakes,
     onOpenHistory
 }) => {
+
+    // Filtrujeme aktivní testy: musí být otevřené A ZÁROVEŇ nesmí být hotové
+    // Slouží pro Badge (červené číslo)
+    const activeTestsCount = scheduledTests.filter(test => {
+        const now = new Date();
+        const isOpen = now >= new Date(test.open_at) && now <= new Date(test.close_at);
+        const isCompleted = completedTestIds.includes(test.id);
+        return isOpen && !isCompleted; 
+    }).length;
+
     return (
         <div className="menuColumn" style={{ maxWidth: '600px' }}>
-            {/* Rychlé upozornění nahoře */}
+            {/* Rychlé upozornění nahoře - ZMĚNA: Kontrola isCompleted */}
             {scheduledTests.some(t => {
                 const now = new Date();
-                return now >= new Date(t.open_at) && now <= new Date(t.close_at);
+                const isOpen = now >= new Date(t.open_at) && now <= new Date(t.close_at);
+                const isCompleted = completedTestIds.includes(t.id);
+                return isOpen && !isCompleted; // Zobrazit jen pokud NENÍ hotovo
             }) && (
                 <div className="alert-box" style={{marginBottom: '1rem', cursor: 'pointer'}} onClick={onOpenScheduled}>
                     🔔 Máš aktivní písemku! Klikni zde pro otevření.
@@ -36,11 +49,20 @@ export const MainMenu = ({
             </button>
 
             <div className="menuColumn" style={{ marginTop: '0', maxWidth: '600px' }}>
-                <button className={`menuButton list-style ${menuSelection % 8 === 1 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenScheduled}>
-                    <span className="list-icon">🗓️</span>
-                    <div style={{ flexGrow: 1, textAlign: 'left' }}><span style={{ display: 'block', fontWeight: 600 }}>Plánované testy</span><small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Písemky a úkoly zadané učitelem.</small></div>
-                    {scheduledTests.length > 0 && <span className="badge">{scheduledTests.length}</span>}
-                </button>
+
+                {/* ZMĚNA: Tlačítko se zobrazí pouze pokud existuje alespoň jeden test (scheduledTests.length > 0).
+                    Odstraněno "|| isTeacher", protože učitel má své vlastní tlačítko níže. */}
+                {scheduledTests.length > 0 && (
+                    <button className={`menuButton list-style ${menuSelection % 8 === 1 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenScheduled}>
+                        <span className="list-icon">🗓️</span>
+                        <div style={{ flexGrow: 1, textAlign: 'left' }}>
+                            <span style={{ display: 'block', fontWeight: 600 }}>Plánované testy</span>
+                            <small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Písemky a úkoly zadané učitelem.</small>
+                        </div>
+                        {/* Badge zobrazuje počet aktivních NEHOTOVÝCH testů */}
+                        {activeTestsCount > 0 && <span className="badge">{activeTestsCount}</span>}
+                    </button>
+                )}
 
                 <button className={`menuButton list-style ${menuSelection % 8 === 2 && isKeyboardMode ? "selected" : ""}`} onClick={onStartSmart}>
                     <span className="list-icon">🎓</span>
@@ -56,24 +78,27 @@ export const MainMenu = ({
                     <div style={{ flexGrow: 1, textAlign: 'left' }}><span style={{ display: 'block', fontWeight: 600 }}>Prohlížení otázek</span><small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Vyhledávání a kontrola všech otázek v přehledném gridu.</small></div>
                 </button>
 
-                <button 
-                    className={`menuButton list-style ${menuSelection % 8 === 5 && isKeyboardMode ? "selected" : ""}`} 
-                    onClick={onOpenTeacherManager} 
-                    style={{ 
-                        marginTop: '0.5rem', 
-                        borderColor: 'var(--color-primary)',
-                        background: isTeacher ? 'rgba(59, 130, 246, 0.1)' : 'var(--color-bg-container)',
-                        display: isTeacher ? 'flex' : 'none'
-                    }}
-                >
-                    <span className="list-icon">👨‍🏫</span>
-                    <div style={{ flexGrow: 1, textAlign: 'left' }}>
-                        <span style={{ display: 'block', fontWeight: 600 }}>Správa testů</span>
-                        <small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>
-                            Plánování písemek a přehled výsledků.
-                        </small>
-                    </div>
-                </button>
+                {/* Tlačítko pro správu testů - vidí ho jen učitel */}
+                {isTeacher && (
+                    <button 
+                        className={`menuButton list-style ${menuSelection % 8 === 5 && isKeyboardMode ? "selected" : ""}`} 
+                        onClick={onOpenTeacherManager} 
+                        style={{ 
+                            marginTop: '0.5rem', 
+                            borderColor: 'var(--color-primary)',
+                            background: 'rgba(59, 130, 246, 0.1)',
+                            display: 'flex'
+                        }}
+                    >
+                        <span className="list-icon">👨‍🏫</span>
+                        <div style={{ flexGrow: 1, textAlign: 'left' }}>
+                            <span style={{ display: 'block', fontWeight: 600 }}>Správa testů</span>
+                            <small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>
+                                Plánování písemek a přehled výsledků.
+                            </small>
+                        </div>
+                    </button>
+                )}
 
                 <button className={`menuButton list-style danger-style ${menuSelection % 8 === 6 && isKeyboardMode ? "selected" : ""}`} onClick={onStartMistakes} style={{ marginTop: '1.5rem' }}>
                     <span className="list-icon">🚑</span>
