@@ -1,9 +1,62 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SubjectBadge } from './SubjectBadge';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 import { formatTime } from '../utils/formatting';
+// getImageUrl už nebude primárně potřeba, ale necháme ho jako fallback
 import { getImageUrl } from '../utils/images';
 import { HighlightedText } from './HighlightedText';
+import { fetchQuestionImage } from '../utils/dataManager';
+
+// Pomocná komponenta pro asynchronní načítání obrázku ve výsledcích
+const ResultImage = ({ question, subject, onZoom }) => {
+    const [imageSrc, setImageSrc] = useState(question.image_base64 || null);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const load = async () => {
+            // Pokud už máme base64, nic neděláme
+            if (question.image_base64) return;
+
+            if (question.id) {
+                try {
+                    const img = await fetchQuestionImage(question.id);
+                    if (isMounted && img) {
+                        setImageSrc(img);
+                    } else if (isMounted) {
+                        // Fallback na starý systém, pokud fetch selže nebo nic nevrátí
+                        // (pro případ, že obrázky jsou lokálně v public složce)
+                        const fallbackUrl = getImageUrl(subject, question.number);
+                        if (fallbackUrl) setImageSrc(fallbackUrl);
+                    }
+                } catch (e) {
+                    console.error("Chyba načítání obrázku ve výsledcích:", e);
+                }
+            }
+        };
+
+        load();
+
+        return () => { isMounted = false; };
+    }, [question, subject]);
+
+    if (!imageSrc) return null;
+
+    return (
+        <div
+            className="imageWrapper small"
+            onClick={() => onZoom(imageSrc)}
+            style={{ marginBottom: '1rem' }}
+        >
+            <img
+                src={imageSrc}
+                alt=""
+                className="questionImage small"
+                loading="lazy"
+            />
+        </div>
+    );
+};
 
 export const ResultScreen = ({
     mode,
@@ -175,9 +228,6 @@ export const ResultScreen = ({
 
                 <div className="reviewList">
                     {list.map((q, i) => {
-                        // ÚPRAVA: Priorita Base64 obrázku
-                        const displayImage = q.image_base64 || getImageUrl(currentSubject, q.number);
-
                         const isCorrect = q.userAnswer === q.correctIndex;
                         const isUnanswered = q.userAnswer === undefined;
 
@@ -238,20 +288,12 @@ export const ResultScreen = ({
                                         </div>
                                     </div>
 
-                                    {displayImage && (
-                                        <div
-                                            className="imageWrapper small"
-                                            onClick={() => onZoom(displayImage)}
-                                            style={{ marginBottom: '1rem' }}
-                                        >
-                                            <img
-                                                src={displayImage}
-                                                alt=""
-                                                className="questionImage small"
-                                                loading="lazy"
-                                            />
-                                        </div>
-                                    )}
+                                    {/* POUŽITÍ NOVÉ KOMPONENTY PRO OBRÁZEK */}
+                                    <ResultImage 
+                                        question={q} 
+                                        subject={currentSubject} 
+                                        onZoom={onZoom} 
+                                    />
 
                                     <div className="review-answers-grid">
                                         <div className="review-answer-row">

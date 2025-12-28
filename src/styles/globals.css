@@ -88,7 +88,6 @@ body.light-mode .menuButton.list-style {
     color: var(--color-text-main); 
 }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     body.light-mode .menuButton.list-style:hover {
         background: #f1f5f9; 
@@ -117,28 +116,101 @@ body.light-mode .test-details {
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Stacked Card Light Mode */
+/* --- STACKED CARD STYLES (OPRAVENO: Viditelnost a rozestupy) --- */
+
+/* Dark Mode Stacked Card (Default = 3+ karet) */
+.stacked-card {
+    /* 1. karta vzadu: posun 15px (bylo 12px), barva Slate-600.
+       2. karta vzadu: posun 30px (bylo 24px), barva Slate-700.
+       Větší odstup = lepší viditelnost i bez hoveru.
+    */
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6), /* Hlavní stín */
+
+        /* 1. karta vzadu */
+        0 15px 0 -1px #475569, 
+        0 15px 1px -1px rgba(255, 255, 255, 0.5), /* Svítící hrana */
+
+        /* 2. karta vzadu */
+        0 30px 0 -2px #334155, 
+        0 30px 1px -2px rgba(255, 255, 255, 0.3); /* Svítící hrana */
+
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    margin-bottom: 4rem; /* Dostatek místa dole */
+    position: relative;
+    z-index: 10;
+}
+
+/* Hover efekt - Decentní posun (z 15/30 na 20/40) */
+@media (hover: hover) {
+    .stacked-card:hover {
+        transform: translateY(-4px); 
+        box-shadow: 
+            0 25px 70px rgba(0, 0, 0, 0.7),
+
+            /* 1. karta */
+            0 20px 0 -1px #475569, 
+            0 20px 1px -1px rgba(255, 255, 255, 0.6),
+
+            /* 2. karta */
+            0 40px 0 -2px #334155,
+            0 40px 1px -2px rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* Pokud zbývá jen 1 karta navíc (celkem 2) */
+.stacked-card.stack-level-1 {
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 15px 0 -1px #475569, 
+        0 15px 1px -1px rgba(255, 255, 255, 0.5) !important;
+}
+
+@media (hover: hover) {
+    .stacked-card.stack-level-1:hover {
+        transform: translateY(-4px);
+        box-shadow: 
+            0 25px 70px rgba(0, 0, 0, 0.7),
+            0 20px 0 -1px #475569, 
+            0 20px 1px -1px rgba(255, 255, 255, 0.6) !important;
+    }
+}
+
+/* Pokud nezbývá žádná další karta (celkem 1) */
+.stacked-card.stack-level-0 {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+@media (hover: hover) {
+    .stacked-card.stack-level-0:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
+    }
+}
+
+/* Light Mode Stacked Card */
 body.light-mode .stacked-card {
     background: #ffffff;
     box-shadow: 
         0 10px 30px rgba(0, 0, 0, 0.1),
-        0 20px 0 -12px #f1f5f9, 
-        0 20px 1px -12px #94a3b8,
-        0 40px 0 -24px #e2e8f0,
-        0 40px 1px -24px #94a3b8;
+        /* Světlý režim: 15px/30px */
+        0 15px 0 -1px #f1f5f9, 
+        0 15px 1px -1px #94a3b8,
+        0 30px 0 -2px #e2e8f0,
+        0 30px 1px -2px #94a3b8;
     border-color: #e2e8f0;
     border-radius: 32px; 
 }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     body.light-mode .stacked-card:hover {
+        transform: translateY(-4px);
         box-shadow: 
             0 15px 40px rgba(0, 0, 0, 0.15),
-            0 25px 0 -12px #f1f5f9, 
-            0 25px 1px -12px #94a3b8,
-            0 50px 0 -24px #e2e8f0,
-            0 50px 1px -24px #94a3b8;
+            0 20px 0 -1px #f1f5f9, 
+            0 20px 1px -1px #94a3b8,
+            0 40px 0 -2px #e2e8f0,
+            0 40px 1px -2px #94a3b8;
     }
 }
 
@@ -150,8 +222,8 @@ body.light-mode .stacked-card.stack-level-0 {
 body.light-mode .stacked-card.stack-level-1 {
     box-shadow: 
         0 10px 30px rgba(0, 0, 0, 0.1),
-        0 20px 0 -12px #f1f5f9, 
-        0 20px 1px -12px #94a3b8 !important;
+        0 15px 0 -1px #f1f5f9, 
+        0 15px 1px -1px #94a3b8 !important;
     border-radius: 32px !important;
 }
 
@@ -166,7 +238,6 @@ body.light-mode .admin-toolbar { background: #f1f5f9; border: 1px solid #e2e8f0;
 body.light-mode .admin-toolbar input[type="text"] { background: #ffffff; color: #1e293b; border-color: #cbd5e1; }
 body.light-mode .admin-card { background: #ffffff; border-color: #e2e8f0; color: #1e293b; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     body.light-mode .admin-card:hover { background: #f8fafc; }
     body.light-mode .btn-icon:hover { background: #e2e8f0; color: #1e293b; }
@@ -342,7 +413,6 @@ body.light-mode .appHeader {
 
 .menuButton { width: 100%; border: none; border-radius: 18px; padding: 1.8rem 1.4rem; cursor: pointer; background: linear-gradient(135deg, var(--color-primary), #6366f1 50%, var(--color-secondary) 100%); color: #fff; font-size: 1.15rem; font-weight: 700; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 10px 40px var(--color-menu-btn-shadow); position: relative; overflow: hidden; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; z-index: 1; }
 .menuButton::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s ease; }
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .menuButton:hover { transform: translateY(-3px); box-shadow: 0 15px 50px rgba(59, 130, 246, 0.7); }
     .menuButton:hover::before { left: 100%; }
@@ -351,7 +421,6 @@ body.light-mode .appHeader {
 
 .menuButton.list-style { aspect-ratio: auto; padding: 1rem 1.5rem; font-size: 1.1rem; display: flex; justify-content: flex-start; align-items: center; width: 100%; margin-top: 8px; background: #252a41; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .menuButton.list-style:hover { background: #363d5a; transform: translateY(-1px); }
 }
@@ -365,7 +434,6 @@ body.light-mode .appHeader {
 
 .menuButton.danger-style { background: #442a30; border-color: var(--color-error); color: var(--color-error); justify-content: space-between; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .menuButton.danger-style:hover { background: #503038; }
 }
@@ -374,7 +442,6 @@ body.light-mode .appHeader {
 .menuButton.danger-style .list-icon { color: var(--color-error); }
 .clearMistakesIcon { opacity: 0.7; transition: opacity 0.2s, transform 0.2s; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .clearMistakesIcon:hover { opacity: 1; transform: scale(1.1); }
 }
@@ -382,21 +449,18 @@ body.light-mode .appHeader {
 /* === BUTTONS & CONTROLS === */
 .menuBackButton { background: transparent; border: 1px solid var(--border-color, rgba(255,255,255,0.2)); color: var(--text-primary); padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .menuBackButton:hover { background: var(--hover-bg, rgba(255,255,255,0.1)); }
 }
 
 .logout-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; opacity: 0.8; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; cursor: pointer; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .logout-btn:hover { opacity: 1; background: rgba(239, 68, 68, 0.2); }
 }
 
 .theme-toggle-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; padding: 0.2rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .theme-toggle-btn:hover { transform: scale(1.1); }
 }
@@ -404,7 +468,6 @@ body.light-mode .appHeader {
 .submitTopButton, .navButton { border: none; border-radius: 14px; padding: 0.9rem 1.8rem; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); min-height: 48px; position: relative; overflow: hidden; }
 .submitTopButton { background: linear-gradient(135deg, var(--color-primary), #2563eb); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); padding: 0.7rem 1.5rem; font-size: 0.95rem; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .submitTopButton:hover { transform: translateY(-2px); }
 }
@@ -412,7 +475,6 @@ body.light-mode .appHeader {
 .navButton { background: rgba(59, 130, 246, 0.15); color: var(--color-primary-light); border: 2px solid rgba(59, 130, 246, 0.3); }
 body.light-mode .navButton { background: rgba(59, 130, 246, 0.1); }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .navButton:hover { background: rgba(59, 130, 246, 0.25); border-color: rgba(59, 130, 246, 0.6); transform: translateY(-1px); }
 }
@@ -425,7 +487,6 @@ body.light-mode .navButton { background: rgba(59, 130, 246, 0.1); }
 .smartGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .smartOptionButton { background: var(--color-card-bg-start); border: 2px solid var(--color-card-border); border-radius: 12px; padding: 1rem; color: var(--color-text-main); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .smartOptionButton:hover { border-color: var(--color-primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
 }
@@ -504,7 +565,6 @@ body.light-mode .card { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); }
 .questionImage { width: 100%; height: 200px; object-fit: contain; border-radius: 12px; border: 2px solid rgba(59, 130, 246, 0.2); background: rgba(0,0,0,0.2); transition: all 0.3s ease; }
 body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .imageWrapper:hover .questionImage { border-color: rgba(59, 130, 246, 0.5); transform: scale(1.01); }
 }
@@ -522,7 +582,6 @@ body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
 .optionButton { width: 100%; min-height: 60px; border: 1px solid var(--color-option-border); border-radius: 14px; padding: 1.2rem 1.6rem; background: linear-gradient(135deg, var(--color-option-bg-start) 0%, var(--color-option-bg-end) 100%); color: var(--color-text-secondary); text-align: left; font-size: 1.05rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); font-weight: 500; outline: none; }
 .optionButton:focus-visible { outline: 3px solid var(--color-primary-light); outline-offset: 2px; border-color: var(--color-primary-light); }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .optionButton:hover { background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%); border-color: rgba(59, 130, 246, 0.5); transform: translateX(4px); }
 }
@@ -543,7 +602,6 @@ body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
 
 .navNumber { width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; background: var(--color-nav-num-bg-start); color: var(--color-text-secondary); border: 1px solid var(--color-nav-num-border); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; touch-action: none; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .navNumber:hover { border-color: var(--color-primary-light); transform: translateY(-3px) scale(1.05); z-index: 10; }
 }
@@ -563,7 +621,6 @@ body.light-mode .score-circle-inner { background: #f0f4f8; box-shadow: inset 0 0
 .reviewList { display: flex; flex-direction: column; gap: 1rem; margin-top: 0; }
 .review-item { background: var(--color-card-bg-end); border: 1px solid var(--color-card-border); border-radius: 16px; padding: 1.2rem; text-align: left; position: relative; overflow: hidden; transition: transform 0.2s ease; border-left: 5px solid transparent; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .review-item:hover { transform: translateY(-2px); border-color: rgba(148, 163, 184, 0.4); }
 }
@@ -585,7 +642,6 @@ body.light-mode .reviewSearchInput { background: rgba(255,255,255,0.6); }
 .reviewGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; padding: 1rem; }
 .reviewCard { background: var(--color-card-bg-end); border: 1px solid var(--color-card-border); border-radius: 16px; padding: 1.5rem; transition: all 0.3s ease; }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .reviewCard:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 }
@@ -617,7 +673,6 @@ body.light-mode .reviewSearchInput { background: rgba(255,255,255,0.6); }
 .subjectButton::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 60%); opacity: 0; transition: opacity 0.4s ease; }
 body.light-mode .subjectButton { background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)); border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .subjectButton:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); border-color: rgba(59, 130, 246, 0.4); }
     .subjectButton:hover::before { opacity: 1; }
@@ -633,7 +688,6 @@ body.light-mode .subjectButton { background: linear-gradient(145deg, rgba(255, 2
 .subjectButton.uploadButton::before { background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.15), transparent 60%); }
 body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.3); border-color: rgba(148, 163, 184, 0.4); }
 
-/* ZMĚNA: Hover jen pro myš */
 @media (hover: hover) {
     .subjectButton.uploadButton:hover { border-color: var(--color-secondary); background: rgba(139, 92, 246, 0.05); transform: translateY(-5px); box-shadow: 0 15px 35px rgba(139, 92, 246, 0.1); }
 }
@@ -707,3 +761,149 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
     padding: 0;
   }
 }
+
+/* --- STACKED CARD STYLES (FINÁLNÍ VERZE PODLE ZADÁNÍ) --- */
+
+/* Logika: 
+   Základní .stacked-card zobrazuje HLAVNÍ KARTU + 2 KARTY VZADU.
+   Třídy .stack-level-1 a .stack-level-0 pak ubírají stíny, když dochází otázky.
+*/
+
+/* DARK MODE (Default) */
+.stacked-card {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 4rem; /* Místo pro karty dole */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    /* Definice stínů (karet):
+       Box-shadow pořadí: X Y Blur Spread Barva
+
+       1. Vrstva: Hlavní měkký stín pod celým balíčkem
+       2. Vrstva: První karta vzadu (Tmavší tělo + Světlá hrana nahoře)
+       3. Vrstva: Druhá karta vzadu (Ještě tmavší tělo + Světlá hrana nahoře)
+    */
+    box-shadow: 
+        /* Hlavní stín do prostoru */
+        0 20px 60px rgba(0, 0, 0, 0.6),
+
+        /* 1. KARTA VZADU (Viditelná vždy) */
+        0 14px 0 -2px rgba(148, 163, 184, 0.15), /* Svítící hrana (border) */
+        0 14px 0 -1px #1e293b,                  /* Tělo karty (Slate-800) */
+
+        /* 2. KARTA VZADU (Viditelná vždy) */
+        0 28px 0 -4px rgba(148, 163, 184, 0.15), /* Svítící hrana */
+        0 28px 0 -3px #0f172a;                  /* Tělo karty (Slate-900) */
+}
+
+/* Hover efekt - Balíček se "nadechne" / rozbalí */
+@media (hover: hover) {
+    .stacked-card:hover {
+        transform: translateY(-5px); /* Hlavní karta jde nahoru */
+        box-shadow: 
+            0 30px 70px rgba(0, 0, 0, 0.7),
+
+            /* 1. karta se posune níž (z 14px na 20px) */
+            0 20px 0 -2px rgba(148, 163, 184, 0.25),
+            0 20px 0 -1px #1e293b,
+
+            /* 2. karta se posune níž (z 28px na 40px) */
+            0 40px 0 -4px rgba(148, 163, 184, 0.25),
+            0 40px 0 -3px #0f172a;
+    }
+}
+
+/* STAV: Zbývá jen 1 další otázka (zobrazíme jen 1 kartu vzadu) */
+.stacked-card.stack-level-1 {
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        /* Pouze 1. karta vzadu */
+        0 14px 0 -2px rgba(148, 163, 184, 0.15),
+        0 14px 0 -1px #1e293b
+        !important; /* Override pro smazání 2. karty */
+}
+
+@media (hover: hover) {
+    .stacked-card.stack-level-1:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 30px 70px rgba(0, 0, 0, 0.7),
+            0 20px 0 -2px rgba(148, 163, 184, 0.25),
+            0 20px 0 -1px #1e293b
+            !important;
+    }
+}
+
+/* STAV: Poslední otázka (žádné karty vzadu) */
+.stacked-card.stack-level-0 {
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.5) 
+        !important; /* Žádné "falešné" karty */
+    margin-bottom: 1.5rem; /* Vrátíme standardní margin, není co ukazovat dole */
+}
+
+@media (hover: hover) {
+    .stacked-card.stack-level-0:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6) !important;
+    }
+}
+
+
+/* LIGHT MODE VARIANTA */
+body.light-mode .stacked-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+
+    /* Světlé barvy pro karty vzadu */
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.1),
+
+        /* 1. karta vzadu */
+        0 14px 0 -2px #cbd5e1, /* Hrana (tmavší šedá) */
+        0 14px 0 -1px #f8fafc, /* Tělo (bílá/světle šedá) */
+
+        /* 2. karta vzadu */
+        0 28px 0 -4px #cbd5e1, 
+        0 28px 0 -3px #f1f5f9;
+}
+
+@media (hover: hover) {
+    body.light-mode .stacked-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 15px 50px rgba(0, 0, 0, 0.15),
+
+            /* Rozbalení */
+            0 20px 0 -2px #94a3b8,
+            0 20px 0 -1px #f8fafc,
+
+            0 40px 0 -4px #94a3b8,
+            0 40px 0 -3px #f1f5f9;
+    }
+}
+
+body.light-mode .stacked-card.stack-level-1 {
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.1),
+        0 14px 0 -2px #cbd5e1,
+        0 14px 0 -1px #f8fafc
+        !important;
+}
+
+@media (hover: hover) {
+    body.light-mode .stacked-card.stack-level-1:hover {
+        transform: translateY(-5px);
+        box-shadow: 
+            0 15px 50px rgba(0, 0, 0, 0.15),
+            0 20px 0 -2px #94a3b8,
+            0 20px 0 -1px #f8fafc
+            !important;
+    }
+}
+
+body.light-mode .stacked-card.stack-level-0 {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ... existing code (Light mode navbar overrides atd.) ... */

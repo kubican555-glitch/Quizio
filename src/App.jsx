@@ -21,6 +21,7 @@ import {
     isFlashcardStyle 
 } from "./utils/formatting.js";
 import { getImageUrl } from "./utils/images.js";
+import { fetchQuestionsLightweight, clearImageCache } from "./utils/dataManager.js"; 
 
 // --- IMPORTY OSTATNÍCH KOMPONENT ---
 import { SubjectBadge } from "./components/SubjectBadge.jsx";
@@ -394,6 +395,7 @@ export default function App() {
     };
     const handleLogout = () => {
         flushSessionStats();
+        clearImageCache(); // Vyčistit cache obrázků při odhlášení
         localStorage.removeItem("quizio_user_code");
         setUser(null); setDbId(null); setSubject(null); setMode(null); setIsSessionBlocked(false); 
     };
@@ -442,20 +444,31 @@ export default function App() {
         const fetchQuestions = async () => {
             if (!subject) { setActiveQuestionsCache([]); return; }
             if (subject === "CUSTOM") { setActiveQuestionsCache(prepareQuestionSet(customQuestions || [])); return; }
+
             setIsLoadingQuestions(true);
             const minDelay = new Promise(resolve => setTimeout(resolve, 500));
+
             try {
-                // ÚPRAVA: Přidán filtr .eq("is_active", true)
-                const queryPromise = supabase.from("questions").select("*").eq("subject", subject).eq("is_active", true).order("number", { ascending: true });
-                const [_, result] = await Promise.all([minDelay, queryPromise]);
-                const { data, error } = result;
+                // OPTIMALIZOVANÝ FETCH: Pouze texty, obrázky se dotáhnou až když budou potřeba
+                const { data, error } = await fetchQuestionsLightweight(subject);
+
+                // Čekáme na minDelay, aby loader neproblikl příliš rychle (UX)
+                await minDelay;
+
                 if (error) throw error;
+
                 if (data && data.length > 0) {
-                    const mappedData = data.map((item) => ({ ...item, correctIndex: item.correct_index, options: Array.isArray(item.options) ? item.options : [], }));
+                    const mappedData = data.map((item) => ({ 
+                        ...item, 
+                        correctIndex: item.correct_index, 
+                        options: Array.isArray(item.options) ? item.options : [], 
+                    }));
                     setActiveQuestionsCache(prepareQuestionSet(mappedData));
                 } else { setActiveQuestionsCache([]); }
             } catch (err) {
-                console.error("Chyba při stahování otázek:", err); alert("Nepodařilo se stáhnout otázky z cloudu."); setActiveQuestionsCache([]);
+                console.error("Chyba při stahování otázek:", err); 
+                alert("Nepodařilo se stáhnout otázky z cloudu."); 
+                setActiveQuestionsCache([]);
             } finally { setIsLoadingQuestions(false); }
         };
         fetchQuestions();
@@ -692,19 +705,21 @@ export default function App() {
 
             const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
 
-            if (e.key === "w" || e.key === "ArrowUp") {
+            const k = e.key.toLowerCase(); // NORMALIZACE KLÁVESY (WASD + Arrows)
+
+            if (k === "w" || e.key === "ArrowUp") {
                 if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts);
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? opts - 1 : (questionSet[currentIndex].userAnswer - 1 + opts) % opts);
             }
-            if (e.key === "s" || e.key === "ArrowDown") {
+            if (k === "s" || e.key === "ArrowDown") {
                 if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? 0 : (questionSet[currentIndex].userAnswer + 1) % opts);
             }
-            if (e.key === "a" || e.key === "ArrowLeft") {
+            if (k === "a" || e.key === "ArrowLeft") {
                 if (isFlashcardInput) return; // Změna: Vypnuto pro flashcards/practice
                 moveToQuestion(currentIndex - 1);
             }
-            if (e.key === "d" || e.key === "ArrowRight" || e.key === "Enter") {
+            if (k === "d" || e.key === "ArrowRight" || e.key === "Enter") {
                 if (isFlashcardInput) { if (showResult) nextFlashcardQuestion(); else confirmFlashcardAnswer(); } else moveToQuestion(currentIndex + 1);
             }
             if (e.key === " ") {
@@ -872,7 +887,7 @@ export default function App() {
                     {!isLoadingQuestions && (
                         <div className="top-navbar">
                             <div className="navbar-group">
-                                <button className="menuBackButton" onClick={() => { flushSessionStats(); setSubject(null); }}>← <span className="mobile-hide-text">Změnit předmět</span></button>
+                                <button className="menuBackButton" onClick={() => { flushSessionStats(); clearImageCache(); setSubject(null); }}>← <span className="mobile-hide-text">Změnit předmět</span></button>
                                 <SubjectBadge subject={subject} compact />
                             </div>
                             <div className="navbar-group">
@@ -979,7 +994,7 @@ export default function App() {
     let comboClass = combo >= 10 ? "combo-high" : combo >= 5 ? "combo-med" : combo >= 3 ? "combo-low" : "";
     let remainingCards = 0;
     if (mode === "smart" || mode === "mistakes") remainingCards = questionSet.length - 1;
-    else if (mode === "random") remainingCards = questionSet.length - 1 - currentIndex;
+    else if (mode === "random" || mode === "test_practice") remainingCards = questionSet.length - 1 - currentIndex;
 
     let stackLevelClass = "";
     if (remainingCards === 0) stackLevelClass = "stack-level-0";
@@ -1037,7 +1052,6 @@ export default function App() {
 
                             {isFlashcardStyle(mode) || mode === 'test_practice' ? (
                                 <div className={`flashcardHeader ${comboClass}`} 
-                                    // ODSTRANĚNY INLINE STYLY PRO POZICI A ZAROVNÁNÍ
                                 >
 
                                     {/* ZMĚNA: Zobrazujeme pouze pokud to není test_practice */}
@@ -1064,7 +1078,6 @@ export default function App() {
                                     {combo >= 3 && (
                                         <div 
                                             className="comboContainer" 
-                                            // ODSTRANĚNY INLINE STYLY PRO ABSOLUTNÍ POZICI (je v CSS)
                                         >
                                             <div className="comboFlame">🔥</div>
                                             <div className="comboCount">{combo}x</div>
@@ -1095,7 +1108,7 @@ export default function App() {
                             )}
 
                             <div className={`card ${isFlashcardStyle(mode) || mode==='test_practice' ? `stacked-card ${stackLevelClass}` : ""} ${shake ? "shake" : ""}`} ref={cardRef}>
-                                <div key={currentIndex} className={exitDirection ? (exitDirection === 'left' ? "card-exit-left" : "card-exit-right") : ((isFlashcardStyle(mode) || mode==='test_practice') ? "" : (direction === "left" ? "card-enter-left" : "card-enter-animation"))} style={{width: '100%'}}>
+                                <div key={currentQuestion.id || currentQuestion.number || currentIndex} className={exitDirection ? (exitDirection === 'left' ? "card-exit-left" : "card-exit-right") : ((isFlashcardStyle(mode) || mode==='test_practice') ? "" : (direction === "left" ? "card-enter-left" : "card-enter-animation"))} style={{width: '100%'}}>
                                     <QuestionCard
                                         currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer}
                                         onSelect={(i) => (isFlashcardStyle(mode) || mode==='test_practice') ? clickFlashcardAnswer(i) : handleAnswer(i)}
