@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabaseClient";
+import { useUserProfile } from "./hooks/useUserProfile"; 
+import { useActivityDetection } from "./hooks/useActivityDetection"; // NOVÝ IMPORT
+import { useGlobalKeyboard } from "./hooks/useGlobalKeyboard"; // NOVÝ IMPORT
+
 import { SubjectSelector } from "./components/SubjectSelector.jsx";
 import { AdminPanel } from "./components/AdminPanel.jsx";
 import { TestManager } from "./components/TestManager.jsx"; 
@@ -39,33 +43,26 @@ import { ReportModal } from "./components/ReportModal.jsx";
 /* ---------- Main App ---------- */
 
 export default function App() {
-    // --- STATE ---
-    const [user, setUser] = useState(null);
-    const [dbId, setDbId] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [syncing, setSyncing] = useState(false);
+    // --- STATE Z HOOKU ---
+    const {
+        user, dbId, loading, syncing, isSessionBlocked,
+        mistakes, history, testPracticeStats, totalTimeMap, totalQuestionsMap,
+        login, logout, takeOverSession, saveData, refreshData,
+        setMistakes, setHistory
+    } = useUserProfile();
 
-    // SESSION MANAGEMENT STATE
-    const [isSessionBlocked, setIsSessionBlocked] = useState(false);
-    const [mySessionId, setMySessionId] = useState(null);
-
+    // --- LOKÁLNÍ STATE APLIKACE ---
     const [subject, setSubject] = useState(null);
     const [customQuestions, setCustomQuestions] = useState(null);
-    const [mistakes, setMistakes] = useState({});
-    const [history, setHistory] = useState([]);
 
-    // Statistiky procvičování testů { "test_id": [true, false, true, ...] }
-    const [testPracticeStats, setTestPracticeStats] = useState({});
-
-    const [theme, setTheme] = useState(
-        () => localStorage.getItem("quizio_theme") || "dark",
-    );
-
+    // UI State
+    const [theme, setTheme] = useState(() => localStorage.getItem("quizio_theme") || "dark");
     const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
     const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
     const [menuSelection, setMenuSelection] = useState(0);
     const [mode, setMode] = useState(null);
 
+    // Modal & Quiz State
     const [showSmartSettings, setShowSmartSettings] = useState(false);
     const [showClearMistakesConfirm, setShowClearMistakesConfirm] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -87,7 +84,10 @@ export default function App() {
     const [recordToDelete, setRecordToDelete] = useState(null);
     const [fullscreenImage, setFullscreenImage] = useState(null);
     const [timeLeftAtSubmit, setTimeLeftAtSubmit] = useState(0);
-    const [isKeyboardMode, setIsKeyboardMode] = useState(false);
+
+    // --- POUŽITÍ NOVÝCH HOOKŮ (REFACTORING) ---
+    const { isKeyboardMode, setIsKeyboardMode } = useGlobalKeyboard();
+    const { sessionTime, setSessionTime, isAfk } = useActivityDetection(mode, isSessionBlocked);
 
     const [direction, setDirection] = useState("right");
     const [exitDirection, setExitDirection] = useState(null);
@@ -97,146 +97,103 @@ export default function App() {
 
     const [scheduledTests, setScheduledTests] = useState([]);
     const [activeTest, setActiveTest] = useState(null);
-
     const [completedTestIds, setCompletedTestIds] = useState([]);
-
-    // State pro modal před spuštěním testu
     const [testToStart, setTestToStart] = useState(null);
 
+    // Refs
     const optionRefsForCurrent = useRef({});
     const cardRef = useRef(null);
     const containerRef = useRef(null);
 
-    const [totalTimeMap, setTotalTimeMap] = useState({});
-    const [sessionTime, setSessionTime] = useState(0);
-    const [isAfk, setIsAfk] = useState(false);
-    const lastActivityRef = useRef(Date.now());
-    const [totalQuestionsMap, setTotalQuestionsMap] = useState({});
+    // Lokální čítač pro session (počet otázek) - čas řeší hook useActivityDetection
     const [sessionQuestionsCount, setSessionQuestionsCount] = useState(0);
 
     const currentQuestion = questionSet[currentIndex] || { question: "", options: [], correctIndex: 0, number: 0, _localIndex: currentIndex };
-
     const isTeacher = user === 'admin' || user === 'Ucitel';
 
-    // --- SESSION MANAGEMENT LOGIC ---
-    const mySessionIdRef = useRef(null);
+    // --- AUTOLOGIN ---
+    useEffect(() => {
+        const savedCode = localStorage.getItem("quizio_user_code");
+        if (savedCode && !user && !loading) {
+             login(savedCode);
+        }
+    }, []);
 
-    const takeOverSession = async () => {
-        if (!dbId) return;
-        const newSessionId = crypto.randomUUID();
-        setMySessionId(newSessionId);
-        mySessionIdRef.current = newSessionId;
-        setIsSessionBlocked(false);
-        await supabase.from("profiles").update({ active_session_id: newSessionId }).eq("id", dbId);
+    // --- DATA SAVING WRAPPER ---
+    const saveDataToCloud = async (newMistakes, newHistory, timeToAdd = 0, questionsToAdd = 0, newTestStats = null) => {
+        const updates = {};
+
+        if (newMistakes !== undefined) updates.mistakes = newMistakes;
+        if (newHistory !== undefined) updates.history = newHistory;
+        if (newTestStats !== null) updates.test_practice_stats = newTestStats;
+
+        if (timeToAdd > 0 && subject) {
+            const currentSubjectTime = totalTimeMap[subject] || 0;
+            updates.subject_times = { ...totalTimeMap, [subject]: currentSubjectTime + timeToAdd };
+            setSessionTime(0); // Reset lokálního čítače z hooku
+        }
+
+        if (questionsToAdd > 0 && subject) {
+            const currentCount = totalQuestionsMap[subject] || 0;
+            updates.question_counts = { ...totalQuestionsMap, [subject]: currentCount + questionsToAdd };
+            setSessionQuestionsCount(0); // Reset lokálního čítače
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await saveData(updates);
+        }
     };
 
-    useEffect(() => {
-        if (!user || !dbId) return;
-        const initSession = async () => {
-            const newSessionId = crypto.randomUUID();
-            setMySessionId(newSessionId);
-            mySessionIdRef.current = newSessionId;
-            await supabase.from("profiles").update({ active_session_id: newSessionId }).eq("id", dbId);
-        };
-        initSession();
-
-        const channel = supabase.channel(`session_guard_${dbId}`).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${dbId}` }, (payload) => {
-                const remoteSessionId = payload.new.active_session_id;
-                if (remoteSessionId && mySessionIdRef.current && remoteSessionId !== mySessionIdRef.current) {
-                    setIsSessionBlocked(true);
-                }
-            }).subscribe();
-
-        const intervalId = setInterval(async () => {
-            if (mySessionIdRef.current) { 
-                const { data, error } = await supabase.from("profiles").select("active_session_id").eq("id", dbId).single();
-                if (!error && data && data.active_session_id) {
-                    if (data.active_session_id !== mySessionIdRef.current) setIsSessionBlocked(true);
-                }
-            }
-        }, 5000);
-
-        return () => {
-            supabase.removeChannel(channel);
-            clearInterval(intervalId);
-        };
-    }, [user, dbId]); 
+    const flushSessionStats = () => {
+        if (sessionTime > 0 || sessionQuestionsCount > 0) {
+            saveDataToCloud(undefined, undefined, sessionTime, sessionQuestionsCount);
+        }
+    };
 
     // --- FETCH FUNCTIONS ---
     const fetchScheduledTests = async () => {
         if (!subject || subject === 'CUSTOM') return;
-        setSyncing(true);
         const { data } = await supabase.from('scheduled_tests').select('*').eq('subject', subject).order('close_at', { ascending: true });
         if (data) setScheduledTests(data);
-        setTimeout(() => setSyncing(false), 500);
     };
 
     const fetchCompletedTests = async () => {
-        if (!user || !dbId) {
-            setCompletedTestIds([]);
-            return;
-        }
-
-        const { data, error } = await supabase
-            .from('test_results')
-            .select('test_id')
-            .eq('user_id', dbId);
-
+        if (!user || !dbId) { setCompletedTestIds([]); return; }
+        const { data } = await supabase.from('test_results').select('test_id').eq('user_id', dbId);
         if (data) {
             const ids = [...new Set(data.map(item => item.test_id))];
             setCompletedTestIds(ids);
         }
     };
 
-    // --- REALTIME TEST FETCHING ---
+    // --- REALTIME & EFFECTS ---
     useEffect(() => {
         if (!subject || subject === 'CUSTOM') return;
-
         fetchScheduledTests();
-        const subscription = supabase.channel('tests_update').on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_tests' }, fetchScheduledTests).subscribe();
-
-        return () => supabase.removeChannel(subscription);
+        const sub = supabase.channel('tests_update').on('postgres_changes', { event: '*', schema: 'public', table: 'scheduled_tests' }, fetchScheduledTests).subscribe();
+        return () => supabase.removeChannel(sub);
     }, [subject]);
 
-    // --- FETCH COMPLETED TESTS (S OPRAVOU PRO DELETE) ---
     useEffect(() => {
-        if (!user || !dbId) {
-            setCompletedTestIds([]);
-            return;
-        }
-
+        if (!user || !dbId) { setCompletedTestIds([]); return; }
         fetchCompletedTests();
-
         const sub = supabase.channel('my_results_update')
-            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'test_results', filter: `user_id=eq.${dbId}` }, 
-            (payload) => {
-                setCompletedTestIds(prev => [...prev, payload.new.test_id]);
-            })
-            // Poslouchání DELETE pro aktualizaci, když učitel smaže pokus
-            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'test_results' }, 
-            () => {
-                fetchCompletedTests();
-            })
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'test_results', filter: `user_id=eq.${dbId}` }, (payload) => setCompletedTestIds(prev => [...prev, payload.new.test_id]))
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'test_results' }, fetchCompletedTests)
             .subscribe();
-
         return () => supabase.removeChannel(sub);
     }, [user, dbId]);
 
-    // --- MANUAL REFRESH HANDLER ---
     const handleManualRefresh = async () => {
-        setSyncing(true);
         await Promise.all([
             fetchScheduledTests(),
-            fetchCompletedTests()
+            fetchCompletedTests(),
+            refreshData()
         ]);
-        setTimeout(() => setSyncing(false), 500);
     };
 
     const handleTestCompletion = (testId) => {
-        setCompletedTestIds(prev => {
-            if (prev.includes(testId)) return prev;
-            return [...prev, testId];
-        });
+        setCompletedTestIds(prev => prev.includes(testId) ? prev : [...prev, testId]);
     };
 
     const triggerHaptic = (type) => {
@@ -247,194 +204,45 @@ export default function App() {
         }
     };
 
-    useEffect(() => {
-        if (containerRef.current) containerRef.current.scrollTop = 0;
-    }, [subject, mode]);
+    useEffect(() => { if (containerRef.current) containerRef.current.scrollTop = 0; }, [subject, mode]);
 
-    // ... (Keyboard Mode Effect) ...
-    useEffect(() => {
-        let lastClientX = -1;
-        let lastClientY = -1;
-        const handleMouseMove = (e) => {
-            if (e.clientX === lastClientX && e.clientY === lastClientY) return;
-            lastClientX = e.clientX; lastClientY = e.clientY;
-            if (document.body.classList.contains("keyboard-mode-active")) {
-                setIsKeyboardMode(false); document.body.classList.remove("keyboard-mode-active");
-            }
-        };
-        const handleKeyDownInteraction = (e) => {
-            if (["Control", "Alt", "Shift", "Meta"].includes(e.key)) return;
-            if (!document.body.classList.contains("keyboard-mode-active")) {
-                setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active");
-            }
-        };
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("keydown", handleKeyDownInteraction);
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("keydown", handleKeyDownInteraction);
-            document.body.classList.remove("keyboard-mode-active");
-        };
-    }, []);
-
-    // === CLOUD AUTH & DATA ===
-    const handleAdminClick = () => {
-        const password = prompt("Zadejte heslo administrátora:");
-        if (password === "admin123") alert("Vítejte v administraci! (Zatím prázdná)");
-        else if (password !== null) alert("Chybné heslo.");
+    // --- HELPERS PRO ÚPRAVU DAT ---
+    const updateMistakes = (newValOrFn) => {
+        const next = typeof newValOrFn === "function" ? newValOrFn(mistakes) : newValOrFn;
+        setMistakes(next);
+        saveDataToCloud(next, undefined);
     };
 
-    const handleCloudLogin = async (enteredCode) => {
-        setLoading(true);
-        try {
-            const { data: codeData, error: codeError } = await supabase.from("access_codes").select("*").eq("code", enteredCode).maybeSingle();
-            if (codeError || !codeData) { alert("Neplatný kód."); setLoading(false); return; }
-
-            const identifiedUser = codeData.used_by || enteredCode;
-            let { data: profileData } = await supabase.from("profiles").select("*").eq("username", identifiedUser).single();
-
-            if (profileData) {
-                setDbId(profileData.id); 
-                setMistakes(profileData.mistakes || {}); 
-                setHistory(profileData.history || []); 
-                setTotalTimeMap(profileData.subject_times || {}); 
-                setTotalQuestionsMap(profileData.question_counts || {}); 
-                setTestPracticeStats(profileData.test_practice_stats || {}); 
-                setUser(identifiedUser);
-            } else {
-                const { data: newData } = await supabase.from("profiles").insert([{ username: identifiedUser, mistakes: {}, history: [], subject_times: {}, question_counts: {}, test_practice_stats: {} }]).select().single();
-                setDbId(newData.id); 
-                setMistakes({}); 
-                setHistory([]); 
-                setTotalTimeMap({}); 
-                setTotalQuestionsMap({}); 
-                setTestPracticeStats({});
-                setUser(identifiedUser);
-            }
-            localStorage.setItem("quizio_user_code", enteredCode);
-        } catch (err) { alert("Chyba přihlášení: " + err.message); } finally { setLoading(false); }
+    const updateHistory = (newValOrFn) => {
+        const next = typeof newValOrFn === "function" ? newValOrFn(history) : newValOrFn;
+        setHistory(next);
+        saveDataToCloud(undefined, next);
     };
 
-    useEffect(() => {
-        const savedCode = localStorage.getItem("quizio_user_code");
-        if (savedCode && !user && !loading) handleCloudLogin(savedCode);
-    }, []);
-
-    const saveDataToCloud = async (newMistakes, newHistory, timeToAdd = 0, questionsToAdd = 0, newTestStats = null) => {
-        if (!dbId) return;
-        setSyncing(true);
-
-        const updates = {};
-
-        if (newMistakes !== undefined) updates.mistakes = newMistakes;
-        if (newHistory !== undefined) updates.history = newHistory;
-
-        if (timeToAdd > 0 && subject) {
-            const currentSubjectTime = totalTimeMap[subject] || 0;
-            const newSubjectTime = currentSubjectTime + timeToAdd;
-            const newTimeMap = { ...totalTimeMap, [subject]: newSubjectTime };
-            updates.subject_times = newTimeMap; 
-            setTotalTimeMap(newTimeMap); 
-            setSessionTime(0); 
-        }
-
-        if (questionsToAdd > 0 && subject) {
-            const currentCount = totalQuestionsMap[subject] || 0;
-            const newCount = currentCount + questionsToAdd;
-            const newQMap = { ...totalQuestionsMap, [subject]: newCount };
-            updates.question_counts = newQMap; 
-            setTotalQuestionsMap(newQMap); 
-            setSessionQuestionsCount(0);
-        }
-
-        if (newTestStats !== null) {
-            updates.test_practice_stats = newTestStats;
-        }
-
-        if (Object.keys(updates).length > 0) {
-            await supabase.from("profiles").update(updates).eq("id", dbId);
-        }
-        setSyncing(false);
-    };
-
-    const flushSessionStats = () => {
-        if (sessionTime > 0 || sessionQuestionsCount > 0) saveDataToCloud(undefined, undefined, sessionTime, sessionQuestionsCount);
+    const handleLogout = () => {
+        flushSessionStats();
+        setSubject(null); 
+        setMode(null);
+        logout(); 
     };
 
     const openHistoryWithRefresh = async () => {
         flushSessionStats();
         setMode("history"); 
-        if (!dbId) return;
-        setSyncing(true); 
-        try {
-            const { data: profileData, error } = await supabase.from("profiles").select("history, subject_times, question_counts, mistakes, test_practice_stats").eq("id", dbId).single();
-            if (error) throw error;
-            if (profileData) {
-                setHistory(profileData.history || []); 
-                setTotalTimeMap(profileData.subject_times || {}); 
-                setTotalQuestionsMap(profileData.question_counts || {}); 
-                setMistakes(profileData.mistakes || {});
-                setTestPracticeStats(profileData.test_practice_stats || {});
-            }
-        } catch (err) { console.error("Chyba při aktualizaci historie:", err); } finally { setSyncing(false); }
+        await refreshData();
     };
 
-    const updateMistakes = (newValOrFn) => {
-        setMistakes((prev) => {
-            const next = typeof newValOrFn === "function" ? newValOrFn(prev) : newValOrFn;
-            saveDataToCloud(next, history); 
-            return next;
-        });
-    };
-    const updateHistory = (newValOrFn) => {
-        setHistory((prev) => {
-            const next = typeof newValOrFn === "function" ? newValOrFn(prev) : newValOrFn;
-            saveDataToCloud(mistakes, next); 
-            return next;
-        });
-    };
-    const handleLogout = () => {
-        flushSessionStats();
-        clearImageCache(); // Vyčistit cache obrázků při odhlášení
-        localStorage.removeItem("quizio_user_code");
-        setUser(null); setDbId(null); setSubject(null); setMode(null); setIsSessionBlocked(false); 
-    };
-
-    // --- DETEKCE AKTIVITY ---
-    useEffect(() => {
-        const resetInactivity = () => {
-            lastActivityRef.current = Date.now();
-            if (isAfk) setIsAfk(false);
-        };
-        window.addEventListener("mousemove", resetInactivity); window.addEventListener("keydown", resetInactivity); window.addEventListener("click", resetInactivity); window.addEventListener("touchstart", resetInactivity);
-        return () => {
-            window.removeEventListener("mousemove", resetInactivity); window.removeEventListener("keydown", resetInactivity); window.removeEventListener("click", resetInactivity); window.removeEventListener("touchstart", resetInactivity);
-        };
-    }, [isAfk]);
-
-    useEffect(() => {
-        if (!mode || mode === 'review' || mode === 'history' || mode === 'admin' || mode === 'teacher_manager' || mode === 'scheduled_list' || mode === 'no_mistakes' || mode === 'real_test' || isSessionBlocked) return;
-        const interval = setInterval(() => {
-            const now = Date.now();
-            if (now - lastActivityRef.current > 60000) { if (!isAfk) setIsAfk(true); } else { setSessionTime(prev => prev + 1); }
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [mode, isAfk, isSessionBlocked]);
-
+    // --- AUTOMATIC SAVE TRIGGER ---
     useEffect(() => {
         if (sessionTime >= 60 || sessionQuestionsCount >= 10) saveDataToCloud(undefined, undefined, sessionTime, sessionQuestionsCount);
     }, [sessionTime, sessionQuestionsCount]);
 
-    const triggerFakeSync = () => {
-        if (!syncing) { setSyncing(true); setTimeout(() => setSyncing(false), 500); }
-    };
+    const triggerFakeSync = () => { /* Syncing now handled by hook state */ };
 
-    useEffect(() => {
-        localStorage.setItem("quizio_theme", theme); document.body.className = theme === "light" ? "light-mode" : "";
-    }, [theme]);
+    useEffect(() => { localStorage.setItem("quizio_theme", theme); document.body.className = theme === "light" ? "light-mode" : ""; }, [theme]);
     const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-    // === NAČÍTÁNÍ OTÁZEK ===
+    // === OTÁZKY & REŽIMY ===
     const prepareQuestionSet = (baseQuestions) => {
         if (!Array.isArray(baseQuestions)) return [];
         return baseQuestions.map((q, idx) => ({ ...q, options: [...(q.options || [])], userAnswer: undefined, _localIndex: idx, }));
@@ -449,20 +257,11 @@ export default function App() {
             const minDelay = new Promise(resolve => setTimeout(resolve, 500));
 
             try {
-                // OPTIMALIZOVANÝ FETCH: Pouze texty, obrázky se dotáhnou až když budou potřeba
                 const { data, error } = await fetchQuestionsLightweight(subject);
-
-                // Čekáme na minDelay, aby loader neproblikl příliš rychle (UX)
                 await minDelay;
-
                 if (error) throw error;
-
                 if (data && data.length > 0) {
-                    const mappedData = data.map((item) => ({ 
-                        ...item, 
-                        correctIndex: item.correct_index, 
-                        options: Array.isArray(item.options) ? item.options : [], 
-                    }));
+                    const mappedData = data.map((item) => ({ ...item, correctIndex: item.correct_index, options: Array.isArray(item.options) ? item.options : [] }));
                     setActiveQuestionsCache(prepareQuestionSet(mappedData));
                 } else { setActiveQuestionsCache([]); }
             } catch (err) {
@@ -474,7 +273,6 @@ export default function App() {
         fetchQuestions();
     }, [subject, customQuestions]);
 
-    // --- TEST MODE LAUNCHERS ---
     const startTestPractice = (test) => {
         const pool = activeQuestionsCache.filter(q => q.number >= test.topic_range_start && q.number <= test.topic_range_end);
         if (pool.length === 0) { alert("Žádné otázky v rozsahu."); return; }
@@ -482,24 +280,11 @@ export default function App() {
         setQuestionSet(shuffled); setMode("test_practice"); setActiveTest(test); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setCombo(0);
     };
 
-    const startGradedTest = async (test) => {
-        const now = new Date();
-        // Pokud nejsou data (null), považujeme test za "připravuje se" a nelze spustit.
-        if (!test.open_at || !test.close_at) {
-            alert("Tento test nemá stanovený termín a nelze jej spustit.");
-            return;
-        }
+    const confirmStartTest = () => {
+        if (!testToStart) return;
+        setTestToStart(null); 
 
-        if (now < new Date(test.open_at)) { alert("Test ještě není otevřen."); return; }
-        if (now > new Date(test.close_at)) { alert("Test je již uzavřen."); return; }
-
-        if (completedTestIds.includes(test.id)) {
-            alert("Tento test jste již vypracovali a odevzdali.");
-            return;
-        }
-
-        if (!confirm(`Spustit test "${test.title}"? \n\n⚠️ POZOR: Opuštění okna se zaznamenává!`)) return;
-
+        const test = testToStart;
         const pool = activeQuestionsCache.filter(q => q.number >= test.topic_range_start && q.number <= test.topic_range_end);
         const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, test.question_count).map((q, idx) => ({ ...q, _localIndex: idx }));
 
@@ -508,7 +293,16 @@ export default function App() {
         setMode("real_test"); 
     };
 
-    // --- MODES START ---
+    const startGradedTest = async (test) => {
+        const now = new Date();
+        if (!test.open_at || !test.close_at) { alert("Tento test nemá stanovený termín."); return; }
+        if (now < new Date(test.open_at)) { alert("Test ještě není otevřen."); return; }
+        if (now > new Date(test.close_at)) { alert("Test je již uzavřen."); return; }
+        if (completedTestIds.includes(test.id)) { alert("Tento test jste již vypracovali."); return; }
+
+        setTestToStart(test); 
+    };
+
     const startRandomMode = () => {
         const pool = activeQuestionsCache;
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
@@ -552,7 +346,7 @@ export default function App() {
 
     const handleReportClick = (questionNumber) => { setQuestionToReport(questionNumber); setReportModalOpen(true); };
 
-    // --- LOGIC ---
+    // --- GAME LOGIC ---
     const handleAnswer = (idx) => {
         if (finished || mode === "review") return;
         setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active");
@@ -570,14 +364,9 @@ export default function App() {
         setQuestionSet(newSet); setSelectedAnswer(idx); setShowResult(true); setSessionQuestionsCount(prev => prev + 1);
 
         if (mode === 'test_practice' && activeTest) {
-            setTestPracticeStats(prev => {
-                const currentStats = prev[activeTest.id] || [];
-                const newStats = [...currentStats, isCorrect].slice(-20);
-                const updated = { ...prev, [activeTest.id]: newStats };
-                // Voláme save s undefined pro mistakes/history, aby se nepřepsaly
-                saveDataToCloud(undefined, undefined, 0, 0, updated);
-                return updated;
-            });
+            const currentStats = testPracticeStats[activeTest.id] || [];
+            const newStats = [...currentStats, isCorrect].slice(-20);
+            saveDataToCloud(undefined, undefined, 0, 0, { ...testPracticeStats, [activeTest.id]: newStats });
         }
 
         if (isCorrect) {
@@ -612,8 +401,7 @@ export default function App() {
     const moveToQuestion = (newIdx) => {
         const b = Math.max(0, Math.min(newIdx, questionSet.length - 1));
         if (b < currentIndex) setDirection("left"); else setDirection("right");
-        setCurrentIndex(b);
-        setSelectedAnswer(null);
+        setCurrentIndex(b); setSelectedAnswer(null);
     };
 
     const handleSwipe = (dir) => {
@@ -628,8 +416,7 @@ export default function App() {
                  if (!isFlashcard && currentIndex > 0) moveToQuestion(currentIndex - 1);
              }
         };
-        setExitDirection(dir);
-        setTimeout(() => { performAction(); setExitDirection(null); }, 150); 
+        setExitDirection(dir); setTimeout(() => { performAction(); setExitDirection(null); }, 150); 
     };
 
     const submitTest = () => {
@@ -649,8 +436,7 @@ export default function App() {
         setCustomQuestions(norm); setSubject("CUSTOM");
     };
 
-    const handleAdminTools = () => { setMode('admin'); };
-
+    // --- CONTROLS ---
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (isSessionBlocked) return;
@@ -662,7 +448,8 @@ export default function App() {
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "f", "F"].includes(e.key)) e.preventDefault();
             if (showConfirmExit || showConfirmSubmit || showSmartSettings || showClearMistakesConfirm || recordToDelete || reportModalOpen) return;
 
-            if (mode && mode !== "review" && mode !== "admin" && mode !== "scheduled_list" && mode !== "teacher_manager" && mode !== "real_test") {
+            // OPRAVA: Vrátenie logiky pre fullscreen obrázky
+            if (mode && !['review', 'admin', 'scheduled_list', 'teacher_manager', 'real_test'].includes(mode)) {
                 const currentQ = questionSet[currentIndex];
                 const imageUrl = currentQ ? getImageUrl(subject, currentQ.number) : null;
                 if (e.key === "f" || e.key === "F") { if (fullscreenImage) setFullscreenImage(null); else if (imageUrl) setFullscreenImage(imageUrl); return; }
@@ -671,13 +458,8 @@ export default function App() {
             if (finished || mode === "no_mistakes") { if (["Backspace", "Enter", "ArrowLeft"].includes(e.key)) setMode(null); return; }
 
             if (!mode && !subject) {
-                const k = e.key.toLowerCase();
-                const modeCount = 8;
-                const getNextIndex = (current, dir) => {
-                    let next = current;
-                    do { next = (next + dir + modeCount) % modeCount; } while (!isTeacher && next === 5);
-                    return next;
-                };
+                const k = e.key.toLowerCase(); const modeCount = 8;
+                const getNextIndex = (current, dir) => { let next = current; do { next = (next + dir + modeCount) % modeCount; } while (!isTeacher && next === 5); return next; };
                 if (k === "w" || k === "arrowup") setMenuSelection((p) => getNextIndex(p, -1));
                 else if (k === "s" || k === "arrowdown") setMenuSelection((p) => getNextIndex(p, 1));
                 else if (k === "d" || k === "arrowright" || e.key === "Enter") {
@@ -685,7 +467,7 @@ export default function App() {
                         if (menuSelection === 0) handleSelectSubject("SPS");
                         else if (menuSelection === 1) handleSelectSubject("STT");
                         else if (menuSelection === 2) document.querySelector("input[type='file']")?.click();
-                        else if (menuSelection === 3 && user === "admin") handleAdminTools();
+                        else if (menuSelection === 3 && user === "admin") setMode('admin');
                     } else {
                         let selection = menuSelection % modeCount; if (selection < 0) selection += modeCount;
                         if (selection === 0) handleStartMode(startMockTest, "mock");
@@ -700,12 +482,10 @@ export default function App() {
                 } else if (k === "a" || k === "arrowleft" || k === "backspace") { if (subject) setSubject(null); }
                 return;
             }
-            if (!mode || mode === 'real_test') return; // V real_test si klávesnici řídí komponenta sama
+            if (!mode || mode === 'real_test') return;
             const opts = questionSet[currentIndex]?.options?.length || 4;
-
             const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
-
-            const k = e.key.toLowerCase(); // NORMALIZACE KLÁVESY (WASD + Arrows)
+            const k = e.key.toLowerCase();
 
             if (k === "w" || e.key === "ArrowUp") {
                 if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts);
@@ -715,10 +495,7 @@ export default function App() {
                 if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? 0 : (questionSet[currentIndex].userAnswer + 1) % opts);
             }
-            if (k === "a" || e.key === "ArrowLeft") {
-                if (isFlashcardInput) return; // Změna: Vypnuto pro flashcards/practice
-                moveToQuestion(currentIndex - 1);
-            }
+            if (k === "a" || e.key === "ArrowLeft") { if (isFlashcardInput) return; moveToQuestion(currentIndex - 1); }
             if (k === "d" || e.key === "ArrowRight" || e.key === "Enter") {
                 if (isFlashcardInput) { if (showResult) nextFlashcardQuestion(); else confirmFlashcardAnswer(); } else moveToQuestion(currentIndex + 1);
             }
@@ -729,23 +506,18 @@ export default function App() {
             if (e.key === "Backspace") clearAnswer();
             if (e.key === "Escape") tryReturnToMenu();
         };
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
+        window.addEventListener("keydown", handleKeyDown); return () => window.removeEventListener("keydown", handleKeyDown);
     }, [mode, questionSet, currentIndex, showResult, selectedAnswer, showConfirmSubmit, showConfirmExit, finished, menuSelection, subject, user, fullscreenImage, reportModalOpen, isSessionBlocked, testToStart]);
 
     useEffect(() => {
         if (finished || (mode !== "mock" && mode !== "smart" && mode !== "mistakes")) return;
         const interval = setInterval(() => {
-            if (mode === "mock") setTimeLeft((p) => Math.max(0, p - 1)); // REAL TEST UŽ MÁ VLASTNÍ TIMER
+            if (mode === "mock") setTimeLeft((p) => Math.max(0, p - 1));
             else setTrainingTime((t) => t + 1);
         }, 1000);
         return () => clearInterval(interval);
     }, [mode, finished]);
-    useEffect(() => {
-        if ((mode === "mock") && timeLeft === 0 && !finished) {
-            submitTest();
-        }
-    }, [timeLeft, mode, finished]);
+    useEffect(() => { if ((mode === "mock") && timeLeft === 0 && !finished) submitTest(); }, [timeLeft, mode, finished]);
 
     // === RENDER ===
     if (!user) return (
@@ -753,7 +525,7 @@ export default function App() {
             <div style={{ position: "absolute", top: "1rem", right: "1rem", zIndex: 100 }}>
                 <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
             </div>
-            <CloudLoginScreen onLogin={handleCloudLogin} loading={loading} />
+            <CloudLoginScreen onLogin={login} loading={loading} />
         </>
     );
 
@@ -768,21 +540,9 @@ export default function App() {
         return (
             <>
                 <ScheduledTestsList 
-                    scheduledTests={scheduledTests}
-                    onBack={() => setMode(null)}
-                    subject={subject}
-                    user={user}
-                    syncing={syncing}
-                    theme={theme}
-                    toggleTheme={toggleTheme}
-                    onStartGradedTest={startGradedTest}
-                    onStartPractice={startTestPractice}
-                    completedTestIds={completedTestIds}
-                    testPracticeStats={testPracticeStats}
-                    onRefresh={handleManualRefresh}
+                    scheduledTests={scheduledTests} onBack={() => setMode(null)} subject={subject} user={user} syncing={syncing} theme={theme} toggleTheme={toggleTheme}
+                    onStartGradedTest={startGradedTest} onStartPractice={startTestPractice} completedTestIds={completedTestIds} testPracticeStats={testPracticeStats} onRefresh={handleManualRefresh}
                 />
-
-                {/* Modal pro potvrzení spuštění testu */}
                 {testToStart && (
                     <ConfirmModal 
                         title={`Spustit test "${testToStart.title}"?`}
@@ -797,10 +557,7 @@ export default function App() {
                                 </ul>
                             </div>
                         }
-                        onCancel={() => setTestToStart(null)} 
-                        onConfirm={confirmStartTest} 
-                        confirmText="Spustit test" 
-                        danger={false}
+                        onCancel={() => setTestToStart(null)} onConfirm={confirmStartTest} confirmText="Spustit test" danger={false}
                     />
                 )}
             </>
@@ -810,19 +567,9 @@ export default function App() {
     if (mode === 'real_test') {
         return (
             <RealTestMode
-                test={activeTest}
-                initialQuestions={questionSet}
-                user={user}
-                userId={dbId}
-                onExit={() => setMode(null)}
-                onFinish={() => {
-                    setMode(null); // nebo přesměrovat na nějakou "děkujeme" obrazovku
-                }}
-                theme={theme} 
-                toggleTheme={toggleTheme} 
-                syncing={syncing} 
-                onReport={handleReportClick}
-                onTestCompleted={handleTestCompletion}
+                test={activeTest} initialQuestions={questionSet} user={user} userId={dbId}
+                onExit={() => setMode(null)} onFinish={() => setMode(null)}
+                theme={theme} toggleTheme={toggleTheme} syncing={syncing} onReport={handleReportClick} onTestCompleted={handleTestCompletion}
             />
         );
     }
@@ -831,34 +578,23 @@ export default function App() {
         if (!subject) return (
             <div className="container fadeIn" style={{ height: "var(--vh)", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'space-between', paddingBottom: "1.5rem" }}>
                 {!isLoadingQuestions && (
-                    <div className="top-navbar">
+                    // OPRAVA: Pridané style={{ width: "100%" }} pre roztiahnutie lišty
+                    <div className="top-navbar" style={{ width: "100%" }}>
                         <div className="navbar-group">
-                            {user === 'admin' && (
-                                <button 
-                                    className="menuBackButton" 
-                                    onClick={handleAdminTools}
-                                    title="Admin Panel"
-                                >
-                                    🛠️ Admin
-                                </button>
-                            )}
+                            {user === 'admin' && <button className="menuBackButton" onClick={() => setMode('admin')} title="Admin Panel">🛠️ Admin</button>}
                             <SubjectBadge subject={subject} compact />
                         </div>
-                        <div className="navbar-group">
-                            <UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} alwaysShowFullName={true} />
-                            <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-                        </div>
+                        <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} alwaysShowFullName={true} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
                     </div>
                 )}
                 {isLoadingQuestions ? (
                     <div style={{ margin: "2rem", fontSize: "1.2rem", color: "#888", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-                        Načítám otázky z databáze...
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>Načítám otázky z databáze...
                     </div>
                 ) : (
-                <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', maxWidth: '800px' }}>
-                    <SubjectSelector menuSelection={menuSelection} onSelectSubject={handleSelectSubject} onUploadFile={handleFileUpload} isKeyboardMode={isKeyboardMode} setIsKeyboardMode={setIsKeyboardMode} />
-                </div>
+                    <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', maxWidth: '800px' }}>
+                        <SubjectSelector menuSelection={menuSelection} onSelectSubject={handleSelectSubject} onUploadFile={handleFileUpload} isKeyboardMode={isKeyboardMode} setIsKeyboardMode={setIsKeyboardMode} />
+                    </div>
                 )}
                 <div style={{ height: '1px' }}></div>
             </div>
@@ -868,9 +604,7 @@ export default function App() {
         return (
             <>
                 <ReportModal 
-                    isOpen={reportModalOpen} 
-                    onClose={() => { setReportModalOpen(false); setQuestionToReport(null); }} 
-                    theme={theme}
+                    isOpen={reportModalOpen} onClose={() => { setReportModalOpen(false); setQuestionToReport(null); }} theme={theme}
                     {...(() => {
                         let activeReportQuestion = currentQuestion; 
                         if (questionToReport) { const found = questionSet.find(q => q.number === questionToReport); if (found) activeReportQuestion = found; }
@@ -879,46 +613,32 @@ export default function App() {
                     })()}
                     mode={mode} username={user} userId={dbId} isExiting={!!exitDirection}
                 />
-
                 {showSmartSettings && <SmartSettingsModal onStart={startSmartMode} onCancel={() => setShowSmartSettings(false)} totalQuestions={activeQuestionsCache.length} />}
                 {showClearMistakesConfirm && <ConfirmModal title="Vynulovat opravnu?" message="Smazat chyby z cloudu?" onCancel={() => setShowClearMistakesConfirm(false)} onConfirm={clearMistakes} confirmText="Smazat" danger={true} />}
 
                 <div ref={containerRef} className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
                     {!isLoadingQuestions && (
-                        <div className="top-navbar">
+                        // OPRAVA: Pridané style={{ width: "100%" }} pre roztiahnutie lišty
+                        <div className="top-navbar" style={{ width: "100%" }}>
                             <div className="navbar-group">
-                                <button className="menuBackButton" onClick={() => { flushSessionStats(); clearImageCache(); setSubject(null); }}>← <span className="mobile-hide-text">Změnit předmět</span></button>
-                                <SubjectBadge subject={subject} compact />
+                                <div className="navbar-group">
+                                    <button className="menuBackButton" onClick={() => { flushSessionStats(); clearImageCache(); setSubject(null); }}>← <span className="mobile-hide-text">Změnit předmět</span></button>
+                                    <SubjectBadge subject={subject} compact />
+                                </div>
                             </div>
-                            <div className="navbar-group">
-                                <UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} />
-                                <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-                            </div>
+                            <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
                         </div>
                     )}
-
                     {isLoadingQuestions ? (
                         <div style={{ margin: "2rem", fontSize: "1.2rem", color: "#888", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
-                            Načítám otázky z databáze...
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>Načítám otázky z databáze...
                         </div>
                     ) : (
                         <MainMenu
-                            scheduledTests={scheduledTests}
-                            completedTestIds={completedTestIds} // PŘEDÁVÁME SEZNAM HOTOVÝCH
-                            menuSelection={menuSelection}
-                            isKeyboardMode={isKeyboardMode}
-                            isTeacher={isTeacher}
-                            mistakesCount={mistakesCount}
-                            onOpenScheduled={() => setMode('scheduled_list')}
-                            onStartMock={() => handleStartMode(startMockTest, "mock")}
-                            onStartSmart={() => handleStartMode(startSmartMode, "smart")}
-                            onStartRandom={() => handleStartMode(startRandomMode, "random")}
-                            onStartReview={() => handleStartMode(startReviewMode, "review")}
-                            onOpenTeacherManager={() => setMode('teacher_manager')}
-                            onStartMistakes={() => handleStartMode(startMistakesMode, "mistakes")}
-                            onClearMistakes={() => setShowClearMistakesConfirm(true)}
-                            onOpenHistory={openHistoryWithRefresh}
+                            scheduledTests={scheduledTests} completedTestIds={completedTestIds} menuSelection={menuSelection} isKeyboardMode={isKeyboardMode} isTeacher={isTeacher} mistakesCount={mistakesCount}
+                            onOpenScheduled={() => setMode('scheduled_list')} onStartMock={() => handleStartMode(startMockTest, "mock")} onStartSmart={() => handleStartMode(startSmartMode, "smart")}
+                            onStartRandom={() => handleStartMode(startRandomMode, "random")} onStartReview={() => handleStartMode(startReviewMode, "review")} onOpenTeacherManager={() => setMode('teacher_manager')}
+                            onStartMistakes={() => handleStartMode(startMistakesMode, "mistakes")} onClearMistakes={() => setShowClearMistakesConfirm(true)} onOpenHistory={openHistoryWithRefresh}
                         />
                     )}
                 </div>
@@ -948,15 +668,12 @@ export default function App() {
             <>
                 <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
                 <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
-                    <div className="top-navbar">
+                    <div className="top-navbar" style={{ width: "100%" }}>
                         <div className="navbar-group">
                             <button className="menuBackButton" onClick={() => { flushSessionStats(); tryReturnToMenu(); }}>← <span className="mobile-hide-text">Zpět</span></button>
                             <SubjectBadge subject={subject} compact />
                         </div>
-                        <div className="navbar-group">
-                            <UserBadgeDisplay user={user} syncing={syncing} />
-                            <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-                        </div>
+                        <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
                     </div>
                     <h1 className="title">Prohlížení otázek</h1>
                     <input type="text" placeholder="Hledat..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="reviewSearchInput" />
@@ -969,11 +686,7 @@ export default function App() {
                                 return (
                                     <div key={q.number} className="reviewCard">
                                         <div className="reviewHeader"><strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} /></div>
-                                        {imageUrl && (
-                                            <div className="imageWrapper" onClick={() => setFullscreenImage(imageUrl)}>
-                                                <img src={imageUrl} alt="" className="reviewImage" />
-                                            </div>
-                                        )}
+                                        {imageUrl && <div className="imageWrapper" onClick={() => setFullscreenImage(imageUrl)}><img src={imageUrl} alt="" className="reviewImage" /></div>}
                                         <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                                             {q.options.map((opt, idx) => (
                                                 <div key={idx} style={{ fontSize: "0.9rem", color: idx === q.correctIndex ? "var(--color-review-correct)" : "var(--color-text-secondary)", fontWeight: idx === q.correctIndex ? "bold" : "normal" }}>
@@ -995,10 +708,7 @@ export default function App() {
     let remainingCards = 0;
     if (mode === "smart" || mode === "mistakes") remainingCards = questionSet.length - 1;
     else if (mode === "random" || mode === "test_practice") remainingCards = questionSet.length - 1 - currentIndex;
-
-    let stackLevelClass = "";
-    if (remainingCards === 0) stackLevelClass = "stack-level-0";
-    else if (remainingCards === 1) stackLevelClass = "stack-level-1";
+    let stackLevelClass = remainingCards === 0 ? "stack-level-0" : remainingCards === 1 ? "stack-level-1" : "";
 
     return (
         <>
@@ -1009,13 +719,8 @@ export default function App() {
                 const qForModal = activeReportQuestion || {};
                 return (
                     <ReportModal 
-                        isOpen={reportModalOpen} 
-                        onClose={() => { setReportModalOpen(false); setQuestionToReport(null); }} 
-                        theme={theme}
-                        questionText={qForModal.question} 
-                        questionId={qForModal.id} 
-                        subject={qForModal.subject} 
-                        questionNumber={qForModal.number}
+                        isOpen={reportModalOpen} onClose={() => { setReportModalOpen(false); setQuestionToReport(null); }} theme={theme}
+                        questionText={qForModal.question} questionId={qForModal.id} subject={qForModal.subject} questionNumber={qForModal.number}
                         mode={mode} options={qForModal.options} correctIndex={qForModal.correctIndex} userAnswer={qForModal.userAnswer} username={user} userId={dbId} isExiting={!!exitDirection}
                     />
                 );
@@ -1033,7 +738,7 @@ export default function App() {
 
                 {!finished && (
                     <>
-                        <div className="top-navbar">
+                        <div className="top-navbar" style={{ width: "100%" }}>
                             <div className="navbar-group">
                                 {mode === 'real_test' ? <span style={{fontWeight:'bold', color:'var(--color-error)'}}>⚠️ TEST: NEOPOUŠTĚJ OKNO!</span> : <button className="menuBackButton" onClick={tryReturnToMenu}>← <span className="mobile-hide-text">Zpět</span></button>}
                                 <div className="mobile-hidden"><SubjectBadge subject={subject} compact /></div>
@@ -1051,54 +756,24 @@ export default function App() {
                             </h1>
 
                             {isFlashcardStyle(mode) || mode === 'test_practice' ? (
-                                <div className={`flashcardHeader ${comboClass}`} 
-                                >
-
-                                    {/* ZMĚNA: Zobrazujeme pouze pokud to není test_practice */}
+                                <div className={`flashcardHeader ${comboClass}`}>
                                     {mode !== 'test_practice' && (
                                         <div className="statItem">
-                                            <span className="statLabel">
-                                                {/* Pokud je random, ukazujeme "Zodpovězeno", jinak "Zbývá" */}
-                                                {mode === "random" ? "Zodpovězeno" : "Zbývá"}
-                                            </span>
-                                            <span className="statValue">
-                                                {(() => {
-                                                    if (mode === "random") {
-                                                        // V režimu Random se jen posouváme, takže currentIndex = počet zodpovězených
-                                                        return currentIndex;
-                                                    }
-                                                    // Pro smart/mistakes (ubývající)
-                                                    return questionSet.length - 1;
-                                                })()}
-                                            </span>
+                                            <span className="statLabel">{mode === "random" ? "Zodpovězeno" : "Zbývá"}</span>
+                                            <span className="statValue">{mode === "random" ? currentIndex : questionSet.length - 1}</span>
                                         </div>
                                     )}
-
-                                    {/* COMBO (pokud je) */}
-                                    {combo >= 3 && (
-                                        <div 
-                                            className="comboContainer" 
-                                        >
-                                            <div className="comboFlame">🔥</div>
-                                            <div className="comboCount">{combo}x</div>
-                                        </div>
-                                    )}
-
-                                    {/* PRAVÁ STRANA: ÚSPĚŠNOST */}
+                                    {combo >= 3 && <div className="comboContainer"><div className="comboFlame">🔥</div><div className="comboCount">{combo}x</div></div>}
                                     <div className="statItem" style={{ textAlign: 'right', marginLeft: 'auto' }}>
                                         <span className="statLabel">Úspěšnost</span>
                                         <span className="statValue">
                                             {mode === 'test_practice' && activeTest ? (() => {
                                                 const stats = testPracticeStats[activeTest.id] || [];
                                                 if (stats.length === 0) return "0%";
-                                                const correct = stats.filter(Boolean).length;
-                                                return Math.round((correct / stats.length) * 100) + "%";
-                                            })() : (
-                                                (score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0) + "%"
-                                            )}
+                                                return Math.round((stats.filter(Boolean).length / stats.length) * 100) + "%";
+                                            })() : (score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0) + "%"}
                                         </span>
                                     </div>
-
                                 </div>
                             ) : (
                                 <>
@@ -1116,7 +791,6 @@ export default function App() {
                                         isKeyboardMode={isKeyboardMode} currentSubject={subject} onZoom={setFullscreenImage} onSwipe={handleSwipe} score={score} onReport={handleReportClick} isExiting={!!exitDirection}
                                     />
                                 </div>
-
                                 {(isFlashcardStyle(mode) || mode==='test_practice') && !showResult && (
                                     <div className="actionButtons right card-enter-animation" key={`btn-confirm-${currentIndex}`}>
                                         <button className="navButton primary" onClick={confirmFlashcardAnswer}>Potvrdit</button>
@@ -1127,7 +801,6 @@ export default function App() {
                                         <button className="navButton" onClick={nextFlashcardQuestion}>Další otázka</button>
                                     </div>
                                 )}
-
                                 {!(isFlashcardStyle(mode) || mode==='test_practice') && (
                                     <>
                                         <div className="actionButtons spaced">
