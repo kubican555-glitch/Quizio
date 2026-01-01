@@ -353,7 +353,14 @@ export default function App() {
     const removeMistake = (qNumber) => updateMistakes((prev) => { const cur = prev[subject] || []; return cur.includes(qNumber) ? { ...prev, [subject]: cur.filter((n) => n !== qNumber) } : prev; });
     const clearMistakes = () => { updateMistakes((prev) => ({ ...prev, [subject]: [] })); setShowClearMistakesConfirm(false); };
     const handleSelectSubject = (subj) => { setSubject(subj.toUpperCase()); };
-    const handleStartMode = (startFn, modeName) => { if (modeName === "smart") { setShowSmartSettings(true); return; } startFn(); };
+    const handleStartMode = (startFn, modeName) => { 
+        if (!activeQuestionsCache || activeQuestionsCache.length === 0) {
+            alert("Žádné otázky nejsou k dispozici. Zkuste prosím změnit předmět nebo se znovu přihlásit.");
+            return;
+        }
+        if (modeName === "smart") { setShowSmartSettings(true); return; } 
+        startFn(); 
+    };
 
     const handleReportClick = (questionNumber) => { setQuestionToReport(questionNumber); setReportModalOpen(true); };
 
