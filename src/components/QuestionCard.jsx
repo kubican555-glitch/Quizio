@@ -120,8 +120,12 @@ export function QuestionCard({
       const diffX = Math.abs(clientX - touchStart.current.x);
       const diffY = Math.abs(clientY - touchStart.current.y);
 
-      if (diffX > diffY && diffX > 10 && e.cancelable) {
-          e.preventDefault();
+      // If horizontal movement is greater than vertical, it's a swipe attempt
+      if (diffX > diffY && diffX > 10) {
+          // Check if we have an onSwipe handler before preventing default
+          if (onSwipe && e.cancelable) {
+              e.preventDefault();
+          }
       }
     };
 

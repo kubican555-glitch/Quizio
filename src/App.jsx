@@ -388,17 +388,33 @@ export default function App() {
 
     const handleSwipe = (dir) => {
         if (finished || showConfirmExit || showConfirmSubmit || exitDirection || isSessionBlocked) return;
+        
+        const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
+        
         const performAction = () => {
-             const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
              if (dir === "left") {
-                 if (isFlashcard && showResult) nextFlashcardQuestion();
-                 else if (isFlashcard && !showResult && selectedAnswer !== null) confirmFlashcardAnswer();
-                 else if (!isFlashcard && currentIndex < questionSet.length - 1) moveToQuestion(currentIndex + 1);
+                 if (isFlashcard) {
+                     if (showResult) nextFlashcardQuestion();
+                     else if (selectedAnswer !== null) confirmFlashcardAnswer();
+                 } else if (currentIndex < questionSet.length - 1) {
+                     moveToQuestion(currentIndex + 1);
+                 }
              } else if (dir === "right") {
-                 if (!isFlashcard && currentIndex > 0) moveToQuestion(currentIndex - 1);
+                 if (!isFlashcard && currentIndex > 0) {
+                     moveToQuestion(currentIndex - 1);
+                 }
              }
         };
-        setExitDirection(dir); setTimeout(() => { performAction(); setExitDirection(null); }, 150); 
+
+        if (isFlashcard) {
+            performAction();
+        } else {
+            setExitDirection(dir); 
+            setTimeout(() => { 
+                performAction(); 
+                setExitDirection(null); 
+            }, 150);
+        }
     };
 
     const submitTest = () => {
