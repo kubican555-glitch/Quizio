@@ -120,8 +120,7 @@ export function QuestionCard({
       const diffX = Math.abs(clientX - touchStart.current.x);
       const diffY = Math.abs(clientY - touchStart.current.y);
 
-      // If we've moved significantly horizontally, prevent scrolling
-      if (diffX > 10 && diffX > diffY && e.cancelable) {
+      if (diffX > diffY && diffX > 10 && e.cancelable) {
           e.preventDefault();
       }
     };

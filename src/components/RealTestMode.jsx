@@ -157,7 +157,6 @@ export function RealTestMode({
 
 
     const handleSwipe = (swipeDirection) => {
-        if (finalResult) return;
         if (swipeDirection === "left") {
             moveToQuestion(currentIndex + 1);
         } else if (swipeDirection === "right") {
