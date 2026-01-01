@@ -59,6 +59,7 @@ export default function App() {
     const [showSmartSettings, setShowSmartSettings] = useState(false);
     const [showClearMistakesConfirm, setShowClearMistakesConfirm] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [reviewPage, setReviewPage] = useState(0);
     const [questionSet, setQuestionSet] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -316,7 +317,7 @@ export default function App() {
     const startReviewMode = () => {
         const all = activeQuestionsCache;
         if (!all || all.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
-        setQuestionSet(all); setMode("review"); setCombo(0);
+        setQuestionSet(all); setMode("review"); setCombo(0); setReviewPage(0); setSearchTerm("");
     };
 
     const addMistake = (qNumber) => updateMistakes((prev) => { const cur = prev[subject] || []; return !cur.includes(qNumber) ? { ...prev, [subject]: [...cur, qNumber] } : prev; });
@@ -675,9 +676,12 @@ export default function App() {
     );
 
     if (mode === "review") {
+        const REVIEW_ITEMS_PER_PAGE = 5;
         const normalizedSearch = removeAccents(searchTerm);
         const filteredQuestions = questionSet.filter((q) => removeAccents(q.question).includes(normalizedSearch) || String(q.number).includes(normalizedSearch));
         const highlightRegex = getSmartRegex(searchTerm);
+        const totalReviewPages = Math.ceil(filteredQuestions.length / REVIEW_ITEMS_PER_PAGE);
+        const paginatedQuestions = filteredQuestions.slice(reviewPage * REVIEW_ITEMS_PER_PAGE, (reviewPage + 1) * REVIEW_ITEMS_PER_PAGE);
 
         return (
             <>
@@ -691,12 +695,19 @@ export default function App() {
                         <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
                     </div>
                     <h1 className="title">Prohlížení otázek</h1>
-                    <input type="text" placeholder="Hledat..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="reviewSearchInput" />
+                    <div className="reviewControls">
+                        <input type="text" placeholder="Hledat..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setReviewPage(0); }} className="reviewSearchInput" />
+                        {totalReviewPages > 1 && (
+                            <div className="reviewPageInfo">
+                                Strana {reviewPage + 1} z {totalReviewPages} ({filteredQuestions.length} otázek)
+                            </div>
+                        )}
+                    </div>
                     <div className="reviewGrid">
-                        {filteredQuestions.length === 0 ? (
+                        {paginatedQuestions.length === 0 ? (
                             <p style={{ textAlign: "center", color: "#888", gridColumn: "1/-1" }}>Nic nenalezeno.</p>
                         ) : (
-                            filteredQuestions.map((q) => {
+                            paginatedQuestions.map((q) => {
                                 const imageUrl = getImageUrl(subject, q.number);
                                 return (
                                     <div key={q.number} className="reviewCard">
@@ -714,6 +725,15 @@ export default function App() {
                             })
                         )}
                     </div>
+                    {totalReviewPages > 1 && (
+                        <div className="reviewPagination">
+                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(0)} disabled={reviewPage === 0}>⏮</button>
+                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(p => p - 1)} disabled={reviewPage === 0}>← Předchozí</button>
+                            <span className="reviewPaginationCurrent">{reviewPage + 1} / {totalReviewPages}</span>
+                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(p => p + 1)} disabled={reviewPage === totalReviewPages - 1}>Další →</button>
+                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(totalReviewPages - 1)} disabled={reviewPage === totalReviewPages - 1}>⏭</button>
+                        </div>
+                    )}
                 </div>
             </>
         );

@@ -1233,3 +1233,73 @@ body.light-mode .historyItemSubject {
         font-size: 0.8rem;
     }
 }
+
+/* === REVIEW MODE PAGINATION === */
+.reviewControls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.reviewPageInfo {
+    font-size: 0.9rem;
+    color: var(--color-text-neutral);
+    text-align: center;
+}
+
+.reviewPagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+}
+
+.reviewPaginationBtn {
+    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
+    border: 1px solid var(--color-card-border);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    color: var(--color-text-main);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reviewPaginationBtn:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.reviewPaginationBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.reviewPaginationCurrent {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    padding: 0 0.5rem;
+}
+
+@media (max-width: 480px) {
+    .reviewPagination {
+        gap: 0.5rem;
+        padding: 0.8rem;
+    }
+    
+    .reviewPaginationBtn {
+        padding: 0.5rem 0.7rem;
+        font-size: 0.8rem;
+    }
+    
+    .reviewPaginationCurrent {
+        font-size: 0.9rem;
+    }
+}
