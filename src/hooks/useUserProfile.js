@@ -202,10 +202,16 @@ export function useUserProfile() {
         }
     };
 
+    // Fake sync pro správné odpovědi (aby uživatel nemohl podvádět sledováním ikony)
+    const triggerFakeSync = () => {
+        setSyncing(true);
+        setTimeout(() => setSyncing(false), 300 + Math.random() * 400);
+    };
+
     return {
         user, dbId, loading, syncing, isSessionBlocked,
         mistakes, history, testPracticeStats, totalTimeMap, totalQuestionsMap,
-        login, logout, takeOverSession, saveData, refreshData,
+        login, logout, takeOverSession, saveData, refreshData, triggerFakeSync,
         setMistakes, setHistory, setTotalTimeMap, setTotalQuestionsMap
     };
 }

@@ -43,7 +43,7 @@ export default function App() {
     const {
         user, dbId, loading, syncing, isSessionBlocked,
         mistakes, history, testPracticeStats, totalTimeMap, totalQuestionsMap,
-        login, logout, takeOverSession, saveData, refreshData,
+        login, logout, takeOverSession, saveData, refreshData, triggerFakeSync,
         setMistakes, setHistory
     } = useUserProfile();
 
@@ -220,8 +220,6 @@ export default function App() {
     useEffect(() => {
         if (sessionTime >= 60 || sessionQuestionsCount >= 10) saveDataToCloud(undefined, undefined, sessionTime, sessionQuestionsCount);
     }, [sessionTime, sessionQuestionsCount]);
-
-    const triggerFakeSync = () => { };
 
     useEffect(() => { localStorage.setItem("quizio_theme", theme); document.body.className = theme === "light" ? "light-mode" : ""; }, [theme]);
     const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
