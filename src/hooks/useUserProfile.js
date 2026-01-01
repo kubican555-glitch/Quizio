@@ -205,7 +205,7 @@ export function useUserProfile() {
     // Fake sync pro správné odpovědi (aby uživatel nemohl podvádět sledováním ikony)
     const triggerFakeSync = () => {
         setSyncing(true);
-        setTimeout(() => setSyncing(false), 300 + Math.random() * 400);
+        setTimeout(() => setSyncing(false), 500);
     };
 
     return {
