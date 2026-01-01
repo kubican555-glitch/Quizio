@@ -187,7 +187,7 @@ export function QuestionCard({
         @keyframes fadeInQuick { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
 
-      {isFlashcard && showResult && !isExiting && (
+      {isFlashcard && (showResult || selectedAnswer !== null) && !isExiting && (
         <button
           onClick={(e) => { e.stopPropagation(); onReport(currentQuestion.number); }}
           title="Nahlásit chybu"
