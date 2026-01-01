@@ -413,7 +413,7 @@ export default function App() {
             setTimeout(() => { 
                 performAction(); 
                 setExitDirection(null); 
-            }, 150);
+            }, 80);
         }
     };
 

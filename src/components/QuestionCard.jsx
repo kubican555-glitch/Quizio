@@ -39,7 +39,7 @@ export function QuestionCard({
 
   const touchStart = useRef({ x: 0, y: 0 });
   const touchCurrent = useRef({ x: 0, y: 0 });
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 35;
 
   // 2. NAČÍTÁNÍ OBRÁZKU
   useEffect(() => {
