@@ -23,7 +23,7 @@ import {
     isFlashcardStyle 
 } from "./utils/formatting.js";
 import { getImageUrl } from "./utils/images.js";
-import { fetchQuestionsLightweight, clearImageCache, getCachedImage } from "./utils/dataManager.js"; 
+import { fetchQuestionsLightweight, clearImageCache, getCachedImage, fetchQuestionImage } from "./utils/dataManager.js"; 
 
 import { SubjectBadge } from "./components/SubjectBadge.jsx";
 import { UserBadgeDisplay } from "./components/UserBadgeDisplay.jsx";
@@ -38,6 +38,33 @@ import { NoMistakesScreen } from "./components/NoMistakesScreen.jsx";
 import { ReportModal } from "./components/ReportModal.jsx";
 
 /* ---------- Main App ---------- */
+
+const ReviewImage = ({ q, subject, setFullscreenImage }) => {
+    const [imgUrl, setImgUrl] = useState(() => {
+        return q.image_base64 || (q.id ? getCachedImage(q.id) : null) || getImageUrl(subject, q.number) || (q.image && q.image.length > 5 ? q.image : null);
+    });
+
+    useEffect(() => {
+        if (q.id && !imgUrl) {
+            fetchQuestionImage(q.id).then(url => {
+                if (url) setImgUrl(url);
+            });
+        }
+    }, [q.id, imgUrl]);
+
+    if (!imgUrl) return null;
+
+    return (
+        <div className="reviewImageWrapper" onClick={() => setFullscreenImage(imgUrl)}>
+            <img 
+                src={imgUrl} 
+                alt="" 
+                className="reviewImage" 
+                onError={(e) => e.target.style.display = 'none'}
+            />
+        </div>
+    );
+};
 
 export default function App() {
     const {
@@ -722,16 +749,7 @@ export default function App() {
                                 return (
                                     <div key={q.number} className="reviewCard">
                                         <div className="reviewHeader"><strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} /></div>
-                                        {imageUrl && (
-                                            <div className="reviewImageWrapper" onClick={() => setFullscreenImage(imageUrl)}>
-                                                <img 
-                                                    src={imageUrl} 
-                                                    alt="" 
-                                                    className="reviewImage" 
-                                                    onError={(e) => e.target.style.display = 'none'}
-                                                />
-                                            </div>
-                                        )}
+                                        <ReviewImage q={q} subject={subject} setFullscreenImage={setFullscreenImage} />
                                         <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                                             {q.options.map((opt, idx) => (
                                                 <div key={idx} style={{ fontSize: "0.9rem", color: idx === q.correctIndex ? "var(--color-review-correct)" : "var(--color-text-secondary)", fontWeight: idx === q.correctIndex ? "bold" : "normal" }}>
