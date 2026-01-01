@@ -322,7 +322,8 @@ body.keyboard-mode-active :focus-visible {
   padding: 1rem;
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
-  height: 100%; overflow: hidden; /* Změna z overflow-y: auto na hidden */
+  height: 100%; overflow-y: auto; 
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none; 
 }
 .container::-webkit-scrollbar { display: none; }
@@ -332,13 +333,9 @@ body.keyboard-mode-active :focus-visible {
   width: 100%; 
   margin: 0 auto; 
   padding: 0 1rem; 
-  flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* Pouze obsah kvízu může scrollovat, pokud je moc dlouhý */
-  scrollbar-width: none;
 }
-.quizContentWrapper::-webkit-scrollbar { display: none; }
 
 /* === ANIMACE === */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
