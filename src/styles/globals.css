@@ -564,18 +564,11 @@ body.light-mode .flashcardHeader {
 }
 
 .statItem:first-child {
-    align-items: flex-start;
     margin-right: auto;
 }
 
 .statItem:last-child {
-    align-items: flex-end;
     margin-left: auto;
-}
-
-.statItem:first-child .statLabel,
-.statItem:last-child .statLabel {
-    text-align: inherit;
 }
 
 .statLabel { 
