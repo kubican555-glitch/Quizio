@@ -788,6 +788,14 @@ export default function App() {
     if (remainingCards <= 1) stackLevelClass = "stack-level-0";
     else if (remainingCards === 2) stackLevelClass = "stack-level-1";
 
+    useEffect(() => {
+        if (isKeyboardMode) {
+            document.body.classList.add('keyboard-mode');
+        } else {
+            document.body.classList.remove('keyboard-mode');
+        }
+    }, [isKeyboardMode]);
+
     return (
         <>
             <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
