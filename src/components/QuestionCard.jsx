@@ -93,12 +93,15 @@ export function QuestionCard({
 
   // 4. SCROLL
   useEffect(() => {
+    // Odstraněno automatické posouvání při výběru odpovědi, které způsobovalo skákání obrazovky na mobilech
+    /*
     if (selectedAnswer !== null && optionRefsForCurrent && optionRefsForCurrent.current && optionRefsForCurrent.current[selectedAnswer]) {
       optionRefsForCurrent.current[selectedAnswer].scrollIntoView({
         behavior: "smooth",
         block: "nearest",
       });
     }
+    */
   }, [selectedAnswer, optionRefsForCurrent]);
 
   // 5. TOUCH EVENTY
