@@ -618,13 +618,6 @@ body.light-mode .flashcardHeader {
     .statLabel {
         font-size: 0.6rem;
     }
-    .statLabel[data-short] {
-        font-size: 0;
-    }
-    .statLabel[data-short]::after {
-        content: attr(data-short);
-        font-size: 0.6rem;
-    }
     .comboFlame { font-size: 1.3rem; }
     .comboCount { font-size: 1.1rem; }
     .comboContainer { gap: 0.2rem; }
