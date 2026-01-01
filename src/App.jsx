@@ -780,13 +780,13 @@ export default function App() {
                                 <div className={`flashcardHeader ${comboClass}`}>
                                     {mode !== 'test_practice' && (
                                         <div className="statItem">
-                                            <span className="statLabel">{mode === "random" ? "Zodpovězeno" : "Zbývá"}</span>
+                                            <span className="statLabel" data-short={mode === "random" ? "Odpov." : "Zbývá"}>{mode === "random" ? "Zodpovězeno" : "Zbývá"}</span>
                                             <span className="statValue">{mode === "random" ? currentIndex : remainingCards}</span>
                                         </div>
                                     )}
                                     {combo >= 3 && <div className="comboContainer"><div className="comboFlame">🔥</div><div className="comboCount">{combo}x</div></div>}
                                     <div className="statItem" style={{ textAlign: 'right', marginLeft: 'auto' }}>
-                                        <span className="statLabel">Úspěšnost</span>
+                                        <span className="statLabel" data-short="Úsp.">Úspěšnost</span>
                                         <span className="statValue">
                                             {mode === 'test_practice' && activeTest ? (() => {
                                                 const stats = testPracticeStats[activeTest.id] || [];
