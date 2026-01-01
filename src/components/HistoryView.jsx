@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { HistoryGraph } from './HistoryGraph';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 
-// Pomocná funkce pro formátování času s hodinami
 const formatFullTime = (seconds) => {
     if (!seconds) return "0s";
     const h = Math.floor(seconds / 3600);
@@ -21,15 +20,14 @@ export const HistoryView = ({
     history = [], 
     totalTimeMap = {}, 
     totalQuestionsMap = {},
-    sessionTime = 0, // PŘIDÁNO: Čas z aktuální session
-    sessionQuestionsCount = 0, // PŘIDÁNO: Otázky z aktuální session
+    sessionTime = 0,
+    sessionQuestionsCount = 0,
     onBack, 
     onDeleteRecord,
     user,
     syncing,
     currentSubject 
 }) => {
-    // 1. Filtrování historie podle předmětu
     const filteredHistory = useMemo(() => {
         let data = [...history];
         if (currentSubject) {
@@ -38,7 +36,6 @@ export const HistoryView = ({
         return data.sort((a, b) => new Date(b.date) - new Date(a.date));
     }, [history, currentSubject]);
 
-    // 2. Výpočet statistik s přičtením aktuální session (Real-time update)
     const totalTime = useMemo(() => {
         let baseTime = 0;
         if (currentSubject) {
@@ -46,7 +43,6 @@ export const HistoryView = ({
         } else {
             baseTime = Object.values(totalTimeMap).reduce((acc, curr) => acc + curr, 0);
         }
-        // Přičteme aktuální session, abychom viděli okamžitý výsledek
         return baseTime + sessionTime;
     }, [totalTimeMap, currentSubject, sessionTime]);
 
@@ -57,11 +53,9 @@ export const HistoryView = ({
         } else {
             baseQuestions = Object.values(totalQuestionsMap).reduce((acc, curr) => acc + curr, 0);
         }
-        // Přičteme aktuální session
         return baseQuestions + sessionQuestionsCount;
     }, [totalQuestionsMap, currentSubject, sessionQuestionsCount]);
 
-    // 3. Výpočet detailních statistik z historie (Testy, Průměr, Max)
     const detailedStats = useMemo(() => {
         if (filteredHistory.length === 0) {
             return { count: 0, average: 0, best: 0 };
@@ -86,7 +80,6 @@ export const HistoryView = ({
         };
     }, [filteredHistory]);
 
-    // Pomocná funkce pro ikonu módu
     const getModeIcon = (mode) => {
         switch(mode) {
             case 'mock': return '⏱️';
@@ -98,7 +91,6 @@ export const HistoryView = ({
         }
     };
 
-    // Pomocná funkce pro název módu
     const getModeName = (mode) => {
         switch(mode) {
             case 'mock': return 'Test nanečisto';
@@ -108,6 +100,28 @@ export const HistoryView = ({
             case 'mistakes': return 'Opravna chyb';
             default: return mode;
         }
+    };
+
+    const getScoreColor = (successRate) => {
+        if (successRate >= 84) return '#22c55e';
+        if (successRate >= 67) return '#84cc16';
+        if (successRate >= 50) return '#eab308';
+        if (successRate >= 33) return '#f97316';
+        return '#ef4444';
+    };
+
+    const getRelativeTime = (date) => {
+        const now = new Date();
+        const diff = now - date;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+
+        if (minutes < 1) return 'Právě teď';
+        if (minutes < 60) return `Před ${minutes} min`;
+        if (hours < 24) return `Před ${hours} hod`;
+        if (days < 7) return `Před ${days} dny`;
+        return date.toLocaleDateString('cs-CZ');
     };
 
     return (
@@ -128,150 +142,126 @@ export const HistoryView = ({
                     Historie výsledků {currentSubject ? `(${currentSubject})` : ''}
                 </h1>
 
-                {/* KARTY STATISTIK (Reflektují filtr + session) */}
-                <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
-                    gap: '1rem', 
-                    marginBottom: '2rem',
-                    width: '100%'
-                }}>
-                    {/* 1. Celkový čas */}
-                    <div className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>⏳</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.8, textAlign: 'center' }}>Celkový čas</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary-light)' }}>
-                            {formatFullTime(totalTime)}
+                <div className="historyStatsGrid">
+                    <div className="historyStatCard">
+                        <div className="historyStatIcon">⏳</div>
+                        <div className="historyStatContent">
+                            <span className="historyStatValue" style={{ color: 'var(--color-primary-light)' }}>
+                                {formatFullTime(totalTime)}
+                            </span>
+                            <span className="historyStatLabel">Celkový čas</span>
                         </div>
                     </div>
 
-                    {/* 2. Zodpovězeno */}
-                    <div className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>✅</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.8, textAlign: 'center' }}>Zodpovězeno otázek</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-success)' }}>
-                            {totalQuestions}
+                    <div className="historyStatCard">
+                        <div className="historyStatIcon">✅</div>
+                        <div className="historyStatContent">
+                            <span className="historyStatValue" style={{ color: 'var(--color-success)' }}>
+                                {totalQuestions}
+                            </span>
+                            <span className="historyStatLabel">Otázek</span>
                         </div>
                     </div>
 
-                    {/* 3. Počet testů */}
-                    <div className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>📝</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.8, textAlign: 'center' }}>Dokončené testy</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-text-main)' }}>
-                            {detailedStats.count}
+                    <div className="historyStatCard">
+                        <div className="historyStatIcon">📝</div>
+                        <div className="historyStatContent">
+                            <span className="historyStatValue">
+                                {detailedStats.count}
+                            </span>
+                            <span className="historyStatLabel">Testů</span>
                         </div>
                     </div>
 
-                    {/* 4. Průměrná úspěšnost */}
-                    <div className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>📊</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.8, textAlign: 'center' }}>Průměrná úspěšnost</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: detailedStats.average >= 75 ? 'var(--color-success)' : detailedStats.average >= 50 ? 'var(--color-warning)' : 'var(--color-error)' }}>
-                            {detailedStats.average}%
+                    <div className="historyStatCard">
+                        <div className="historyStatIcon">📊</div>
+                        <div className="historyStatContent">
+                            <span className="historyStatValue" style={{ 
+                                color: detailedStats.average >= 75 ? 'var(--color-success)' : 
+                                       detailedStats.average >= 50 ? 'var(--color-warning)' : 'var(--color-error)' 
+                            }}>
+                                {detailedStats.average}%
+                            </span>
+                            <span className="historyStatLabel">Průměr</span>
                         </div>
                     </div>
 
-                    {/* 5. Nejlepší výsledek */}
-                    <div className="card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <div style={{ fontSize: '1.8rem', marginBottom: '0.3rem' }}>🏆</div>
-                        <div style={{ fontSize: '0.8rem', opacity: 0.8, textAlign: 'center' }}>Nejlepší skóre</div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-warning)' }}>
-                            {detailedStats.best}%
+                    <div className="historyStatCard historyStatCardHighlight">
+                        <div className="historyStatIcon">🏆</div>
+                        <div className="historyStatContent">
+                            <span className="historyStatValue" style={{ color: '#fbbf24' }}>
+                                {detailedStats.best}%
+                            </span>
+                            <span className="historyStatLabel">Nejlepší</span>
                         </div>
                     </div>
                 </div>
 
-                {/* GRAF (Bar chart) */}
                 <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', textAlign: 'center' }}>Vývoj úspěšnosti</h3>
-                    <div style={{ height: '250px', width: '100%' }}>
+                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', textAlign: 'center', fontSize: '1.1rem' }}>
+                        Vývoj úspěšnosti
+                    </h3>
+                    <div style={{ height: '220px', width: '100%' }}>
                         <HistoryGraph data={filteredHistory} />
                     </div>
                 </div>
 
-                {/* SEZNAM HISTORIE */}
-                <h3 style={{ marginBottom: '1rem', paddingLeft: '0.5rem' }}>Poslední aktivity</h3>
+                <h3 className="historyListTitle">Poslední aktivity</h3>
 
                 {filteredHistory.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem', opacity: 0.6 }}>
-                        {currentSubject 
+                    <div className="historyEmpty">
+                        <div className="historyEmptyIcon">📭</div>
+                        <p>{currentSubject 
                             ? `Zatím žádná historie pro ${currentSubject}.`
-                            : "Zatím žádná historie. Hurá do učení! 🚀"}
+                            : "Zatím žádná historie. Hurá do učení!"}</p>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                        {filteredHistory.map((item) => {
+                    <div className="historyList">
+                        {filteredHistory.map((item, index) => {
                             const date = new Date(item.date);
                             const successRate = item.score?.total > 0 
                                 ? Math.round((item.score.correct / item.score.total) * 100) 
                                 : 0;
-
-                            // Aktualizovaná logika barev podle nových intervalů
-                            let scoreColor = 'var(--color-text-main)';
-                            if (successRate >= 84) scoreColor = '#22c55e'; // 1 (84-100%)
-                            else if (successRate >= 67) scoreColor = '#84cc16'; // 2 (67-83%)
-                            else if (successRate >= 50) scoreColor = '#eab308'; // 3 (50-66%)
-                            else if (successRate >= 33) scoreColor = '#f97316'; // 4 (33-49%)
-                            else scoreColor = '#ef4444'; // 5 (0-32%)
+                            const scoreColor = getScoreColor(successRate);
 
                             return (
-                                <div key={item.id} className="card" style={{ 
-                                    padding: '1rem', 
-                                    display: 'flex', 
-                                    alignItems: 'center', 
-                                    justifyContent: 'space-between',
-                                    gap: '1rem',
-                                    animation: 'fadeIn 0.3s ease'
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-                                        <div style={{ 
-                                            fontSize: '1.8rem', 
-                                            backgroundColor: 'rgba(255,255,255,0.05)', 
-                                            width: '50px', 
-                                            height: '50px', 
-                                            borderRadius: '50%', 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            justifyContent: 'center' 
+                                <div 
+                                    key={item.id} 
+                                    className="historyItem"
+                                    style={{ animationDelay: `${index * 0.05}s` }}
+                                >
+                                    <div className="historyItemLeft">
+                                        <div className="historyItemIcon" style={{ 
+                                            background: `linear-gradient(135deg, ${scoreColor}20, ${scoreColor}10)`,
+                                            borderColor: `${scoreColor}40`
                                         }}>
                                             {getModeIcon(item.mode)}
                                         </div>
-                                        <div>
-                                            <div style={{ fontWeight: 'bold', marginBottom: '0.2rem' }}>
+                                        <div className="historyItemInfo">
+                                            <div className="historyItemMode">
                                                 {getModeName(item.mode)}
-                                                {!currentSubject && item.subject && <span style={{ opacity: 0.6, fontSize: '0.85em', marginLeft: '6px' }}>({item.subject})</span>}
+                                                {!currentSubject && item.subject && (
+                                                    <span className="historyItemSubject">{item.subject}</span>
+                                                )}
                                             </div>
-                                            <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                                {date.toLocaleDateString('cs-CZ')} • {date.toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'})}
+                                            <div className="historyItemDate">
+                                                {getRelativeTime(date)}
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                        <div>
-                                            <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: scoreColor }}>
+                                    <div className="historyItemRight">
+                                        <div className="historyItemScore">
+                                            <span className="historyItemPercent" style={{ color: scoreColor }}>
                                                 {successRate}%
-                                            </div>
-                                            <div style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                                            </span>
+                                            <span className="historyItemFraction">
                                                 {item.score?.correct}/{item.score?.total}
-                                            </div>
+                                            </span>
                                         </div>
-
                                         <button 
+                                            className="historyDeleteBtn"
                                             onClick={() => onDeleteRecord(item.id)}
-                                            style={{
-                                                background: 'transparent',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                fontSize: '1.2rem',
-                                                opacity: 0.4,
-                                                padding: '8px',
-                                                transition: 'opacity 0.2s',
-                                                color: 'var(--color-text-main)'
-                                            }}
-                                            onMouseOver={(e) => e.target.style.opacity = 1}
-                                            onMouseOut={(e) => e.target.style.opacity = 0.4}
                                             title="Smazat záznam"
                                         >
                                             🗑️

@@ -875,3 +875,279 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
     padding: 0;
   }
 }
+
+/* === HISTORY VIEW REDESIGN === */
+.historyStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.historyStatCard {
+    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
+    border: 1px solid var(--color-card-border);
+    border-radius: 16px;
+    padding: 1rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.historyStatCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.historyStatCardHighlight {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.historyStatIcon {
+    font-size: 1.5rem;
+}
+
+.historyStatContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.historyStatValue {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+}
+
+.historyStatLabel {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-neutral);
+    font-weight: 600;
+    text-align: center;
+}
+
+.historyListTitle {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-left: 0.3rem;
+    color: var(--color-text-main);
+}
+
+.historyEmpty {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
+    border-radius: 20px;
+    border: 1px solid var(--color-card-border);
+}
+
+.historyEmptyIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.historyEmpty p {
+    color: var(--color-text-neutral);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.historyList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.historyItem {
+    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
+    border: 1px solid var(--color-card-border);
+    border-radius: 16px;
+    padding: 0.9rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    animation: slideUp 0.3s ease both;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.historyItem:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.historyItemLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.historyItemIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border: 1px solid;
+    flex-shrink: 0;
+}
+
+.historyItemInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.historyItemMode {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.historyItemSubject {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-neutral);
+    background: rgba(255, 255, 255, 0.08);
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+}
+
+body.light-mode .historyItemSubject {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.historyItemDate {
+    font-size: 0.75rem;
+    color: var(--color-text-neutral);
+}
+
+.historyItemRight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.historyItemScore {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+}
+
+.historyItemPercent {
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.historyItemFraction {
+    font-size: 0.75rem;
+    color: var(--color-text-neutral);
+}
+
+.historyDeleteBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    opacity: 0.3;
+    padding: 8px;
+    transition: opacity 0.2s, transform 0.2s;
+    color: var(--color-text-main);
+    border-radius: 8px;
+}
+
+.historyDeleteBtn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .historyStatsGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+    }
+    
+    .historyStatCard {
+        padding: 0.8rem 0.5rem;
+        border-radius: 12px;
+    }
+    
+    .historyStatIcon {
+        font-size: 1.3rem;
+    }
+    
+    .historyStatValue {
+        font-size: 1.1rem;
+    }
+    
+    .historyStatLabel {
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .historyStatsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .historyStatCardHighlight {
+        grid-column: span 2;
+    }
+    
+    .historyItem {
+        padding: 0.8rem 1rem;
+        border-radius: 14px;
+    }
+    
+    .historyItemIcon {
+        width: 38px;
+        height: 38px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+    }
+    
+    .historyItemMode {
+        font-size: 0.9rem;
+    }
+    
+    .historyItemPercent {
+        font-size: 1.1rem;
+    }
+    
+    .historyItemRight {
+        gap: 0.6rem;
+    }
+    
+    .historyDeleteBtn {
+        padding: 6px;
+        font-size: 1rem;
+    }
+}
