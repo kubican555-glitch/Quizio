@@ -394,14 +394,15 @@ export default function App() {
         if (b < currentIndex) setDirection("left"); else setDirection("right");
         setCurrentIndex(b); setSelectedAnswer(null);
         
-        // Mobilní zarovnání na začátek otázky
+        // Mobilní zarovnání na začátek otázky - upraveno pro plynulost
         if (window.innerWidth <= 768) {
-            setTimeout(() => {
+            // Použijeme requestAnimationFrame pro maximální plynulost
+            requestAnimationFrame(() => {
                 const container = document.querySelector('.container');
                 if (container) {
                     container.scrollTo({ top: 0, behavior: 'instant' });
                 }
-            }, 50);
+            });
         }
     };
 
