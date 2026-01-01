@@ -269,29 +269,25 @@ body.light-mode .backArrowBtn { color: #0f172a; }
 
 html, body {
   width: 100%; min-height: 100%;
-  background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+  background: var(--color-bg-start);
   background-attachment: fixed; background-size: cover;
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
   color: var(--color-text-main);
   transition: background-color 0.4s ease, color 0.4s ease;
   user-select: none; -webkit-user-select: none; cursor: default;
-  /* DŮLEŽITÉ PRO IPHONE - ZABRÁNÍ BÍLÝM PRUHŮM */
-  background-color: var(--color-bg-start); 
 
   /* --- OPRAVY PRO MOBILNÍ DOTYKOVÉ CHOVÁNÍ --- */
   -webkit-touch-callout: none;      /* Zabrání vyvolání kontextového menu na iOS (lupa) */
   -webkit-tap-highlight-color: transparent; /* Odstraní šedé podbarvení při kliknutí */
+  
+  /* Zabrání skákání při overscrollu a zajistí barvu pozadí */
+  overscroll-behavior-y: none;
 }
 
-/* Zabránění přetahování obrázků (ghost image) */
-img {
-    -webkit-user-drag: none;
-    user-drag: none;
-    user-select: none;
-    -webkit-user-select: none;
+body.light-mode {
+  background: var(--color-bg-start) !important;
+  background-color: var(--color-bg-start) !important;
 }
-
-input, textarea { user-select: text; -webkit-user-select: text; cursor: text; }
 
 #root { 
     width: 100%; 
@@ -299,20 +295,11 @@ input, textarea { user-select: text; -webkit-user-select: text; cursor: text; }
     display: flex; 
     flex-direction: column; 
     padding-top: 0; 
+    background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
 }
 
-body.modal-open { overflow: hidden !important; }
-
-/* === REŽIM KLÁVESNICE (SKRYTÍ KURZORU) === */
-body.keyboard-mode-active,
-body.keyboard-mode-active * {
-    cursor: none !important;
-}
-
-body.keyboard-mode-active :focus-visible {
-    outline: 2px solid var(--color-primary-light);
-    outline-offset: 2px;
-    pointer-events: auto !important;
+body.light-mode #root {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 60%, #cbd5e1 100%);
 }
 
 /* === KONTEJNER (Scrollovací oblast) === */
@@ -323,6 +310,8 @@ body.keyboard-mode-active :focus-visible {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
   min-height: 100vh;
   scrollbar-width: none; 
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .container::-webkit-scrollbar { display: none; }
 
