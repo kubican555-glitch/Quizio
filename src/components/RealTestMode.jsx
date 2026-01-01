@@ -156,6 +156,14 @@ export function RealTestMode({
     }, [currentIndex, selectedAnswer, showConfirmSubmit, isSubmitting, currentQuestion, finalResult]);
 
 
+    const handleSwipe = (swipeDirection) => {
+        if (swipeDirection === "left") {
+            moveToQuestion(currentIndex + 1);
+        } else if (swipeDirection === "right") {
+            moveToQuestion(currentIndex - 1);
+        }
+    };
+
     // --- RENDER ---
     if (finalResult) {
         return (
@@ -232,6 +240,7 @@ export function RealTestMode({
                             isKeyboardMode={true}
                             currentSubject={test.subject}
                             onZoom={setFullscreenImage}
+                            onSwipe={handleSwipe}
                             score={{correct:0, total:0}}
                         />
                     </div>
