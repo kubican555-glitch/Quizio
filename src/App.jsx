@@ -373,7 +373,16 @@ export default function App() {
                 const qToMove = newSet.shift(); qToMove.userAnswer = undefined; newSet.splice(Math.min(newSet.length, 3 + Math.floor(Math.random() * 3)), 0, qToMove);
             }
             if (newSet.length === 0) { setFinished(true); addToHistory(score); }
-            else { setQuestionSet(newSet); setSelectedAnswer(null); setShowResult(false); }
+            else { 
+                setQuestionSet(newSet); setSelectedAnswer(null); setShowResult(false); 
+                // Mobilní zarovnání pro smart/mistakes mode
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        const container = document.querySelector('.container');
+                        if (container) container.scrollTo({ top: 0, behavior: 'instant' });
+                    }, 50);
+                }
+            }
         }
     };
     const confirmFlashcardAnswer = () => { if (!finished && !showResult) clickFlashcardAnswer(selectedAnswer !== null ? selectedAnswer : -1); };
@@ -384,6 +393,16 @@ export default function App() {
         const b = Math.max(0, Math.min(newIdx, questionSet.length - 1));
         if (b < currentIndex) setDirection("left"); else setDirection("right");
         setCurrentIndex(b); setSelectedAnswer(null);
+        
+        // Mobilní zarovnání na začátek otázky
+        if (window.innerWidth <= 768) {
+            setTimeout(() => {
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.scrollTo({ top: 0, behavior: 'instant' });
+                }
+            }, 50);
+        }
     };
 
     const handleSwipe = (dir) => {
