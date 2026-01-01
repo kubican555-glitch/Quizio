@@ -107,6 +107,7 @@ export function QuestionCard({
     if (!element) return;
 
     const handleTouchStart = (e) => {
+      // Record initial touch point
       touchStart.current = { x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY };
       touchCurrent.current = { ...touchStart.current };
     };
@@ -120,35 +121,42 @@ export function QuestionCard({
       const diffX = Math.abs(clientX - touchStart.current.x);
       const diffY = Math.abs(clientY - touchStart.current.y);
 
-      // If horizontal movement is greater than vertical, it's a swipe attempt
+      // If horizontal movement is dominant, prevent scrolling to capture the swipe
       if (diffX > diffY && diffX > 10) {
-          // Check if we have an onSwipe handler before preventing default
-          if (onSwipe && e.cancelable) {
-              e.preventDefault();
-          }
+        if (onSwipe && e.cancelable) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (!touchStart.current.x) return;
+      const distanceX = touchCurrent.current.x - touchStart.current.x;
+      const distanceY = touchCurrent.current.y - touchStart.current.y;
+      
+      const absX = Math.abs(distanceX);
+      const absY = Math.abs(distanceY);
+
+      // Reset touch start
+      touchStart.current = { x: 0, y: 0 };
+
+      // Ensure horizontal swipe is dominant and meets threshold
+      if (absX > absY && absX > minSwipeDistance && onSwipe) {
+        if (distanceX > 0) onSwipe("right");
+        else onSwipe("left");
       }
     };
 
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
     element.addEventListener('touchmove', handleTouchMove, { passive: false });
+    element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       element.removeEventListener('touchstart', handleTouchStart);
       element.removeEventListener('touchmove', handleTouchMove);
+      element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, []);
-
-  const handleTouchEnd = () => {
-    if (!touchStart.current.x) return;
-    const distanceX = touchCurrent.current.x - touchStart.current.x;
-    const distanceY = touchCurrent.current.y - touchStart.current.y;
-    touchStart.current = { x: 0, y: 0 };
-
-    if (Math.abs(distanceY) > Math.abs(distanceX)) return;
-
-    if (distanceX > minSwipeDistance && onSwipe) onSwipe("right");
-    else if (distanceX < -minSwipeDistance && onSwipe) onSwipe("left");
-  };
+  }, [onSwipe]);
 
   // 6. RENDER
   if (!currentQuestion || !isReady) {

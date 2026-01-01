@@ -156,10 +156,12 @@ export function RealTestMode({
     }, [currentIndex, selectedAnswer, showConfirmSubmit, isSubmitting, currentQuestion, finalResult]);
 
 
-    const handleSwipe = (swipeDirection) => {
-        if (swipeDirection === "left") {
+    const handleSwipe = (dir) => {
+        if (finalResult || showConfirmSubmit || isSubmitting) return;
+        
+        if (dir === "left") {
             moveToQuestion(currentIndex + 1);
-        } else if (swipeDirection === "right") {
+        } else if (dir === "right") {
             moveToQuestion(currentIndex - 1);
         }
     };
