@@ -932,11 +932,24 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
     text-align: center;
 }
 
+.historyListHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
 .historyListTitle {
     font-size: 1.1rem;
-    margin-bottom: 1rem;
+    margin: 0;
     padding-left: 0.3rem;
     color: var(--color-text-main);
+}
+
+.historyPageInfo {
+    font-size: 0.85rem;
+    color: var(--color-text-neutral);
+    font-weight: 500;
 }
 
 .historyEmpty {
@@ -1149,5 +1162,74 @@ body.light-mode .historyItemSubject {
     .historyDeleteBtn {
         padding: 6px;
         font-size: 1rem;
+    }
+}
+
+/* === HISTORY PAGINATION === */
+.historyPagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+}
+
+.historyPaginationBtn {
+    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
+    border: 1px solid var(--color-card-border);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    color: var(--color-text-main);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.historyPaginationBtn:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+}
+
+.historyPaginationBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.historyPaginationDots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.historyPaginationDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-card-border);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.historyPaginationDot.active {
+    background: var(--color-primary);
+    transform: scale(1.2);
+}
+
+.historyPaginationDot:hover:not(.active) {
+    background: var(--color-text-neutral);
+}
+
+@media (max-width: 480px) {
+    .historyPagination {
+        gap: 0.6rem;
+        padding: 0.8rem;
+    }
+    
+    .historyPaginationBtn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
     }
 }

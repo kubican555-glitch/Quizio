@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { HistoryGraph } from './HistoryGraph';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 
@@ -16,6 +16,9 @@ const formatFullTime = (seconds) => {
     return parts.join(' ');
 };
 
+const ITEMS_PER_PAGE = 10;
+const MAX_ITEMS = 20;
+
 export const HistoryView = ({ 
     history = [], 
     totalTimeMap = {}, 
@@ -28,13 +31,21 @@ export const HistoryView = ({
     syncing,
     currentSubject 
 }) => {
+    const [currentPage, setCurrentPage] = useState(0);
+
     const filteredHistory = useMemo(() => {
         let data = [...history];
         if (currentSubject) {
             data = data.filter(h => h.subject === currentSubject);
         }
-        return data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        return data.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, MAX_ITEMS);
     }, [history, currentSubject]);
+
+    const totalPages = Math.ceil(filteredHistory.length / ITEMS_PER_PAGE);
+    const paginatedHistory = filteredHistory.slice(
+        currentPage * ITEMS_PER_PAGE,
+        (currentPage + 1) * ITEMS_PER_PAGE
+    );
 
     const totalTime = useMemo(() => {
         let baseTime = 0;
@@ -206,7 +217,14 @@ export const HistoryView = ({
                     </div>
                 </div>
 
-                <h3 className="historyListTitle">Poslední aktivity</h3>
+                <div className="historyListHeader">
+                    <h3 className="historyListTitle">Poslední aktivity</h3>
+                    {totalPages > 1 && (
+                        <span className="historyPageInfo">
+                            {currentPage + 1} / {totalPages}
+                        </span>
+                    )}
+                </div>
 
                 {filteredHistory.length === 0 ? (
                     <div className="historyEmpty">
@@ -216,61 +234,91 @@ export const HistoryView = ({
                             : "Zatím žádná historie. Hurá do učení!"}</p>
                     </div>
                 ) : (
-                    <div className="historyList">
-                        {filteredHistory.map((item, index) => {
-                            const date = new Date(item.date);
-                            const successRate = item.score?.total > 0 
-                                ? Math.round((item.score.correct / item.score.total) * 100) 
-                                : 0;
-                            const scoreColor = getScoreColor(successRate);
+                    <>
+                        <div className="historyList">
+                            {paginatedHistory.map((item, index) => {
+                                const date = new Date(item.date);
+                                const successRate = item.score?.total > 0 
+                                    ? Math.round((item.score.correct / item.score.total) * 100) 
+                                    : 0;
+                                const scoreColor = getScoreColor(successRate);
 
-                            return (
-                                <div 
-                                    key={item.id} 
-                                    className="historyItem"
-                                    style={{ animationDelay: `${index * 0.05}s` }}
+                                return (
+                                    <div 
+                                        key={item.id} 
+                                        className="historyItem"
+                                        style={{ animationDelay: `${index * 0.03}s` }}
+                                    >
+                                        <div className="historyItemLeft">
+                                            <div className="historyItemIcon" style={{ 
+                                                background: `linear-gradient(135deg, ${scoreColor}20, ${scoreColor}10)`,
+                                                borderColor: `${scoreColor}40`
+                                            }}>
+                                                {getModeIcon(item.mode)}
+                                            </div>
+                                            <div className="historyItemInfo">
+                                                <div className="historyItemMode">
+                                                    {getModeName(item.mode)}
+                                                    {!currentSubject && item.subject && (
+                                                        <span className="historyItemSubject">{item.subject}</span>
+                                                    )}
+                                                </div>
+                                                <div className="historyItemDate">
+                                                    {getRelativeTime(date)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="historyItemRight">
+                                            <div className="historyItemScore">
+                                                <span className="historyItemPercent" style={{ color: scoreColor }}>
+                                                    {successRate}%
+                                                </span>
+                                                <span className="historyItemFraction">
+                                                    {item.score?.correct}/{item.score?.total}
+                                                </span>
+                                            </div>
+                                            <button 
+                                                className="historyDeleteBtn"
+                                                onClick={() => onDeleteRecord(item.id)}
+                                                title="Smazat záznam"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {totalPages > 1 && (
+                            <div className="historyPagination">
+                                <button 
+                                    className="historyPaginationBtn"
+                                    onClick={() => setCurrentPage(p => p - 1)}
+                                    disabled={currentPage === 0}
                                 >
-                                    <div className="historyItemLeft">
-                                        <div className="historyItemIcon" style={{ 
-                                            background: `linear-gradient(135deg, ${scoreColor}20, ${scoreColor}10)`,
-                                            borderColor: `${scoreColor}40`
-                                        }}>
-                                            {getModeIcon(item.mode)}
-                                        </div>
-                                        <div className="historyItemInfo">
-                                            <div className="historyItemMode">
-                                                {getModeName(item.mode)}
-                                                {!currentSubject && item.subject && (
-                                                    <span className="historyItemSubject">{item.subject}</span>
-                                                )}
-                                            </div>
-                                            <div className="historyItemDate">
-                                                {getRelativeTime(date)}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="historyItemRight">
-                                        <div className="historyItemScore">
-                                            <span className="historyItemPercent" style={{ color: scoreColor }}>
-                                                {successRate}%
-                                            </span>
-                                            <span className="historyItemFraction">
-                                                {item.score?.correct}/{item.score?.total}
-                                            </span>
-                                        </div>
-                                        <button 
-                                            className="historyDeleteBtn"
-                                            onClick={() => onDeleteRecord(item.id)}
-                                            title="Smazat záznam"
-                                        >
-                                            🗑️
-                                        </button>
-                                    </div>
+                                    ← Novější
+                                </button>
+                                <div className="historyPaginationDots">
+                                    {Array.from({ length: totalPages }, (_, i) => (
+                                        <button
+                                            key={i}
+                                            className={`historyPaginationDot ${currentPage === i ? 'active' : ''}`}
+                                            onClick={() => setCurrentPage(i)}
+                                        />
+                                    ))}
                                 </div>
-                            );
-                        })}
-                    </div>
+                                <button 
+                                    className="historyPaginationBtn"
+                                    onClick={() => setCurrentPage(p => p + 1)}
+                                    disabled={currentPage === totalPages - 1}
+                                >
+                                    Starší →
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
