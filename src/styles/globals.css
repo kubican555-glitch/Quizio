@@ -275,6 +275,7 @@ html, body {
   color: var(--color-text-main);
   transition: background-color 0.4s ease, color 0.4s ease;
   user-select: none; -webkit-user-select: none; cursor: default;
+  scrollbar-gutter: stable;
 
   /* --- OPRAVY PRO MOBILNÍ DOTYKOVÉ CHOVÁNÍ --- */
   -webkit-touch-callout: none;      /* Zabrání vyvolání kontextového menu na iOS (lupa) */
@@ -282,6 +283,16 @@ html, body {
   
   /* Zabrání skákání při overscrollu a zajistí barvu pozadí */
   overscroll-behavior-y: none;
+}
+
+/* Skrytí scrollbaru globálně */
+::-webkit-scrollbar {
+    display: none;
+}
+
+* {
+    -ms-overflow-style: none;  /* IE a Edge */
+    scrollbar-width: none;     /* Firefox */
 }
 
 body.light-mode {
