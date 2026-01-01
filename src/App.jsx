@@ -45,13 +45,11 @@ const ReviewImage = ({ q, subject, setFullscreenImage }) => {
     });
 
     useEffect(() => {
-        let isMounted = true;
         if (q.id && !imgUrl) {
             fetchQuestionImage(q.id).then(url => {
-                if (isMounted && url) setImgUrl(url);
+                if (url) setImgUrl(url);
             });
         }
-        return () => { isMounted = false; };
     }, [q.id, imgUrl]);
 
     if (!imgUrl) return null;
@@ -353,14 +351,7 @@ export default function App() {
     const removeMistake = (qNumber) => updateMistakes((prev) => { const cur = prev[subject] || []; return cur.includes(qNumber) ? { ...prev, [subject]: cur.filter((n) => n !== qNumber) } : prev; });
     const clearMistakes = () => { updateMistakes((prev) => ({ ...prev, [subject]: [] })); setShowClearMistakesConfirm(false); };
     const handleSelectSubject = (subj) => { setSubject(subj.toUpperCase()); };
-    const handleStartMode = (startFn, modeName) => { 
-        if (!activeQuestionsCache || activeQuestionsCache.length === 0) {
-            alert("Žádné otázky nejsou k dispozici. Zkuste prosím změnit předmět nebo se znovu přihlásit.");
-            return;
-        }
-        if (modeName === "smart") { setShowSmartSettings(true); return; } 
-        startFn(); 
-    };
+    const handleStartMode = (startFn, modeName) => { if (modeName === "smart") { setShowSmartSettings(true); return; } startFn(); };
 
     const handleReportClick = (questionNumber) => { setQuestionToReport(questionNumber); setReportModalOpen(true); };
 
@@ -796,14 +787,6 @@ export default function App() {
     let stackLevelClass = "";
     if (remainingCards <= 1) stackLevelClass = "stack-level-0";
     else if (remainingCards === 2) stackLevelClass = "stack-level-1";
-
-    useEffect(() => {
-        if (isKeyboardMode) {
-            document.body.classList.add('keyboard-mode');
-        } else {
-            document.body.classList.remove('keyboard-mode');
-        }
-    }, [isKeyboardMode]);
 
     return (
         <>
