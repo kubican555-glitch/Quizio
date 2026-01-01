@@ -541,7 +541,7 @@ body.light-mode .timer { background: linear-gradient(135deg, rgba(37, 99, 235, 0
     border: 1px solid rgba(148, 163, 184, 0.15); 
     backdrop-filter: blur(30px); 
     border-radius: 32px; 
-    padding: 0.8rem 1rem; /* Zmenšený padding pro posun ke krajům */
+    padding: 0.8rem 1.2rem; 
     margin-bottom: 1rem; 
     transition: all 0.3s ease; 
     position: relative;
@@ -561,16 +561,6 @@ body.light-mode .flashcardHeader {
     align-items: center;
     flex: 1;
     min-width: 0;
-}
-
-.statItem:first-child {
-    align-items: flex-start; /* První stat více doleva */
-    padding-left: 0.5rem;
-}
-
-.statItem:last-child {
-    align-items: flex-end; /* Poslední stat více doprava */
-    padding-right: 0.5rem;
 }
 
 .statLabel { 
