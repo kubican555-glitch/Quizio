@@ -23,7 +23,7 @@ import {
     isFlashcardStyle 
 } from "./utils/formatting.js";
 import { getImageUrl } from "./utils/images.js";
-import { fetchQuestionsLightweight, clearImageCache } from "./utils/dataManager.js"; 
+import { fetchQuestionsLightweight, clearImageCache, getCachedImage } from "./utils/dataManager.js"; 
 
 import { SubjectBadge } from "./components/SubjectBadge.jsx";
 import { UserBadgeDisplay } from "./components/UserBadgeDisplay.jsx";
@@ -718,8 +718,7 @@ export default function App() {
                             <p style={{ textAlign: "center", color: "#888", gridColumn: "1/-1" }}>Nic nenalezeno.</p>
                         ) : (
                             paginatedQuestions.map((q) => {
-                                const staticUrl = getImageUrl(subject, q.number);
-                                const imageUrl = staticUrl || (q.image && q.image.length > 5 ? q.image : null);
+                                const imageUrl = q.image_base64 || (q.id ? getCachedImage(q.id) : null) || getImageUrl(subject, q.number) || (q.image && q.image.length > 5 ? q.image : null);
                                 return (
                                     <div key={q.number} className="reviewCard">
                                         <div className="reviewHeader"><strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} /></div>
