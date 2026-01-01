@@ -228,7 +228,7 @@ export function RealTestMode({
                 <div className="progressText">Otázka {currentIndex + 1} / {questionSet.length}</div>
 
                 <div className="card" ref={cardRef}>
-                    <div key={currentIndex} className={direction === 'left' ? "card-enter-left" : "card-enter-animation"} style={{width: '100%'}}>
+                    <div key={currentIndex} className={direction === 'left' ? "slide-in-left" : "slide-in-right"} style={{width: '100%'}}>
                         <QuestionCard
                             currentQuestion={currentQuestion}
                             mode="mock" 

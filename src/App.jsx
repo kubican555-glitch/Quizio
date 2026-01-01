@@ -771,7 +771,7 @@ export default function App() {
                             )}
 
                             <div className={`card ${isFlashcardStyle(mode) || mode==='test_practice' ? `stacked-card ${stackLevelClass}` : ""} ${shake ? "shake" : ""}`} ref={cardRef}>
-                                <div key={currentQuestion.id || currentQuestion.number || currentIndex} className={exitDirection ? (exitDirection === 'left' ? "card-exit-left" : "card-exit-right") : ((isFlashcardStyle(mode) || mode==='test_practice') ? "" : (direction === "left" ? "card-enter-left" : "card-enter-animation"))} style={{width: '100%'}}>
+                                <div key={currentQuestion.id || currentQuestion.number || currentIndex} className={exitDirection ? (exitDirection === 'left' ? "card-exit-left" : "card-exit-right") : ((isFlashcardStyle(mode) || mode==='test_practice') ? "" : (direction === "left" ? "slide-in-left" : "slide-in-right"))} style={{width: '100%'}}>
                                     <QuestionCard
                                         currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer}
                                         onSelect={(i) => (isFlashcardStyle(mode) || mode==='test_practice') ? clickFlashcardAnswer(i) : handleAnswer(i)}
