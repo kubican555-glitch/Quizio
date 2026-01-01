@@ -54,208 +54,214 @@
   --vh: 100vh;
 }
 
-/* --- SVĚTLÝ MOTIV --- */
+/* --- SVĚTLÝ MOTIV (VYLEPŠENÝ) --- */
 body.light-mode {
-  background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 50%, #cbd5e1 100%) !important;
-  color: #1e293b;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 60%, #cbd5e1 100%) !important;
+  color: #0f172a; 
 
-  --color-bg-start: #f0f4f8; --color-bg-mid: #e2e8f0; --color-bg-end: #cbd5e1;
-  --color-text-main: #1e293b; --color-text-secondary: #475569; --color-text-neutral: #64748b;
+  --color-bg-start: #f8fafc; 
+  --color-bg-mid: #e2e8f0; 
+  --color-bg-end: #cbd5e1;
+  --color-text-main: #0f172a; 
+  --color-text-secondary: #334155; 
+  --color-text-neutral: #64748b;
 
-  --color-card-bg-start: rgba(255, 255, 255, 0.9);
-  --color-card-bg-end: rgba(255, 255, 255, 0.8);
-  --color-card-border: rgba(148, 163, 184, 0.5);
+  --color-card-bg-start: rgba(255, 255, 255, 0.95);
+  --color-card-bg-end: rgba(255, 255, 255, 0.9);
+  --color-card-border: rgba(203, 213, 225, 0.8);
 
-  --color-option-bg-start: rgba(255, 255, 255, 0.7);
-  --color-option-bg-end: rgba(255, 255, 255, 0.5);
-  --color-option-border: rgba(148, 163, 184, 0.4);
-  --color-option-hover-bg-start: rgba(59, 130, 246, 0.1);
+  --color-option-bg-start: rgba(255, 255, 255, 0.8);
+  --color-option-bg-end: rgba(255, 255, 255, 0.6);
+  --color-option-border: rgba(203, 213, 225, 0.8);
+  --color-option-hover-bg-start: rgba(59, 130, 246, 0.15);
   --color-option-hover-bg-end: rgba(59, 130, 246, 0.05);
 
-  --color-nav-num-bg-start: rgba(255, 255, 255, 0.9);
-  --color-nav-num-bg-end: rgba(255, 255, 255, 0.7);
-  --color-nav-num-border: rgba(148, 163, 184, 0.5);
+  --color-nav-num-bg-start: #ffffff;
+  --color-nav-num-bg-end: #f1f5f9;
+  --color-nav-num-border: rgba(203, 213, 225, 0.8);
 
-  --color-back-btn-bg: rgba(203, 213, 225, 0.8);
-  --color-back-btn-color: #1e293b;
-  --color-back-btn-border: rgba(148, 163, 184, 0.4);
-  --color-menu-btn-shadow: rgba(59, 130, 246, 0.3);
+  --color-back-btn-bg: rgba(255, 255, 255, 0.8);
+  --color-back-btn-color: #0f172a;
+  --color-back-btn-border: rgba(203, 213, 225, 0.8);
+  --color-menu-btn-shadow: rgba(37, 99, 235, 0.25);
+
+  --color-primary: #2563eb; 
+  --color-primary-light: #3b82f6;
 }
 
 body.light-mode .menuButton.list-style {
-    background: var(--color-card-bg-start); 
-    border-color: var(--color-card-border); 
-    color: var(--color-text-main); 
+    background: #ffffff; 
+    border-color: #e2e8f0; 
+    color: #0f172a; 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 @media (hover: hover) {
     body.light-mode .menuButton.list-style:hover {
-        background: #f1f5f9; 
+        background: #f8fafc; 
         transform: translateY(-1px);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border-color: var(--color-primary);
     }
 }
 
 body.light-mode .menuButton.list-style span {
-    color: var(--color-text-main); 
+    color: #0f172a; 
 }
 
-/* Vzhled Opravna chyb (Danger) */
 body.light-mode .menuButton.list-style.danger-style {
-    background: rgba(255, 230, 230, 0.8); 
-    border-color: var(--color-error); 
+    background: #fef2f2; 
+    border-color: #fecaca; 
 }
 body.light-mode .menuButton.list-style.danger-style span {
-    color: var(--color-text-main); 
+    color: #991b1b; 
 }
 body.light-mode .menuButton.list-style.danger-style .list-icon {
-    color: var(--color-error); 
+    color: #ef4444; 
 }
 
 body.light-mode .test-details {
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.95); 
 }
 
-/* --- STACKED CARD STYLES (OPRAVENO: Viditelnost a rozestupy) --- */
+/* --- STACKED CARD STYLES (OPRAVENO: Fixnutá priorita a viditelnost) --- */
 
-/* Dark Mode Stacked Card (Default = 3+ karet) */
-.stacked-card {
-    /* 1. karta vzadu: posun 15px (bylo 12px), barva Slate-600.
-       2. karta vzadu: posun 30px (bylo 24px), barva Slate-700.
-       Větší odstup = lepší viditelnost i bez hoveru.
-    */
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.6), /* Hlavní stín */
+/* Používáme .card.stacked-card pro zvýšení specificity nad obyčejné .card */
 
-        /* 1. karta vzadu */
-        0 15px 0 -1px #475569, 
-        0 15px 1px -1px rgba(255, 255, 255, 0.5), /* Svítící hrana */
-
-        /* 2. karta vzadu */
-        0 30px 0 -2px #334155, 
-        0 30px 1px -2px rgba(255, 255, 255, 0.3); /* Svítící hrana */
-
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    margin-bottom: 4rem; /* Dostatek místa dole */
+/* Dark Mode Stacked Card */
+.card.stacked-card {
     position: relative;
     z-index: 10;
-}
+    margin-bottom: 4rem; /* Důležité: Místo pro stíny dole */
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-/* Hover efekt - Decentní posun (z 15/30 na 20/40) */
-@media (hover: hover) {
-    .stacked-card:hover {
-        transform: translateY(-4px); 
-        box-shadow: 
-            0 25px 70px rgba(0, 0, 0, 0.7),
+    /* TRVALE ROZBALENO (bez hoveru) */
+    transform: translateY(-5px); 
 
-            /* 1. karta */
-            0 20px 0 -1px #475569, 
-            0 20px 1px -1px rgba(255, 255, 255, 0.6),
-
-            /* 2. karta */
-            0 40px 0 -2px #334155,
-            0 40px 1px -2px rgba(255, 255, 255, 0.4);
-    }
-}
-
-/* Pokud zbývá jen 1 karta navíc (celkem 2) */
-.stacked-card.stack-level-1 {
+    /* Agresivní stíny pro viditelnost */
     box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.6),
-        0 15px 0 -1px #475569, 
-        0 15px 1px -1px rgba(255, 255, 255, 0.5) !important;
+        /* Hlavní stín */
+        0 30px 80px rgba(0, 0, 0, 0.8),
+
+        /* 1. KARTA VZADU (Posun 25px) */
+        0 25px 0 -1px rgba(255, 255, 255, 0.15), /* Svítící hrana */
+        0 25px 0 0 #1e293b,                  /* Pevné tělo */
+
+        /* 2. KARTA VZADU (Posun 50px) */
+        0 50px 0 -3px rgba(255, 255, 255, 0.1), /* Svítící hrana */
+        0 50px 0 -2px #0f172a;                  /* Pevné tělo */
 }
 
-@media (hover: hover) {
-    .stacked-card.stack-level-1:hover {
-        transform: translateY(-4px);
-        box-shadow: 
-            0 25px 70px rgba(0, 0, 0, 0.7),
-            0 20px 0 -1px #475569, 
-            0 20px 1px -1px rgba(255, 255, 255, 0.6) !important;
-    }
+/* STAV: Zbývá jen 1 další otázka (zobrazíme jen 1 kartu vzadu) */
+.card.stacked-card.stack-level-1 {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 30px 70px rgba(0, 0, 0, 0.7),
+        /* Pouze 1. karta vzadu */
+        0 25px 0 -1px rgba(255, 255, 255, 0.15),
+        0 25px 0 0 #1e293b
+        !important;
 }
 
-/* Pokud nezbývá žádná další karta (celkem 1) */
-.stacked-card.stack-level-0 {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+/* STAV: Poslední otázka (žádné karty vzadu) */
+.card.stacked-card.stack-level-0 {
+    transform: translateY(0);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.6) 
+        !important; 
+    margin-bottom: 1.5rem; /* Reset marginu */
 }
 
-@media (hover: hover) {
-    .stacked-card.stack-level-0:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
-    }
-}
 
 /* Light Mode Stacked Card */
-body.light-mode .stacked-card {
+body.light-mode .card.stacked-card {
     background: #ffffff;
+    border-color: #cbd5e1;
+    transform: translateY(-5px);
+
+    /* Světlé barvy pro karty vzadu */
     box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.1),
-        /* Světlý režim: 15px/30px */
-        0 15px 0 -1px #f1f5f9, 
-        0 15px 1px -1px #94a3b8,
-        0 30px 0 -2px #e2e8f0,
-        0 30px 1px -2px #94a3b8;
-    border-color: #e2e8f0;
+        /* Hlavní stín */
+        0 25px 60px rgba(37, 99, 235, 0.25),
+
+        /* 1. karta vzadu (Posun 25px) */
+        0 25px 0 -1px #94a3b8, /* Hrana */
+        0 25px 0 0 #f1f5f9,    /* Tělo */
+
+        /* 2. karta vzadu (Posun 50px) */
+        0 50px 0 -3px #94a3b8, /* Hrana */
+        0 50px 0 -2px #e2e8f0; /* Tělo */
+
     border-radius: 32px; 
 }
 
-@media (hover: hover) {
-    body.light-mode .stacked-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 
-            0 15px 40px rgba(0, 0, 0, 0.15),
-            0 20px 0 -1px #f1f5f9, 
-            0 20px 1px -1px #94a3b8,
-            0 40px 0 -2px #e2e8f0,
-            0 40px 1px -2px #94a3b8;
-    }
-}
-
-body.light-mode .stacked-card.stack-level-0 {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+body.light-mode .card.stacked-card.stack-level-1 {
+    transform: translateY(-5px);
+    box-shadow: 
+        0 25px 60px rgba(37, 99, 235, 0.25),
+        0 25px 0 -1px #94a3b8, 
+        0 25px 0 0 #f1f5f9 !important;
     border-radius: 32px !important;
 }
 
-body.light-mode .stacked-card.stack-level-1 {
-    box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.1),
-        0 15px 0 -1px #f1f5f9, 
-        0 15px 1px -1px #94a3b8 !important;
+body.light-mode .card.stacked-card.stack-level-0 {
+    transform: translateY(0);
+    box-shadow: 0 15px 40px rgba(37, 99, 235, 0.15) !important;
     border-radius: 32px !important;
 }
 
 /* Light mode navbar override */
-body.light-mode .top-navbar, body.light-mode .navbar, body.light-mode .appHeader { 
-    background: rgba(255, 255, 255, 0.85); /* Více neprůhledné */
-    border-color: rgba(0,0,0,0.05); 
+body.light-mode .top-navbar, 
+body.light-mode .navbar, 
+body.light-mode .appHeader { 
+    background: rgba(255, 255, 255, 0.95); 
+    border-bottom: 1px solid rgba(0,0,0,0.08); 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
 }
 
-/* === ADMIN PANEL LIGHT MODE FIXES (PŘIDÁNO) === */
-body.light-mode .admin-toolbar { background: #f1f5f9; border: 1px solid #e2e8f0; }
-body.light-mode .admin-toolbar input[type="text"] { background: #ffffff; color: #1e293b; border-color: #cbd5e1; }
-body.light-mode .admin-card { background: #ffffff; border-color: #e2e8f0; color: #1e293b; }
+/* === ADMIN PANEL LIGHT MODE FIXES === */
+body.light-mode .admin-toolbar { background: #f8fafc; border: 1px solid #e2e8f0; }
+body.light-mode .admin-toolbar input[type="text"] { background: #ffffff; color: #0f172a; border-color: #cbd5e1; }
+body.light-mode .admin-card { background: #ffffff; border-color: #e2e8f0; color: #0f172a; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
 @media (hover: hover) {
-    body.light-mode .admin-card:hover { background: #f8fafc; }
-    body.light-mode .btn-icon:hover { background: #e2e8f0; color: #1e293b; }
+    body.light-mode .admin-card:hover { background: #f8fafc; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+    body.light-mode .btn-icon:hover { background: #e2e8f0; color: #0f172a; }
     body.light-mode .admin-toolbar .navButton:hover { background: #f1f5f9; }
 }
 
 body.light-mode .admin-badge.badge-num { background: #e2e8f0; color: #475569; border-color: #cbd5e1; }
-body.light-mode .question-text { color: #1e293b; }
+body.light-mode .question-text { color: #0f172a; }
 body.light-mode .btn-icon { background: #f1f5f9; color: #64748b; border-color: #cbd5e1; }
 
-body.light-mode .form-input-style { background: #ffffff; color: #1e293b; border-color: #cbd5e1; }
-body.light-mode .form-input-style:focus { background: #ffffff; border-color: var(--color-primary); }
+body.light-mode .form-input-style { background: #ffffff; color: #0f172a; border-color: #cbd5e1; }
+body.light-mode .form-input-style:focus { background: #ffffff; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
 
-body.light-mode .admin-toolbar .navButton { background: #ffffff; color: #1e293b; border: 1px solid #cbd5e1; }
+body.light-mode .admin-toolbar .navButton { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
 
-body.light-mode .admin-toolbar .navButton.primary { background: var(--color-primary); color: #fff; border: none; }
-body.light-mode .logoText { color: #1e293b; } 
-body.light-mode .backArrowBtn { color: #1e293b; } 
+/* OPRAVA PRIMÁRNÍHO TLAČÍTKA PRO LIGHT MODE - KONTRAST */
+body.light-mode .admin-toolbar .navButton.primary,
+body.light-mode .navButton.primary,
+body.light-mode .submitTopButton { 
+    background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+    color: #ffffff; 
+    border: none;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); 
+    font-weight: 700;
+}
+
+@media (hover: hover) {
+    body.light-mode .admin-toolbar .navButton.primary:hover,
+    body.light-mode .navButton.primary:hover,
+    body.light-mode .submitTopButton:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af); 
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+    }
+}
+
+body.light-mode .logoText { color: #0f172a; } 
+body.light-mode .backArrowBtn { color: #0f172a; } 
 
 
 /* === GLOBALS === */
@@ -293,7 +299,6 @@ input, textarea { user-select: text; -webkit-user-select: text; cursor: text; }
     height: 100%; 
     display: flex; 
     flex-direction: column; 
-    /* DŮLEŽITÉ: ZMĚNA - Odstraněn padding-top z rootu, aby pozadí šlo pod notch */
     padding-top: 0; 
 }
 
@@ -315,7 +320,6 @@ body.keyboard-mode-active :focus-visible {
 .container { 
   max-width: 960px; width: 100%; margin: 0 auto; 
   padding: 1rem;
-  /* PŘIDÁNO: Padding pro safe-area přesunut sem */
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
   height: 100%; overflow-y: auto; scrollbar-width: none; 
@@ -331,7 +335,6 @@ body.keyboard-mode-active :focus-visible {
 @keyframes glow { 0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); } 50% { box-shadow: 0 0 35px rgba(59, 130, 246, 0.6); } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-8px) rotate(-2deg); } 40% { transform: translateX(8px) rotate(2deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
 .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--color-error) !important; box-shadow: 0 0 30px rgba(239, 68, 68, 0.4) !important; }
-/* OPRAVA: Zahrnutí translate do animace popIn */
 @keyframes popIn { 
     from { transform: translate(-50%, -50%) scale(0); opacity: 0; } 
     to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
@@ -351,21 +354,15 @@ body.keyboard-mode-active :focus-visible {
 .top-navbar, .navbar, .appHeader {
     width: 100%;
     max-width: 960px;
-
-    /* ZMĚNA: Relative místo Sticky */
     position: relative; 
-    z-index: 1000;    /* Stále vysoký index pro překrytí */
-
+    z-index: 1000;
     margin: 0 auto 1rem auto; 
     padding: 0.8rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    /* ZMĚNA: Plnější pozadí, aby neprosvítal glow */
-    background: rgba(10, 14, 39, 0.95); /* Tmavá poloprůhledná pro Dark Mode */
-
-    border-radius: 12px; /* Vráceno zaoblení, když není sticky */
+    background: rgba(10, 14, 39, 0.95);
+    border-radius: 12px;
     backdrop-filter: blur(15px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
@@ -373,15 +370,6 @@ body.keyboard-mode-active :focus-visible {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Light mode override pro Navbar */
-body.light-mode .top-navbar, 
-body.light-mode .navbar, 
-body.light-mode .appHeader { 
-    background: rgba(255, 255, 255, 0.95); /* Světlá neprůhledná */
-    border-color: rgba(0,0,0,0.05); 
-}
-
-/* Skupina vlevo a vpravo */
 .navbar-group {
     display: flex;
     align-items: center;
@@ -392,7 +380,6 @@ body.light-mode .appHeader {
 .title { font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 800; text-align: center; background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0.3rem 0 0.5rem; letter-spacing: -1px; }
 
 /* === MENU GRID === */
-/* OPRAVA: Rozdělení stylů pro subjectGrid a menuColumn pro odstranění mezery dole */
 .subjectGrid { 
     display: grid; 
     gap: 1.5rem; 
@@ -408,7 +395,7 @@ body.light-mode .appHeader {
     width: 100%; 
     max-width: 700px; 
     gap: 0.5rem; 
-    margin: 0 auto; /* ZMĚNA: Reset marginů (odstraněno 2.5rem dole) */
+    margin: 0 auto;
 }
 
 .menuButton { width: 100%; border: none; border-radius: 18px; padding: 1.8rem 1.4rem; cursor: pointer; background: linear-gradient(135deg, var(--color-primary), #6366f1 50%, var(--color-secondary) 100%); color: #fff; font-size: 1.15rem; font-weight: 700; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 10px 40px var(--color-menu-btn-shadow); position: relative; overflow: hidden; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; z-index: 1; }
@@ -473,13 +460,39 @@ body.light-mode .appHeader {
 }
 
 .navButton { background: rgba(59, 130, 246, 0.15); color: var(--color-primary-light); border: 2px solid rgba(59, 130, 246, 0.3); }
-body.light-mode .navButton { background: rgba(59, 130, 246, 0.1); }
+
+/* VYLEPŠENÉ TLAČÍTKO PRO SVĚTLÝ REŽIM */
+body.light-mode .navButton { 
+    background: rgba(37, 99, 235, 0.05); /* Velmi jemná modrá */
+    border: 1px solid rgba(37, 99, 235, 0.3); 
+    color: var(--color-primary); 
+}
 
 @media (hover: hover) {
     .navButton:hover { background: rgba(59, 130, 246, 0.25); border-color: rgba(59, 130, 246, 0.6); transform: translateY(-1px); }
+    body.light-mode .navButton:hover { background: rgba(37, 99, 235, 0.15); border-color: var(--color-primary); }
 }
 
 .navButton.primary { background: linear-gradient(135deg, var(--color-primary), #2563eb); color: white; border: none; box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5); }
+
+/* VÝRAZNÉ PRIMÁRNÍ TLAČÍTKO PRO SVĚTLÝ REŽIM */
+body.light-mode .navButton.primary,
+body.light-mode .submitTopButton {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8); /* Sytá modrá */
+    color: white;
+    border: none;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35); /* Výraznější stín */
+    font-weight: 800; /* Tučnější písmo */
+}
+
+@media (hover: hover) {
+    body.light-mode .navButton.primary:hover,
+    body.light-mode .submitTopButton:hover {
+        background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+    }
+}
+
 .navButton:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 /* Smart settings modal */
@@ -498,7 +511,7 @@ body.light-mode .progressBarContainer { background: rgba(0, 0, 0, 0.1); }
 .progressText { text-align: right; font-size: 0.8rem; color: var(--color-text-neutral); font-weight: 500; margin-bottom: 0.5rem; }
 
 .timer { font-weight: 700; background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%); border: 2px solid rgba(59, 130, 246, 0.5); color: var(--color-primary-light); padding: 0.6rem 1.2rem; border-radius: 12px; font-size: 0.95rem; display: inline-flex; align-items: center; justify-content: center; }
-body.light-mode .timer { background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%); }
+body.light-mode .timer { background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); border-color: rgba(37, 99, 235, 0.4); color: var(--color-primary); }
 .timerWarning { color: #fbbf24 !important; border-color: rgba(251, 191, 36, 0.5) !important; animation: pulse 1.5s infinite; }
 .timerDanger { color: #ff6b6b !important; border-color: rgba(239, 68, 68, 0.6) !important; animation: blink 0.8s infinite; }
 
@@ -516,7 +529,7 @@ body.light-mode .timer { background: linear-gradient(135deg, rgba(59, 130, 246, 
     transition: all 0.3s ease; 
     position: relative; /* DŮLEŽITÉ: Rodič pro absolutní pozici comba */
 }
-body.light-mode .flashcardHeader { background: rgba(255, 255, 255, 0.6); border-color: rgba(0,0,0,0.05); }
+body.light-mode .flashcardHeader { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.05); }
 
 .statItem { display: flex; flex-direction: column; align-items: center; }
 .statLabel { font-size: 0.75rem; text-transform: uppercase; color: var(--color-text-neutral); font-weight: 700; letter-spacing: 0.5px; }
@@ -545,6 +558,7 @@ body.light-mode .flashcardHeader { background: rgba(255, 255, 255, 0.6); border-
 .combo-high .comboCount { background: linear-gradient(135deg, #ef4444, #a855f7); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; animation: pump 0.4s infinite; }
 
 /* === KARTA OTÁZKY === */
+/* TOTO JE ZÁKLADNÍ DEFINICE - musí být PŘED .stacked-card modifikací, nebo .stacked-card musí mít vyšší specificitu */
 .card { 
     /* ZVĚTŠENÍ ZAOBLENÍ NA 32px PRO ZACHOVÁNÍ KULATOSTI I VZADU */
     padding: clamp(1.5rem, 4vw, 2.2rem); 
@@ -557,7 +571,7 @@ body.light-mode .flashcardHeader { background: rgba(255, 255, 255, 0.6); border-
     margin-top: 1rem; 
     overflow: hidden; /* DŮLEŽITÉ: Ořízne obsah (obrázky), aby nepřetékaly přes rohy */
 }
-body.light-mode .card { box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); }
+body.light-mode .card { box-shadow: 0 15px 50px rgba(37, 99, 235, 0.1); border-color: rgba(255,255,255,0.8); }
 
 .questionHeader { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 1.5rem; }
 .questionText { font-size: clamp(1.2rem, 5vw, 1.6rem); font-weight: 700; line-height: 1.5; letter-spacing: -0.5px; }
@@ -567,6 +581,7 @@ body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
 
 @media (hover: hover) {
     .imageWrapper:hover .questionImage { border-color: rgba(59, 130, 246, 0.5); transform: scale(1.01); }
+    body.light-mode .imageWrapper:hover .questionImage { border-color: var(--color-primary); }
 }
 
 @media (min-width: 768px) {
@@ -580,10 +595,12 @@ body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
 
 .options { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.2rem; }
 .optionButton { width: 100%; min-height: 60px; border: 1px solid var(--color-option-border); border-radius: 14px; padding: 1.2rem 1.6rem; background: linear-gradient(135deg, var(--color-option-bg-start) 0%, var(--color-option-bg-end) 100%); color: var(--color-text-secondary); text-align: left; font-size: 1.05rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); font-weight: 500; outline: none; }
+body.light-mode .optionButton { color: #334155; font-weight: 600; }
 .optionButton:focus-visible { outline: 3px solid var(--color-primary-light); outline-offset: 2px; border-color: var(--color-primary-light); }
 
 @media (hover: hover) {
     .optionButton:hover { background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%); border-color: rgba(59, 130, 246, 0.5); transform: translateX(4px); }
+    body.light-mode .optionButton:hover { border-color: var(--color-primary); }
 }
 
 .optionButton:active { transform: scale(0.98); }
@@ -601,19 +618,24 @@ body.light-mode .questionImage { background: rgba(255, 255, 255, 0.8); }
 .compactNavigator.grabbing .navNumber { pointer-events: none; transform: scale(1); }
 
 .navNumber { width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px; background: var(--color-nav-num-bg-start); color: var(--color-text-secondary); border: 1px solid var(--color-nav-num-border); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; touch-action: none; }
+body.light-mode .navNumber { color: #64748b; }
 
 @media (hover: hover) {
     .navNumber:hover { border-color: var(--color-primary-light); transform: translateY(-3px) scale(1.05); z-index: 10; }
+    body.light-mode .navNumber:hover { border-color: var(--color-primary); color: var(--color-primary); }
 }
 
 .navNumber.current { background: var(--color-primary); color: white; border-color: var(--color-primary-light); transform: scale(1.15); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5); z-index: 5; }
+body.light-mode .navNumber.current { border-color: transparent; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
 .navNumber.answered { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: var(--color-primary-light); }
+body.light-mode .navNumber.answered { background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.3); color: var(--color-primary); }
 
 /* === VÝSLEDKY A REVIEW === */
 .resultScreen { text-align: center; padding: 2rem 1rem; animation: fadeIn 0.6s ease-out; max-width: 800px; margin: 0 auto; width: 100%; }
 .score-circle-container { position: relative; width: 200px; height: 200px; margin: 0 auto 2rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
+body.light-mode .score-circle-container { box-shadow: 0 0 30px rgba(37, 99, 235, 0.15); }
 .score-circle-inner { width: 170px; height: 170px; border-radius: 50%; background: var(--color-bg-start); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-body.light-mode .score-circle-inner { background: #f0f4f8; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
+body.light-mode .score-circle-inner { background: #f8fafc; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); }
 .score-percentage { font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
 .score-fraction { font-size: 1rem; color: var(--color-text-neutral); margin-top: 0.5rem; font-weight: 600; }
 
@@ -671,10 +693,11 @@ body.light-mode .reviewSearchInput { background: rgba(255,255,255,0.6); }
 .subjectGrid { display: grid; width: 100%; justify-content: center; padding-bottom: 2rem; grid-template-columns: 1fr; gap: 1.5rem; max-width: 500px; margin: 0 auto; }
 .subjectButton { width: 100%; height: 100%; min-height: 220px; padding: 2rem 1rem; background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.3)); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: var(--color-text-main); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
 .subjectButton::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 60%); opacity: 0; transition: opacity 0.4s ease; }
-body.light-mode .subjectButton { background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.5)); border-color: rgba(255, 255, 255, 0.6); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
+body.light-mode .subjectButton { background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6)); border-color: rgba(255, 255, 255, 0.8); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
 
 @media (hover: hover) {
     .subjectButton:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3); border-color: rgba(59, 130, 246, 0.4); }
+    body.light-mode .subjectButton:hover { box-shadow: 0 25px 50px rgba(37, 99, 235, 0.15); border-color: var(--color-primary); }
     .subjectButton:hover::before { opacity: 1; }
     .subjectButton:hover .subjectIcon { transform: scale(1.1) rotate(5deg); }
 }
@@ -761,149 +784,3 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
     padding: 0;
   }
 }
-
-/* --- STACKED CARD STYLES (FINÁLNÍ VERZE PODLE ZADÁNÍ) --- */
-
-/* Logika: 
-   Základní .stacked-card zobrazuje HLAVNÍ KARTU + 2 KARTY VZADU.
-   Třídy .stack-level-1 a .stack-level-0 pak ubírají stíny, když dochází otázky.
-*/
-
-/* DARK MODE (Default) */
-.stacked-card {
-    position: relative;
-    z-index: 10;
-    margin-bottom: 4rem; /* Místo pro karty dole */
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-    /* Definice stínů (karet):
-       Box-shadow pořadí: X Y Blur Spread Barva
-
-       1. Vrstva: Hlavní měkký stín pod celým balíčkem
-       2. Vrstva: První karta vzadu (Tmavší tělo + Světlá hrana nahoře)
-       3. Vrstva: Druhá karta vzadu (Ještě tmavší tělo + Světlá hrana nahoře)
-    */
-    box-shadow: 
-        /* Hlavní stín do prostoru */
-        0 20px 60px rgba(0, 0, 0, 0.6),
-
-        /* 1. KARTA VZADU (Viditelná vždy) */
-        0 14px 0 -2px rgba(148, 163, 184, 0.15), /* Svítící hrana (border) */
-        0 14px 0 -1px #1e293b,                  /* Tělo karty (Slate-800) */
-
-        /* 2. KARTA VZADU (Viditelná vždy) */
-        0 28px 0 -4px rgba(148, 163, 184, 0.15), /* Svítící hrana */
-        0 28px 0 -3px #0f172a;                  /* Tělo karty (Slate-900) */
-}
-
-/* Hover efekt - Balíček se "nadechne" / rozbalí */
-@media (hover: hover) {
-    .stacked-card:hover {
-        transform: translateY(-5px); /* Hlavní karta jde nahoru */
-        box-shadow: 
-            0 30px 70px rgba(0, 0, 0, 0.7),
-
-            /* 1. karta se posune níž (z 14px na 20px) */
-            0 20px 0 -2px rgba(148, 163, 184, 0.25),
-            0 20px 0 -1px #1e293b,
-
-            /* 2. karta se posune níž (z 28px na 40px) */
-            0 40px 0 -4px rgba(148, 163, 184, 0.25),
-            0 40px 0 -3px #0f172a;
-    }
-}
-
-/* STAV: Zbývá jen 1 další otázka (zobrazíme jen 1 kartu vzadu) */
-.stacked-card.stack-level-1 {
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.6),
-        /* Pouze 1. karta vzadu */
-        0 14px 0 -2px rgba(148, 163, 184, 0.15),
-        0 14px 0 -1px #1e293b
-        !important; /* Override pro smazání 2. karty */
-}
-
-@media (hover: hover) {
-    .stacked-card.stack-level-1:hover {
-        transform: translateY(-5px);
-        box-shadow: 
-            0 30px 70px rgba(0, 0, 0, 0.7),
-            0 20px 0 -2px rgba(148, 163, 184, 0.25),
-            0 20px 0 -1px #1e293b
-            !important;
-    }
-}
-
-/* STAV: Poslední otázka (žádné karty vzadu) */
-.stacked-card.stack-level-0 {
-    box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.5) 
-        !important; /* Žádné "falešné" karty */
-    margin-bottom: 1.5rem; /* Vrátíme standardní margin, není co ukazovat dole */
-}
-
-@media (hover: hover) {
-    .stacked-card.stack-level-0:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6) !important;
-    }
-}
-
-
-/* LIGHT MODE VARIANTA */
-body.light-mode .stacked-card {
-    background: #ffffff;
-    border-color: #e2e8f0;
-
-    /* Světlé barvy pro karty vzadu */
-    box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.1),
-
-        /* 1. karta vzadu */
-        0 14px 0 -2px #cbd5e1, /* Hrana (tmavší šedá) */
-        0 14px 0 -1px #f8fafc, /* Tělo (bílá/světle šedá) */
-
-        /* 2. karta vzadu */
-        0 28px 0 -4px #cbd5e1, 
-        0 28px 0 -3px #f1f5f9;
-}
-
-@media (hover: hover) {
-    body.light-mode .stacked-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 
-            0 15px 50px rgba(0, 0, 0, 0.15),
-
-            /* Rozbalení */
-            0 20px 0 -2px #94a3b8,
-            0 20px 0 -1px #f8fafc,
-
-            0 40px 0 -4px #94a3b8,
-            0 40px 0 -3px #f1f5f9;
-    }
-}
-
-body.light-mode .stacked-card.stack-level-1 {
-    box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.1),
-        0 14px 0 -2px #cbd5e1,
-        0 14px 0 -1px #f8fafc
-        !important;
-}
-
-@media (hover: hover) {
-    body.light-mode .stacked-card.stack-level-1:hover {
-        transform: translateY(-5px);
-        box-shadow: 
-            0 15px 50px rgba(0, 0, 0, 0.15),
-            0 20px 0 -2px #94a3b8,
-            0 20px 0 -1px #f8fafc
-            !important;
-    }
-}
-
-body.light-mode .stacked-card.stack-level-0 {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* ... existing code (Light mode navbar overrides atd.) ... */

@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { isFlashcardStyle } from '../utils/formatting';
-// Přidán import getCachedImage
 import { fetchQuestionImage, getCachedImage } from '../utils/dataManager';
+import { getImageUrl } from "../utils/images"; 
+import { HighlightedText } from "./HighlightedText";
 
 export function QuestionCard({
   currentQuestion,
@@ -19,53 +20,49 @@ export function QuestionCard({
   isExiting,
   optionRefsForCurrent 
 }) {
-  // OPTIMALIZACE: Inicializujeme stav hned při prvním renderu
-  // Pokud máme obrázek v cache, isReady bude rovnou true -> ŽÁDNÉ PROBLIKNUTÍ
+  // 1. OPTIMALIZACE OBRÁZKŮ:
   const [lazyImage, setLazyImage] = useState(() => {
       if (currentQuestion?.image_base64) return currentQuestion.image_base64;
       if (currentQuestion?.id) return getCachedImage(currentQuestion.id) || null;
-      return null;
+      const staticUrl = getImageUrl(currentSubject, currentQuestion?.number);
+      return staticUrl || null;
   });
 
   const [isReady, setIsReady] = useState(() => {
-      // Pokud máme obrázek (v datech nebo cache), jsme ready hned
-      if (currentQuestion?.image_base64) return true;
-      if (currentQuestion?.id && getCachedImage(currentQuestion.id) !== undefined) return true;
-      // Pokud otázka nemá ID, taky ready (není co stahovat)
+      if (lazyImage) return true;
       if (!currentQuestion?.id) return true;
-      // Jinak musíme čekat na fetch
       return false;
   });
 
   const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
+
   const touchStart = useRef({ x: 0, y: 0 });
   const touchCurrent = useRef({ x: 0, y: 0 });
   const minSwipeDistance = 50;
 
+  // 2. NAČÍTÁNÍ OBRÁZKU
   useEffect(() => {
     let isMounted = true;
+    if (isReady) return;
 
-    // Pokud už jsme ready z inicializace, fetch nespouštíme zbytečně
-    // Ale pokud isReady je false, musíme to stáhnout
-    if (!isReady && currentQuestion?.id) {
+    if (currentQuestion?.id) {
         const timeoutId = setTimeout(() => {
             if (isMounted) {
-                console.log("QuestionCard: Timeout, zobrazuji text.");
+                console.log("QuestionCard: Timeout načítání obrázku, zobrazuji kartu.");
                 setIsReady(true);
             }
         }, 3000);
 
         const loadImage = async () => {
             try {
-                // Zkusíme stáhnout (fetchQuestionImage si řeší cache uvnitř)
                 const img = await fetchQuestionImage(currentQuestion.id);
-
                 if (isMounted) {
-                    setLazyImage(img);
+                    if (img) setLazyImage(img);
                     setIsReady(true);
                 }
             } catch (err) {
+                console.error("Chyba při načítání obrázku v kartě:", err);
                 if (isMounted) setIsReady(true);
             }
         };
@@ -75,10 +72,26 @@ export function QuestionCard({
             isMounted = false; 
             clearTimeout(timeoutId);
         };
+    } else {
+        setIsReady(true);
     }
-  }, [currentQuestion?.id, isReady]);
+  }, [currentQuestion, isReady]);
 
-  // Scroll na odpověď
+  // 3. ZOOM LOGIKA
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+        if (e.key === "f" || e.key === "F") {
+            if (lazyImage && onZoom) {
+                onZoom(lazyImage);
+            }
+        }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lazyImage, onZoom]);
+
+  // 4. SCROLL
   useEffect(() => {
     if (selectedAnswer !== null && optionRefsForCurrent && optionRefsForCurrent.current && optionRefsForCurrent.current[selectedAnswer]) {
       optionRefsForCurrent.current[selectedAnswer].scrollIntoView({
@@ -88,7 +101,7 @@ export function QuestionCard({
     }
   }, [selectedAnswer, optionRefsForCurrent]);
 
-  // Touch eventy
+  // 5. TOUCH EVENTY
   useEffect(() => {
     const element = cardContainerRef.current;
     if (!element) return;
@@ -107,7 +120,9 @@ export function QuestionCard({
       const diffX = Math.abs(clientX - touchStart.current.x);
       const diffY = Math.abs(clientY - touchStart.current.y);
 
-      if (diffX > diffY && diffX > 10 && e.cancelable) e.preventDefault();
+      if (diffX > diffY && diffX > 10 && e.cancelable) {
+          e.preventDefault();
+      }
     };
 
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
@@ -117,7 +132,7 @@ export function QuestionCard({
       element.removeEventListener('touchstart', handleTouchStart);
       element.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [isReady]);
+  }, []);
 
   const handleTouchEnd = () => {
     if (!touchStart.current.x) return;
@@ -126,12 +141,13 @@ export function QuestionCard({
     touchStart.current = { x: 0, y: 0 };
 
     if (Math.abs(distanceY) > Math.abs(distanceX)) return;
-    if (distanceX > minSwipeDistance) onSwipe("right");
-    else if (distanceX < -minSwipeDistance) onSwipe("left");
+
+    if (distanceX > minSwipeDistance && onSwipe) onSwipe("right");
+    else if (distanceX < -minSwipeDistance && onSwipe) onSwipe("left");
   };
 
-  // Loading stav - zobrazí se jen pokud opravdu nemáme data
-  if (!currentQuestion || !isReady)
+  // 6. RENDER
+  if (!currentQuestion || !isReady) {
     return (
       <div style={{ padding: "4rem 2rem", textAlign: "center", color: "var(--color-text-secondary)" }}>
         <div className="spinner" style={{margin: "0 auto 10px auto", width: "24px", height: "24px", border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "var(--color-primary)", borderRadius: "50%", animation: "spin 1s linear infinite"}}></div>
@@ -139,15 +155,18 @@ export function QuestionCard({
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
+  }
 
-  const displayImage = lazyImage || currentQuestion.image_base64;
+  // --- PODMÍNKA PRO ZOBRAZENÍ ČÍSLA OTÁZKY ---
+  // Číslo zobrazíme POUZE pokud je mode 'random' (Flashcards) nebo 'review' (Prohlížení)
+  const shouldShowNumber = mode === 'random' || mode === 'review';
 
   return (
     <div
       ref={cardContainerRef}
       style={{ position: 'relative', touchAction: 'pan-y' }}
       onTouchEnd={handleTouchEnd}
-      className="fade-in-content"
+      className="questionCardContent fade-in-content"
     >
       <style>{`
         .fade-in-content { animation: fadeInQuick 0.3s ease-out; }
@@ -159,45 +178,74 @@ export function QuestionCard({
           onClick={(e) => { e.stopPropagation(); onReport(currentQuestion.number); }}
           title="Nahlásit chybu"
           className="report-btn-flash"
-          style={{ position: 'absolute', top: '-15px', right: '-15px', background: 'transparent', border: 'none', padding: 0, width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '1.2rem', zIndex: 20, opacity: 0.9 }}
+          style={{ position: 'absolute', top: '-10px', right: '-10px', background: 'transparent', border: 'none', padding: 0, width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '1.2rem', zIndex: 20, opacity: 0.7 }}
         >
           🏳️
         </button>
       )}
 
       <div className="questionHeader">
-        <h2 className="questionText">
-          {isFlashcard && `#${currentQuestion.number} `}
-          {currentQuestion.question}
-        </h2>
+        <div className="questionText">
+            {/* Zde je změna: Podmíněné vykreslení čísla */}
+            {shouldShowNumber && <span className="questionNumber">#{currentQuestion.number} </span>}
+            {currentQuestion.question}
+        </div>
 
-        {displayImage && (
-          <div className="imageWrapper" onClick={() => onZoom(displayImage)}>
-            <img src={displayImage} alt="Otázka" className="questionImage" decoding="async" />
+        {lazyImage && (
+          <div className="imageWrapper" onClick={() => onZoom && onZoom(lazyImage)}>
+            <img src={lazyImage} alt="Otázka" className="questionImage" decoding="async" />
+            <div className="fullscreenHint mobile-hidden">Klikni nebo stiskni F</div>
           </div>
         )}
       </div>
 
       <div className="options">
-        {(currentQuestion.options || []).map((opt, i) => {
+        {(currentQuestion.options || []).map((option, index) => {
+          const isSelected = selectedAnswer === index;
+          const isCorrect = currentQuestion.correctIndex === index;
+
+          let className = "optionButton";
           let style = {};
-          if (isFlashcard && showResult) {
-            if (i === currentQuestion.correctIndex) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e" };
-            if (selectedAnswer === i && i !== currentQuestion.correctIndex) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444" };
-          } else if (((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === i) || (isFlashcard && selectedAnswer === i && !showResult)) {
-            style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
+
+          if (showResult) {
+            if (isCorrect) {
+                className += " correct";
+                if (isFlashcard) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e" };
+            } else if (isSelected) {
+                className += " wrong";
+                if (isFlashcard) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444" };
+            } else {
+                className += " dim";
+            }
+          } else if (isSelected) {
+            className += " selected";
+            if (isFlashcard) style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
+          }
+
+          // OPRAVA VIZUÁLNÍHO OZNAČENÍ V TESTU:
+          // Pokud je mode 'real_test' (nebo 'mock', 'training') a odpověď je uložená v currentQuestion.userAnswer,
+          // aplikujeme styl "selected".
+          if (!showResult && !isSelected && ((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === index)) {
+             className += " selected"; 
+             // Zde přidávám explicitní silnější styl, aby to bylo vidět
+             style = { background: "rgba(59, 130, 246, 0.4)", borderColor: "#3b82f6", borderWidth: "2px" };
           }
 
           return (
             <button
-              key={i}
-              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[i] = el; }}
-              className="optionButton"
+              key={index}
+              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[index] = el; }}
+              className={className}
               style={style}
-              onClick={() => !disabled && onSelect(i)}
+              onClick={() => !disabled && onSelect(index)}
               disabled={disabled}
             >
-              {opt}
+              {/* Odstraněno: <span className="optionIndex">{String.fromCharCode(65 + index)}.</span> */}
+              <HighlightedText text={option} />
+              {/* Odstraněny ikony: 
+                  {showResult && isCorrect && <span className="resultIcon">✓</span>}
+                  {showResult && isSelected && !isCorrect && <span className="resultIcon">✗</span>} 
+              */}
             </button>
           );
         })}

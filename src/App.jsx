@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabaseClient";
 import { useUserProfile } from "./hooks/useUserProfile"; 
-import { useActivityDetection } from "./hooks/useActivityDetection"; // NOVÝ IMPORT
-import { useGlobalKeyboard } from "./hooks/useGlobalKeyboard"; // NOVÝ IMPORT
+import { useActivityDetection } from "./hooks/useActivityDetection";
+import { useGlobalKeyboard } from "./hooks/useGlobalKeyboard";
 
 import { SubjectSelector } from "./components/SubjectSelector.jsx";
 import { AdminPanel } from "./components/AdminPanel.jsx";
 import { TestManager } from "./components/TestManager.jsx"; 
 
-// --- IMPORTY POMOCNÝCH KOMPONENT ---
 import { SessionBlockedScreen } from "./components/SessionBlockedScreen.jsx";
 import { CloudLoginScreen } from "./components/CloudLoginScreen.jsx";
 import { CustomImageModal } from "./components/CustomImageModal.jsx";
@@ -17,7 +16,6 @@ import { MainMenu } from "./components/MainMenu.jsx";
 import { ScheduledTestsList } from "./components/ScheduledTestsList.jsx";
 import { RealTestMode } from "./components/RealTestMode.jsx";
 
-// --- IMPORTY Z UTILS ---
 import { 
     formatTime, 
     removeAccents, 
@@ -27,7 +25,6 @@ import {
 import { getImageUrl } from "./utils/images.js";
 import { fetchQuestionsLightweight, clearImageCache } from "./utils/dataManager.js"; 
 
-// --- IMPORTY OSTATNÍCH KOMPONENT ---
 import { SubjectBadge } from "./components/SubjectBadge.jsx";
 import { UserBadgeDisplay } from "./components/UserBadgeDisplay.jsx";
 import { HistoryView } from "./components/HistoryView.jsx";
@@ -43,7 +40,6 @@ import { ReportModal } from "./components/ReportModal.jsx";
 /* ---------- Main App ---------- */
 
 export default function App() {
-    // --- STATE Z HOOKU ---
     const {
         user, dbId, loading, syncing, isSessionBlocked,
         mistakes, history, testPracticeStats, totalTimeMap, totalQuestionsMap,
@@ -51,18 +47,15 @@ export default function App() {
         setMistakes, setHistory
     } = useUserProfile();
 
-    // --- LOKÁLNÍ STATE APLIKACE ---
     const [subject, setSubject] = useState(null);
     const [customQuestions, setCustomQuestions] = useState(null);
 
-    // UI State
     const [theme, setTheme] = useState(() => localStorage.getItem("quizio_theme") || "dark");
     const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
     const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
     const [menuSelection, setMenuSelection] = useState(0);
     const [mode, setMode] = useState(null);
 
-    // Modal & Quiz State
     const [showSmartSettings, setShowSmartSettings] = useState(false);
     const [showClearMistakesConfirm, setShowClearMistakesConfirm] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
@@ -85,7 +78,6 @@ export default function App() {
     const [fullscreenImage, setFullscreenImage] = useState(null);
     const [timeLeftAtSubmit, setTimeLeftAtSubmit] = useState(0);
 
-    // --- POUŽITÍ NOVÝCH HOOKŮ (REFACTORING) ---
     const { isKeyboardMode, setIsKeyboardMode } = useGlobalKeyboard();
     const { sessionTime, setSessionTime, isAfk } = useActivityDetection(mode, isSessionBlocked);
 
@@ -100,18 +92,15 @@ export default function App() {
     const [completedTestIds, setCompletedTestIds] = useState([]);
     const [testToStart, setTestToStart] = useState(null);
 
-    // Refs
     const optionRefsForCurrent = useRef({});
     const cardRef = useRef(null);
     const containerRef = useRef(null);
 
-    // Lokální čítač pro session (počet otázek) - čas řeší hook useActivityDetection
     const [sessionQuestionsCount, setSessionQuestionsCount] = useState(0);
 
     const currentQuestion = questionSet[currentIndex] || { question: "", options: [], correctIndex: 0, number: 0, _localIndex: currentIndex };
     const isTeacher = user === 'admin' || user === 'Ucitel';
 
-    // --- AUTOLOGIN ---
     useEffect(() => {
         const savedCode = localStorage.getItem("quizio_user_code");
         if (savedCode && !user && !loading) {
@@ -119,7 +108,6 @@ export default function App() {
         }
     }, []);
 
-    // --- DATA SAVING WRAPPER ---
     const saveDataToCloud = async (newMistakes, newHistory, timeToAdd = 0, questionsToAdd = 0, newTestStats = null) => {
         const updates = {};
 
@@ -130,13 +118,13 @@ export default function App() {
         if (timeToAdd > 0 && subject) {
             const currentSubjectTime = totalTimeMap[subject] || 0;
             updates.subject_times = { ...totalTimeMap, [subject]: currentSubjectTime + timeToAdd };
-            setSessionTime(0); // Reset lokálního čítače z hooku
+            setSessionTime(0); 
         }
 
         if (questionsToAdd > 0 && subject) {
             const currentCount = totalQuestionsMap[subject] || 0;
             updates.question_counts = { ...totalQuestionsMap, [subject]: currentCount + questionsToAdd };
-            setSessionQuestionsCount(0); // Reset lokálního čítače
+            setSessionQuestionsCount(0); 
         }
 
         if (Object.keys(updates).length > 0) {
@@ -150,7 +138,6 @@ export default function App() {
         }
     };
 
-    // --- FETCH FUNCTIONS ---
     const fetchScheduledTests = async () => {
         if (!subject || subject === 'CUSTOM') return;
         const { data } = await supabase.from('scheduled_tests').select('*').eq('subject', subject).order('close_at', { ascending: true });
@@ -166,7 +153,6 @@ export default function App() {
         }
     };
 
-    // --- REALTIME & EFFECTS ---
     useEffect(() => {
         if (!subject || subject === 'CUSTOM') return;
         fetchScheduledTests();
@@ -206,7 +192,6 @@ export default function App() {
 
     useEffect(() => { if (containerRef.current) containerRef.current.scrollTop = 0; }, [subject, mode]);
 
-    // --- HELPERS PRO ÚPRAVU DAT ---
     const updateMistakes = (newValOrFn) => {
         const next = typeof newValOrFn === "function" ? newValOrFn(mistakes) : newValOrFn;
         setMistakes(next);
@@ -232,17 +217,15 @@ export default function App() {
         await refreshData();
     };
 
-    // --- AUTOMATIC SAVE TRIGGER ---
     useEffect(() => {
         if (sessionTime >= 60 || sessionQuestionsCount >= 10) saveDataToCloud(undefined, undefined, sessionTime, sessionQuestionsCount);
     }, [sessionTime, sessionQuestionsCount]);
 
-    const triggerFakeSync = () => { /* Syncing now handled by hook state */ };
+    const triggerFakeSync = () => { };
 
     useEffect(() => { localStorage.setItem("quizio_theme", theme); document.body.className = theme === "light" ? "light-mode" : ""; }, [theme]);
     const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-    // === OTÁZKY & REŽIMY ===
     const prepareQuestionSet = (baseQuestions) => {
         if (!Array.isArray(baseQuestions)) return [];
         return baseQuestions.map((q, idx) => ({ ...q, options: [...(q.options || [])], userAnswer: undefined, _localIndex: idx, }));
@@ -346,7 +329,6 @@ export default function App() {
 
     const handleReportClick = (questionNumber) => { setQuestionToReport(questionNumber); setReportModalOpen(true); };
 
-    // --- GAME LOGIC ---
     const handleAnswer = (idx) => {
         if (finished || mode === "review") return;
         setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active");
@@ -436,7 +418,6 @@ export default function App() {
         setCustomQuestions(norm); setSubject("CUSTOM");
     };
 
-    // --- CONTROLS ---
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (isSessionBlocked) return;
@@ -448,12 +429,16 @@ export default function App() {
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "f", "F"].includes(e.key)) e.preventDefault();
             if (showConfirmExit || showConfirmSubmit || showSmartSettings || showClearMistakesConfirm || recordToDelete || reportModalOpen) return;
 
-            // OPRAVA: Vrátenie logiky pre fullscreen obrázky
-            if (mode && !['review', 'admin', 'scheduled_list', 'teacher_manager', 'real_test'].includes(mode)) {
-                const currentQ = questionSet[currentIndex];
-                const imageUrl = currentQ ? getImageUrl(subject, currentQ.number) : null;
-                if (e.key === "f" || e.key === "F") { if (fullscreenImage) setFullscreenImage(null); else if (imageUrl) setFullscreenImage(imageUrl); return; }
+            // --- UPRAVENÁ LOGIKA PRO f/F (Globální toggle) ---
+            if (e.key === "f" || e.key === "F") {
+                // 1. Vždy zavřít, pokud je otevřeno (globálně)
+                // Otevírání řeší samotná komponenta QuestionCard, která ví, jaký obrázek má.
+                if (fullscreenImage) {
+                    setFullscreenImage(null);
+                }
+                return;
             }
+
             if (fullscreenImage) return;
             if (finished || mode === "no_mistakes") { if (["Backspace", "Enter", "ArrowLeft"].includes(e.key)) setMode(null); return; }
 
@@ -519,7 +504,6 @@ export default function App() {
     }, [mode, finished]);
     useEffect(() => { if ((mode === "mock") && timeLeft === 0 && !finished) submitTest(); }, [timeLeft, mode, finished]);
 
-    // === RENDER ===
     if (!user) return (
         <>
             <div style={{ position: "absolute", top: "1rem", right: "1rem", zIndex: 100 }}>
@@ -578,7 +562,6 @@ export default function App() {
         if (!subject) return (
             <div className="container fadeIn" style={{ height: "var(--vh)", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'space-between', paddingBottom: "1.5rem" }}>
                 {!isLoadingQuestions && (
-                    // OPRAVA: Pridané style={{ width: "100%" }} pre roztiahnutie lišty
                     <div className="top-navbar" style={{ width: "100%" }}>
                         <div className="navbar-group">
                             {user === 'admin' && <button className="menuBackButton" onClick={() => setMode('admin')} title="Admin Panel">🛠️ Admin</button>}
@@ -618,7 +601,6 @@ export default function App() {
 
                 <div ref={containerRef} className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
                     {!isLoadingQuestions && (
-                        // OPRAVA: Pridané style={{ width: "100%" }} pre roztiahnutie lišty
                         <div className="top-navbar" style={{ width: "100%" }}>
                             <div className="navbar-group">
                                 <div className="navbar-group">
@@ -706,9 +688,15 @@ export default function App() {
 
     let comboClass = combo >= 10 ? "combo-high" : combo >= 5 ? "combo-med" : combo >= 3 ? "combo-low" : "";
     let remainingCards = 0;
-    if (mode === "smart" || mode === "mistakes") remainingCards = questionSet.length - 1;
-    else if (mode === "random" || mode === "test_practice") remainingCards = questionSet.length - 1 - currentIndex;
-    let stackLevelClass = remainingCards === 0 ? "stack-level-0" : remainingCards === 1 ? "stack-level-1" : "";
+    if (mode === "smart" || mode === "mistakes") remainingCards = questionSet.length;
+    else if (mode === "random" || mode === "test_practice") remainingCards = questionSet.length - currentIndex;
+
+    // --- OPRAVA: Posun indexu pro stacked cards ---
+    // Pokud zbývá 1 karta (ta aktuální), neměly by být vidět žádné karty vzadu (stack-level-0).
+    // Pokud zbývají 2 karty (aktuální + 1 vzadu), měla by být vidět 1 karta vzadu (stack-level-1).
+    let stackLevelClass = "";
+    if (remainingCards <= 1) stackLevelClass = "stack-level-0";
+    else if (remainingCards === 2) stackLevelClass = "stack-level-1";
 
     return (
         <>
@@ -760,7 +748,7 @@ export default function App() {
                                     {mode !== 'test_practice' && (
                                         <div className="statItem">
                                             <span className="statLabel">{mode === "random" ? "Zodpovězeno" : "Zbývá"}</span>
-                                            <span className="statValue">{mode === "random" ? currentIndex : questionSet.length - 1}</span>
+                                            <span className="statValue">{mode === "random" ? currentIndex : remainingCards}</span>
                                         </div>
                                     )}
                                     {combo >= 3 && <div className="comboContainer"><div className="comboFlame">🔥</div><div className="comboCount">{combo}x</div></div>}
