@@ -559,8 +559,23 @@ body.light-mode .flashcardHeader {
     display: flex; 
     flex-direction: column; 
     align-items: center;
-    flex: 1;
+    flex: 0 0 auto;
     min-width: 0;
+}
+
+.statItem:first-child {
+    align-items: flex-start;
+    margin-right: auto;
+}
+
+.statItem:last-child {
+    align-items: flex-end;
+    margin-left: auto;
+}
+
+.statItem:first-child .statLabel,
+.statItem:last-child .statLabel {
+    text-align: inherit;
 }
 
 .statLabel { 
