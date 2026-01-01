@@ -676,12 +676,22 @@ export default function App() {
     );
 
     if (mode === "review") {
-        const REVIEW_ITEMS_PER_PAGE = 5;
+        const REVIEW_COLUMNS = window.innerWidth > 768 ? 2 : 1;
+        const REVIEW_ROWS = 5;
+        const REVIEW_ITEMS_PER_PAGE = REVIEW_COLUMNS * REVIEW_ROWS;
         const normalizedSearch = removeAccents(searchTerm);
         const filteredQuestions = questionSet.filter((q) => removeAccents(q.question).includes(normalizedSearch) || String(q.number).includes(normalizedSearch));
         const highlightRegex = getSmartRegex(searchTerm);
         const totalReviewPages = Math.ceil(filteredQuestions.length / REVIEW_ITEMS_PER_PAGE);
         const paginatedQuestions = filteredQuestions.slice(reviewPage * REVIEW_ITEMS_PER_PAGE, (reviewPage + 1) * REVIEW_ITEMS_PER_PAGE);
+
+        const scrollToTop = () => {
+            if (containerRef.current) {
+                containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
 
         return (
             <>
@@ -708,11 +718,21 @@ export default function App() {
                             <p style={{ textAlign: "center", color: "#888", gridColumn: "1/-1" }}>Nic nenalezeno.</p>
                         ) : (
                             paginatedQuestions.map((q) => {
-                                const imageUrl = getImageUrl(subject, q.number);
+                                const staticUrl = getImageUrl(subject, q.number);
+                                const imageUrl = staticUrl || (q.image && q.image.length > 5 ? q.image : null);
                                 return (
                                     <div key={q.number} className="reviewCard">
                                         <div className="reviewHeader"><strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} /></div>
-                                        {imageUrl && <div className="imageWrapper" onClick={() => setFullscreenImage(imageUrl)}><img src={imageUrl} alt="" className="reviewImage" /></div>}
+                                        {imageUrl && (
+                                            <div className="reviewImageWrapper" onClick={() => setFullscreenImage(imageUrl)}>
+                                                <img 
+                                                    src={imageUrl} 
+                                                    alt="" 
+                                                    className="reviewImage" 
+                                                    onError={(e) => e.target.style.display = 'none'}
+                                                />
+                                            </div>
+                                        )}
                                         <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                                             {q.options.map((opt, idx) => (
                                                 <div key={idx} style={{ fontSize: "0.9rem", color: idx === q.correctIndex ? "var(--color-review-correct)" : "var(--color-text-secondary)", fontWeight: idx === q.correctIndex ? "bold" : "normal" }}>
@@ -727,11 +747,11 @@ export default function App() {
                     </div>
                     {totalReviewPages > 1 && (
                         <div className="reviewPagination">
-                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(0)} disabled={reviewPage === 0}>⏮</button>
-                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(p => p - 1)} disabled={reviewPage === 0}>← Předchozí</button>
+                            <button className="reviewPaginationBtn" onClick={() => { setReviewPage(0); scrollToTop(); }} disabled={reviewPage === 0}>⏮</button>
+                            <button className="reviewPaginationBtn" onClick={() => { setReviewPage(p => p - 1); scrollToTop(); }} disabled={reviewPage === 0}>← Předchozí</button>
                             <span className="reviewPaginationCurrent">{reviewPage + 1} / {totalReviewPages}</span>
-                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(p => p + 1)} disabled={reviewPage === totalReviewPages - 1}>Další →</button>
-                            <button className="reviewPaginationBtn" onClick={() => setReviewPage(totalReviewPages - 1)} disabled={reviewPage === totalReviewPages - 1}>⏭</button>
+                            <button className="reviewPaginationBtn" onClick={() => { setReviewPage(p => p + 1); scrollToTop(); }} disabled={reviewPage === totalReviewPages - 1}>Další →</button>
+                            <button className="reviewPaginationBtn" onClick={() => { setReviewPage(totalReviewPages - 1); scrollToTop(); }} disabled={reviewPage === totalReviewPages - 1}>⏭</button>
                         </div>
                     )}
                 </div>
