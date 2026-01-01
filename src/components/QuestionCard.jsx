@@ -177,7 +177,6 @@ export function QuestionCard({
     <div
       ref={cardContainerRef}
       style={{ position: 'relative', touchAction: 'pan-y' }}
-      onTouchEnd={handleTouchEnd}
       className="questionCardContent fade-in-content"
     >
       <style>{`
