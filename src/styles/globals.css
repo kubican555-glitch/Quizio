@@ -610,7 +610,15 @@ body.light-mode .flashcardHeader {
 
 @media (max-width: 480px) {
     .flashcardHeader {
-        padding: 0.6rem 1.2rem;
+        padding: 0.6rem 1rem;
+    }
+    .statItem:first-child {
+        margin-right: 0;
+        margin-left: 0.5rem;
+    }
+    .statItem:last-child {
+        margin-left: 0;
+        margin-right: 0.5rem;
     }
     .statValue {
         font-size: 1rem;
