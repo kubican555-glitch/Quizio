@@ -45,11 +45,13 @@ const ReviewImage = ({ q, subject, setFullscreenImage }) => {
     });
 
     useEffect(() => {
+        let isMounted = true;
         if (q.id && !imgUrl) {
             fetchQuestionImage(q.id).then(url => {
-                if (url) setImgUrl(url);
+                if (isMounted && url) setImgUrl(url);
             });
         }
+        return () => { isMounted = false; };
     }, [q.id, imgUrl]);
 
     if (!imgUrl) return null;
