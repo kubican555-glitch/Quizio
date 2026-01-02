@@ -1016,7 +1016,19 @@ body.light-mode .optionButton.wrong {
 .actionButtons.right { justify-content: flex-end; }
 
 /* === NAVIGÁTOR (DRAG & SCROLL FIX) === */
-.navigatorWrapper { width: 100%; display: flex; justify-content: center; overflow: hidden; padding: 0; margin-top: 0.5rem; }
+.navigatorWrapper { 
+    width: 100%; 
+    display: flex; 
+    justify-content: center; 
+    overflow: hidden; 
+    padding: 0; 
+    margin-top: auto; /* Tlačí navigátor dolů */
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 20px));
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    background: linear-gradient(to top, var(--color-bg-start) 60%, transparent);
+}
 .compactNavigator { display: flex; gap: 8px; padding: 15px 10px; overflow-x: auto; overflow-y: hidden; max-width: 100%; touch-action: pan-x; scrollbar-width: none; cursor: grab; user-select: none; -webkit-user-select: none; }
 .compactNavigator::-webkit-scrollbar { display: none; }
 .compactNavigator.grabbing { cursor: grabbing; scroll-behavior: auto; }
