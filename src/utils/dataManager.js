@@ -126,22 +126,32 @@ export const fetchQuestionsLightweight = async (subject = null) => {
   }
 };
 
-export const preloadTestImages = async (questionSet) => {
+export const preloadTestImages = async (questionSet, onProgress) => {
   if (!questionSet || !Array.isArray(questionSet)) return;
   
   const idsToFetch = questionSet
     .filter(q => q.id && !imageCache.has(q.id))
     .map(q => q.id);
     
-  if (idsToFetch.length === 0) return;
+  if (idsToFetch.length === 0) {
+    if (onProgress) onProgress(100);
+    return;
+  }
 
   console.log(`Přednačítám ${idsToFetch.length} obrázků pro plynulý test...`);
   
+  const total = idsToFetch.length;
+  let loaded = 0;
+
   // Stahujeme paralelně v dávkách, abychom nezahltili Supabase
   const batchSize = 10;
   for (let i = 0; i < idsToFetch.length; i += batchSize) {
     const batch = idsToFetch.slice(i, i + batchSize);
-    await Promise.all(batch.map(id => fetchQuestionImage(id)));
+    await Promise.all(batch.map(async (id) => {
+      await fetchQuestionImage(id);
+      loaded++;
+      if (onProgress) onProgress((loaded / total) * 100);
+    }));
   }
 };
 

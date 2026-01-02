@@ -134,6 +134,7 @@ export default function App() {
 
     const [sessionQuestionsCount, setSessionQuestionsCount] = useState(0);
     const [readyQuestionId, setReadyQuestionId] = useState(null);
+    const [loadingProgress, setLoadingProgress] = useState(0);
 
     const currentQuestion = questionSet[currentIndex] || { question: "", options: [], correctIndex: 0, number: 0, _localIndex: currentIndex };
     const currentQuestionId = currentQuestion.id || currentQuestion.number || currentIndex;
@@ -324,7 +325,10 @@ export default function App() {
         const shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
         
         setMode("loading");
-        await preloadTestImages(shuffled);
+        setLoadingProgress(0);
+        await preloadTestImages(shuffled, (progress) => {
+            setLoadingProgress(progress);
+        });
         
         setReadyQuestionId(null); setQuestionSet(shuffled); setMode("test_practice"); setActiveTest(test); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setCombo(0);
     };
@@ -339,7 +343,10 @@ export default function App() {
         const prepared = prepareQuestionSet(selected, true);
 
         setMode("loading");
-        await preloadTestImages(prepared);
+        setLoadingProgress(0);
+        await preloadTestImages(prepared, (progress) => {
+            setLoadingProgress(progress);
+        });
 
         setQuestionSet(prepared); 
         setActiveTest(test); 
@@ -370,7 +377,10 @@ export default function App() {
         
         // Přednačtení obrázků
         setMode("loading"); // Dočasný stav pro preloading
-        await preloadTestImages(prepared);
+        setLoadingProgress(0);
+        await preloadTestImages(prepared, (progress) => {
+            setLoadingProgress(progress);
+        });
         
         setReadyQuestionId(null); setQuestionSet(prepared); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
     };
@@ -1090,7 +1100,20 @@ export default function App() {
                     />
                 )}
 
-                {!finished && (
+                {mode === "loading" && (
+                    <div className="loadingScreen">
+                        <div className="loadingCard">
+                            <div className="loadingSpinner"></div>
+                            <h2>Příprava testu...</h2>
+                            <p>Načítám obrázky a otázky pro plynulý průběh.</p>
+                            <div className="loadingProgressBarContainer">
+                                <div className="loadingProgressBarFill" style={{ width: `${loadingProgress}%` }}></div>
+                            </div>
+                            <span className="loadingProgressText">{Math.round(loadingProgress)}%</span>
+                        </div>
+                    </div>
+                )}
+                {!finished && mode !== "loading" && (
                     <>
                         <div className="top-navbar" style={{ width: "100%" }}>
                             <div className="navbar-group">
