@@ -604,7 +604,6 @@ export default function App() {
             const k = e.key.toLowerCase();
 
             if (k === "w" || e.key === "ArrowUp") {
-                const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
                 if (isFlashcardInput && !showResult) {
                     const nextVisual = visualSelection === null ? opts - 1 : (visualSelection - 1 + opts) % opts;
                     selectRandomAnswer(nextVisual);
@@ -612,7 +611,6 @@ export default function App() {
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? opts - 1 : (questionSet[currentIndex].userAnswer - 1 + opts) % opts);
             }
             if (k === "s" || e.key === "ArrowDown") {
-                const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
                 if (isFlashcardInput && !showResult) {
                     const nextVisual = visualSelection === null ? 0 : (visualSelection + 1) % opts;
                     selectRandomAnswer(nextVisual);
@@ -624,14 +622,14 @@ export default function App() {
                 if (isFlashcardInput) { 
                     if (showResult) nextFlashcardQuestion(); 
                     else {
-                        const finalIdx = visualSelection !== null ? shuffledMapping[visualSelection] : selectedAnswer;
+                        const finalIdx = visualSelection !== null ? (shuffledMapping[visualSelection] ?? selectedAnswer) : selectedAnswer;
                         clickFlashcardAnswer(finalIdx);
                     }
                 } else moveToQuestion(currentIndex + 1);
             }
             if (e.key === " ") {
                 if (isFlashcardInput && !showResult) {
-                    const finalIdx = visualSelection !== null ? shuffledMapping[visualSelection] : selectedAnswer;
+                    const finalIdx = visualSelection !== null ? (shuffledMapping[visualSelection] ?? selectedAnswer) : selectedAnswer;
                     clickFlashcardAnswer(finalIdx);
                 }
                 else if (!finished && mode === "mock") setShowConfirmSubmit(true); 
