@@ -33,6 +33,7 @@ export function RealTestMode({
     const [fullscreenImage, setFullscreenImage] = useState(null);
     const [direction, setDirection] = useState('right');
     const [finalResult, setFinalResult] = useState(null);
+    const [showAutoSubmitModal, setShowAutoSubmitModal] = useState(false);
 
     // Refs
     const cardRef = useRef(null);
@@ -126,7 +127,9 @@ export function RealTestMode({
                 timeLeft: Math.max(0, timeLeft)
             });
 
-            if (force) alert("Čas vypršel! Test byl automaticky odeslán.");
+            if (force) {
+                setShowAutoSubmitModal(true);
+            }
 
         } catch (error) {
             console.error("Chyba při ukládání:", error);
@@ -236,6 +239,17 @@ export function RealTestMode({
                     onConfirm={() => submitTest(false)} 
                     confirmText="ODEVZDAT" 
                     danger={true} 
+                />
+            )}
+
+            {showAutoSubmitModal && (
+                <ConfirmModal 
+                    title="Čas vypršel" 
+                    message="Časový limit pro tento test vypršel. Vaše odpovědi byly automaticky uloženy a odeslány k vyhodnocení."
+                    onCancel={() => setShowAutoSubmitModal(false)} 
+                    onConfirm={() => setShowAutoSubmitModal(false)} 
+                    confirmText="Zobrazit výsledky" 
+                    danger={false} 
                 />
             )}
 
