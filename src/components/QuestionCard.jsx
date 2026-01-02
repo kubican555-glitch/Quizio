@@ -270,7 +270,7 @@ export function QuestionCard({
   const rotation = isDragging ? (swipeOffset / window.innerWidth) * 15 : (isFlying ? (swipeDirection === 'right' ? 15 : -15) : 0);
   const opacity = isFlying ? 0 : 1;
   
-  // Dynamické styly pro swipe - optimalizováno pro výkon
+  // Dynamické styly pro swipe - optimalizováno pro výkon a zamezení výběru textu
   const swipeStyles = {
     position: 'relative',
     touchAction: 'pan-y',
@@ -279,6 +279,9 @@ export function QuestionCard({
     opacity: opacity,
     willChange: 'transform, opacity',
     backfaceVisibility: 'hidden',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    WebkitTouchCallout: 'none'
   };
 
   return (
