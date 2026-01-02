@@ -118,17 +118,17 @@ export const HistoryGraph = ({ data = [] }) => {
             </svg>
 
             {/* Popisky osy Y (Známky) - VPRAVO (Zarovnáno na střed zóny) */}
-            <div style={{ position: 'absolute', right: -15, top: '4%', fontSize: '0.6rem', opacity: 0.8, color: '#22c55e', fontWeight: 'bold' }}>1</div>
-            <div style={{ position: 'absolute', right: -15, top: '22%', fontSize: '0.6rem', opacity: 0.8, color: '#84cc16', fontWeight: 'bold' }}>2</div>
-            <div style={{ position: 'absolute', right: -15, top: '40%', fontSize: '0.6rem', opacity: 0.8, color: '#eab308', fontWeight: 'bold' }}>3</div>
-            <div style={{ position: 'absolute', right: -15, top: '57%', fontSize: '0.6rem', opacity: 0.8, color: '#f97316', fontWeight: 'bold' }}>4</div>
-            <div style={{ position: 'absolute', right: -15, top: '82%', fontSize: '0.6rem', opacity: 0.8, color: '#ef4444', fontWeight: 'bold' }}>5</div>
+            <div style={{ position: 'absolute', right: -15, top: '4%', fontSize: '0.65rem', opacity: 1, color: '#4ade80', fontWeight: '800' }}>1</div>
+            <div style={{ position: 'absolute', right: -15, top: '22%', fontSize: '0.65rem', opacity: 1, color: '#a3e635', fontWeight: '800' }}>2</div>
+            <div style={{ position: 'absolute', right: -15, top: '40%', fontSize: '0.65rem', opacity: 1, color: '#fde047', fontWeight: '800' }}>3</div>
+            <div style={{ position: 'absolute', right: -15, top: '57%', fontSize: '0.65rem', opacity: 1, color: '#fb923c', fontWeight: '800' }}>4</div>
+            <div style={{ position: 'absolute', right: -15, top: '82%', fontSize: '0.65rem', opacity: 1, color: '#f87171', fontWeight: '800' }}>5</div>
 
             {/* Popisky osy Y (Procenta) - VLEVO (Zarovnáno přesně na čáry) */}
-            <div style={{ position: 'absolute', left: -25, top: '13%', fontSize: '0.6rem', opacity: 0.6, fontWeight: '500', color: '#22c55e', transform: 'translateY(-50%)' }}>84%</div>
-            <div style={{ position: 'absolute', left: -25, top: '33%', fontSize: '0.6rem', opacity: 0.6, fontWeight: '500', color: '#84cc16', transform: 'translateY(-50%)' }}>67%</div>
-            <div style={{ position: 'absolute', left: -25, top: '50%', fontSize: '0.6rem', opacity: 0.6, fontWeight: '500', color: '#eab308', transform: 'translateY(-50%)' }}>50%</div>
-            <div style={{ position: 'absolute', left: -25, top: '67%', fontSize: '0.6rem', opacity: 0.6, fontWeight: '500', color: '#f97316', transform: 'translateY(-50%)' }}>33%</div>
+            <div style={{ position: 'absolute', left: -25, top: '13%', fontSize: '0.6rem', opacity: 0.9, fontWeight: '700', color: '#4ade80', transform: 'translateY(-50%)' }}>84%</div>
+            <div style={{ position: 'absolute', left: -25, top: '33%', fontSize: '0.6rem', opacity: 0.9, fontWeight: '700', color: '#a3e635', transform: 'translateY(-50%)' }}>67%</div>
+            <div style={{ position: 'absolute', left: -25, top: '50%', fontSize: '0.6rem', opacity: 0.9, fontWeight: '700', color: '#fde047', transform: 'translateY(-50%)' }}>50%</div>
+            <div style={{ position: 'absolute', left: -25, top: '67%', fontSize: '0.6rem', opacity: 0.9, fontWeight: '700', color: '#fb923c', transform: 'translateY(-50%)' }}>33%</div>
         </div>
     );
 };

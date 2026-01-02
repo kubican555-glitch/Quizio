@@ -111,7 +111,7 @@ export const MainMenu = ({
                     ) : (<span style={{ opacity: 0.6 }}>✓</span>)}
                 </button>
 
-                <button className={`navButton primary-style ${menuSelection % 8 === 7 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenHistory} style={{ marginTop: '1rem', width: '100%', padding: '1rem', fontSize: '1rem', display: 'flex', justifyContent: 'center' }}>Historie výsledků 📊</button>
+                <button className={`navButton primary-style ${menuSelection % 8 === 7 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenHistory} style={{ marginTop: '1rem', width: '100%', padding: '1rem', fontSize: '1rem', display: 'flex', justifyContent: 'center', border: menuSelection % 8 === 7 && isKeyboardMode ? '2px solid var(--color-primary)' : '1px solid transparent', boxShadow: menuSelection % 8 === 7 && isKeyboardMode ? '0 0 15px var(--color-primary)' : 'none' }}>Historie výsledků 📊</button>
                 <div className="keyboard-hints" style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6", flexShrink: 0, marginBottom: "1rem" }}>
                     Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />Mezerník – potvrzení • Enter – potvrzení / další • Esc – zrušit
                 </div>
