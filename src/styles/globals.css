@@ -574,7 +574,7 @@ body.light-mode #root {
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
   padding-top: max(1rem, env(safe-area-inset-top));
-  padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
+  padding-bottom: env(safe-area-inset-bottom); /* Sníženo pro využití místa dole */
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   scrollbar-width: none; 
