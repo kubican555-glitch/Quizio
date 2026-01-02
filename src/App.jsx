@@ -534,6 +534,8 @@ export default function App() {
             setCombo(0); 
             setShowResult(false);
             setSelectedAnswer(null);
+            setVisualSelection(null);
+            setShuffledMapping([]);
         } 
     };
     const confirmExit = () => { 
@@ -542,6 +544,8 @@ export default function App() {
         setCombo(0); 
         setShowResult(false);
         setSelectedAnswer(null);
+        setVisualSelection(null);
+        setShuffledMapping([]);
     };
     const handleFileUpload = (questions) => {
         if (!questions) return;
