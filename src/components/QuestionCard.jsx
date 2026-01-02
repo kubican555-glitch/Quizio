@@ -272,14 +272,15 @@ export function QuestionCard({
   const rotation = isDragging ? (swipeOffset / window.innerWidth) * 15 : (isFlying ? (swipeDirection === 'right' ? 15 : -15) : 0);
   const opacity = isFlying ? 0 : 1;
   
-  // Dynamické styly pro swipe
+  // Dynamické styly pro swipe - optimalizováno pro výkon
   const swipeStyles = {
     position: 'relative',
     touchAction: 'pan-y',
-    transform: `translateX(${swipeOffset}px) rotate(${rotation}deg)`,
-    transition: isDragging ? 'none' : 'transform 0.2s ease-out, opacity 0.2s ease-out',
+    transform: `translate3d(${swipeOffset}px, 0, 0) rotate(${rotation}deg)`,
+    transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease-out',
     opacity: opacity,
-    willChange: isDragging ? 'transform' : 'auto',
+    willChange: 'transform, opacity',
+    backfaceVisibility: 'hidden',
   };
 
   return (
