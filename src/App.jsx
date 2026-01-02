@@ -1180,7 +1180,7 @@ export default function App() {
                                     </div>
                                 )}
                                 {!(isFlashcardStyle(mode) || mode==='test_practice') && (
-                                    <div style={{ opacity: isContentReady ? 1 : 0, transition: 'opacity 0.1s ease-in' }}>
+                                    <div style={{ opacity: isContentReady ? 1 : 0, transition: 'opacity 0.1s ease-in', height: isContentReady ? 'auto' : '0', overflow: isContentReady ? 'visible' : 'hidden' }}>
                                         <div className="actionButtons spaced">
                                             <button className="navButton" onClick={() => moveToQuestion(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}>Předchozí</button>
                                             <button className="navButton" onClick={() => moveToQuestion(currentIndex + 1)} disabled={currentIndex >= questionSet.length - 1}>Další</button>
