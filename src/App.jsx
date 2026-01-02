@@ -88,6 +88,7 @@ export default function App() {
     const [theme, setTheme] = useState(() => localStorage.getItem("quizio_theme") || "dark");
     const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
     const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+    const [isTransitioningSubject, setIsTransitioningSubject] = useState(false);
     const [menuSelection, setMenuSelection] = useState(-1);
     const [mode, setMode] = useState(null);
 
@@ -314,7 +315,10 @@ export default function App() {
                 console.error("Chyba při stahování otázek:", err); 
                 alert("Nepodařilo se stáhnout otázky z cloudu."); 
                 setActiveQuestionsCache([]);
-            } finally { setIsLoadingQuestions(false); }
+            } finally { 
+                setIsLoadingQuestions(false);
+                setIsTransitioningSubject(false);
+            }
         };
         fetchQuestions();
     }, [subject, customQuestions]);
@@ -441,7 +445,7 @@ export default function App() {
             setShowCustomImport(true);
             return;
         }
-        // OKAMŽITÁ ZMĚNA STAVU bez čekání
+        setIsTransitioningSubject(true);
         setSubject(subj.toUpperCase()); 
         setMenuSelection(0);
         setMode(null);
@@ -897,25 +901,25 @@ export default function App() {
     }
 
     if (!mode) {
-        if (!subject) return (
+        if (!subject || isTransitioningSubject) return (
             <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'space-between', paddingBottom: "1.5rem" }}>
-                {!isLoadingQuestions && (
-                    <div className="top-navbar" style={{ width: "100%" }}>
-                        <div className="navbar-group">
-                            {user === 'admin' && <button className="menuBackButton" onClick={() => setMode('admin')} title="Admin Panel">🛠️ Admin</button>}
-                            <SubjectBadge subject={subject} compact />
-                        </div>
-                        <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} alwaysShowFullName={true} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
-                    </div>
-                )}
-                {isLoadingQuestions ? (
+                {(isLoadingQuestions || isTransitioningSubject) ? (
                     <div style={{ margin: "2rem", fontSize: "1.2rem", color: "#888", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>Načítám otázky z databáze...
                     </div>
                 ) : (
-                    <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', maxWidth: '800px' }}>
-                        <SubjectSelector menuSelection={menuSelection} onSelectSubject={handleSelectSubject} onUploadFile={handleFileUpload} isKeyboardMode={isKeyboardMode} setIsKeyboardMode={setIsKeyboardMode} />
-                    </div>
+                    <>
+                        <div className="top-navbar" style={{ width: "100%" }}>
+                            <div className="navbar-group">
+                                {user === 'admin' && <button className="menuBackButton" onClick={() => setMode('admin')} title="Admin Panel">🛠️ Admin</button>}
+                                <SubjectBadge subject={subject} compact />
+                            </div>
+                            <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} alwaysShowFullName={true} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
+                        </div>
+                        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%', maxWidth: '800px' }}>
+                            <SubjectSelector menuSelection={menuSelection} onSelectSubject={handleSelectSubject} onUploadFile={handleFileUpload} isKeyboardMode={isKeyboardMode} setIsKeyboardMode={setIsKeyboardMode} />
+                        </div>
+                    </>
                 )}
                 <div style={{ height: '1px' }}></div>
             </div>
