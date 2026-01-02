@@ -544,13 +544,14 @@ export default function App() {
     };
     const tryReturnToMenu = () => { 
         if (mode === "test_practice") {
-            setMode("scheduled"); // Set mode to scheduled tests view
+            setMode("scheduled"); // This must match the state that shows ScheduledTestsList
             setCombo(0);
             setShowResult(false);
             setSelectedAnswer(null);
             setVisualSelection(null);
             setShuffledMapping([]);
             setMenuSelection(1);
+            setActiveTest(null); // Clear active test to return to list
             return;
         }
         if (mode === "mock" && !finished) {
@@ -575,6 +576,7 @@ export default function App() {
         setVisualSelection(null);
         setShuffledMapping([]);
         setMenuSelection(wasPractice ? 1 : 0);
+        if (wasPractice) setActiveTest(null); // Clear active test to return to list
     };
     const handleFileUpload = (questions) => {
         if (!questions) return;
