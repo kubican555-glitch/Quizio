@@ -57,6 +57,7 @@ export function ConfirmModal({
     confirmText = "Ano, pokračovat",
     cancelText = "Zrušit",
     danger = false,
+    hideButtons = false,
 }) {
     return createPortal(
         <div
@@ -67,32 +68,34 @@ export function ConfirmModal({
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <h3>{title}</h3>
                 <p>{message}</p>
-                <div
-                    className="modalButtons"
-                    style={{
-                        display: "flex",
-                        gap: "1rem",
-                        justifyContent: "flex-end",
-                    }}
-                >
-                    <button className="navButton" onClick={onCancel}>
-                        {cancelText}
-                    </button>
-                    <button
-                        className="navButton primary"
-                        onClick={onConfirm}
-                        style={
-                            danger
-                                ? {
-                                      backgroundColor: "var(--error)",
-                                      borderColor: "var(--error)",
-                                  }
-                                : {}
-                        }
+                {!hideButtons && (
+                    <div
+                        className="modalButtons"
+                        style={{
+                            display: "flex",
+                            gap: "1rem",
+                            justifyContent: "flex-end",
+                        }}
                     >
-                        {confirmText}
-                    </button>
-                </div>
+                        <button className="navButton" onClick={onCancel}>
+                            {cancelText}
+                        </button>
+                        <button
+                            className="navButton primary"
+                            onClick={onConfirm}
+                            style={
+                                danger
+                                    ? {
+                                          backgroundColor: "var(--error)",
+                                          borderColor: "var(--error)",
+                                      }
+                                    : {}
+                            }
+                        >
+                            {confirmText}
+                        </button>
+                    </div>
+                )}
             </div>
         </div>,
         document.body

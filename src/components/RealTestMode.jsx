@@ -101,6 +101,11 @@ export function RealTestMode({
         });
         setShowAutoSubmitModal(true);
 
+        // Po 3 sekundách automaticky zavřeme modál a ukážeme výsledky
+        setTimeout(() => {
+            setShowAutoSubmitModal(false);
+        }, 3000);
+
         if (onTestCompleted) onTestCompleted(test.id);
 
         // Ukládání do databáze provedeme ASYNCHRONNĚ na pozadí
@@ -427,6 +432,7 @@ export function RealTestMode({
                     onConfirm={() => setShowAutoSubmitModal(false)} 
                     confirmText="Zobrazit výsledky" 
                     danger={false} 
+                    hideButtons={true}
                 />
             )}
 
