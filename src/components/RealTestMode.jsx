@@ -29,6 +29,7 @@ export function RealTestMode({
     const [timeLeft, setTimeLeft] = useState(test.time_limit * 60);
     const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingRef = useRef(false);
     const [fullscreenImage, setFullscreenImage] = useState(null);
     const [direction, setDirection] = useState('right');
     const [finalResult, setFinalResult] = useState(null);
@@ -90,7 +91,8 @@ export function RealTestMode({
     };
 
     const submitTest = async (force = false) => {
-        if (isSubmitting || finalResult) return;
+        if (isSubmittingRef.current || finalResult) return;
+        isSubmittingRef.current = true;
         setIsSubmitting(true);
         setShowConfirmSubmit(false);
 
@@ -128,6 +130,7 @@ export function RealTestMode({
 
         } catch (error) {
             console.error("Chyba při ukládání:", error);
+            isSubmittingRef.current = false;
             if (!force) {
                 alert("Chyba při ukládání výsledků. Zkuste to prosím znovu.");
                 setIsSubmitting(false);
