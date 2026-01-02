@@ -223,8 +223,22 @@ body.light-mode .appHeader {
 body.light-mode .menuBackButton,
 body.light-mode .theme-toggle-btn,
 body.light-mode .userBadge,
-body.light-mode .sync-status {
+body.light-mode .sync-status,
+body.light-mode .user-badge {
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Dark Mode ohraničení pro přepínač témat */
+.theme-toggle-btn {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+@media (hover: hover) {
+    .theme-toggle-btn:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
 }
 
 /* === ADMIN PANEL BASE STYLES (DARK MODE) === */
