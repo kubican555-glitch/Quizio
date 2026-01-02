@@ -568,6 +568,11 @@ body.light-mode #root {
 }
 
 /* === KONTEJNER (Scrollovací oblast) --- */
+body.keyboard-mode-active,
+body.keyboard-mode-active * {
+    cursor: none !important;
+}
+
 .container { 
   max-width: 960px; width: 100%; margin: 0 auto; 
   padding: 1rem;
