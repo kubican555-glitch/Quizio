@@ -40,6 +40,10 @@ export function RealTestMode({
     const optionRefsForCurrent = useRef({});
     const questionSetRef = useRef(questionSet);
     const timeLeftRef = useRef(timeLeft);
+    
+    // Čas začátku testu pro přesný výpočet na mobilech
+    const testStartTimeRef = useRef(Date.now());
+    const testDurationMs = test.time_limit * 60 * 1000;
 
     // Udržování aktuálních hodnot v refs
     useEffect(() => {
@@ -123,24 +127,52 @@ export function RealTestMode({
         }
     };
 
-    // --- ČASOVAČ ---
+    // --- ČASOVAČ (s podporou pro mobily a pozastavené browsery) ---
     useEffect(() => {
-        if (finalResult) return; 
-        const timer = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    // Volání přes ref pro aktuální verzi funkce
+        if (finalResult) return;
+        
+        // Funkce pro výpočet zbývajícího času na základě skutečného času
+        const calculateRemainingTime = () => {
+            const elapsed = Date.now() - testStartTimeRef.current;
+            const remaining = Math.max(0, Math.ceil((testDurationMs - elapsed) / 1000));
+            return remaining;
+        };
+        
+        // Kontrola při návratu do aplikace (mobil)
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && !isSubmittingRef.current && !finalResult) {
+                const remaining = calculateRemainingTime();
+                if (remaining <= 0) {
                     if (handleTimeExpiredRef.current) {
                         handleTimeExpiredRef.current();
                     }
-                    return 0;
+                } else {
+                    setTimeLeft(remaining);
                 }
-                return prev - 1;
-            });
+            }
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        
+        const timer = setInterval(() => {
+            const remaining = calculateRemainingTime();
+            
+            if (remaining <= 0) {
+                clearInterval(timer);
+                if (handleTimeExpiredRef.current && !isSubmittingRef.current) {
+                    handleTimeExpiredRef.current();
+                }
+                setTimeLeft(0);
+            } else {
+                setTimeLeft(remaining);
+            }
         }, 1000);
-        return () => clearInterval(timer);
-    }, [finalResult]);
+        
+        return () => {
+            clearInterval(timer);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [finalResult, testDurationMs]);
 
     // --- LOGIKA ---
     const handleAnswer = (answerIndex) => {
