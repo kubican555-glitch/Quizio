@@ -95,10 +95,19 @@ export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alw
                             display: compactOnMobile ? "inline-block" : (showCloud ? "inline-block" : "none"), 
                             width: compactOnMobile ? "1.2em" : "auto", 
                             textAlign: "center",
-                            visibility: compactOnMobile ? (showCloud ? 'visible' : 'hidden') : 'visible'
+                            visibility: compactOnMobile ? (showCloud ? 'visible' : 'hidden') : 'visible',
+                            animation: syncing ? "pulseSync 1.5s ease-in-out infinite" : "none",
+                            willChange: "transform, opacity"
                         }}
                     >
                         ☁️
+                        <style>{`
+                            @keyframes pulseSync {
+                                0% { opacity: 0.4; transform: scale(0.9) translate3d(0,0,0); }
+                                50% { opacity: 1; transform: scale(1.1) translate3d(0,0,0); }
+                                100% { opacity: 0.4; transform: scale(0.9) translate3d(0,0,0); }
+                            }
+                        `}</style>
                     </span>
                 </div>
             </div>
