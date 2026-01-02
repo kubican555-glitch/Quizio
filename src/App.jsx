@@ -783,7 +783,7 @@ export default function App() {
             if (k === "a" || e.key === "ArrowLeft") { 
                 if (isFlashcardInput) return; 
                 if (mode === 'history') { setMode(null); return; }
-                moveToQuestion(currentIndex - 1); 
+                if (currentIndex > 0) moveToQuestion(currentIndex - 1); 
             }
             if (k === "d" || e.key === "ArrowRight" || e.key === "Enter") {
                 if (mode === 'history') return; 
@@ -793,7 +793,9 @@ export default function App() {
                         const finalIdx = visualSelection !== null ? (shuffledMapping[visualSelection] ?? selectedAnswer) : selectedAnswer;
                         clickFlashcardAnswer(finalIdx);
                     }
-                } else moveToQuestion(currentIndex + 1);
+                } else if (currentIndex < questionSet.length - 1) {
+                    moveToQuestion(currentIndex + 1);
+                }
             }
             if (e.key === " ") {
                 if (mode === 'history') return;
