@@ -243,8 +243,13 @@ export default function App() {
 
     const openHistoryWithRefresh = async () => {
         flushSessionStats();
+        // Set mode first to show the screen, then refresh data
         setMode("history"); 
-        await refreshData();
+        try {
+            await refreshData();
+        } catch (err) {
+            console.error("Refresh history failed:", err);
+        }
     };
 
     useEffect(() => {

@@ -27,11 +27,19 @@ export const HistoryView = ({
     sessionQuestionsCount = 0,
     onBack, 
     onDeleteRecord,
+    onRefresh,
     user,
     syncing,
     currentSubject 
 }) => {
     const [currentPage, setCurrentPage] = useState(0);
+
+    // Refresh data whenever the component mounts
+    useEffect(() => {
+        if (onRefresh) {
+            onRefresh();
+        }
+    }, []);
 
     const filteredHistory = useMemo(() => {
         let data = [...history];
