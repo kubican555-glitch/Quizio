@@ -215,8 +215,16 @@ body.light-mode .top-navbar,
 body.light-mode .navbar, 
 body.light-mode .appHeader { 
     background: rgba(255, 255, 255, 0.95); 
-    border-bottom: 1px solid rgba(0,0,0,0.08); 
+    border: 1px solid rgba(0, 0, 0, 0.1); /* Přidáno ohraničení pro lepší viditelnost v light modu */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15); 
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+}
+
+body.light-mode .menuBackButton,
+body.light-mode .theme-toggle-btn,
+body.light-mode .userBadge,
+body.light-mode .sync-status {
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
 }
 
 /* === ADMIN PANEL BASE STYLES (DARK MODE) === */
