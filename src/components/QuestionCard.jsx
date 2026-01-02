@@ -1,10 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { isFlashcardStyle } from '../utils/formatting.js';
-import { fetchQuestionImage, getCachedImage } from '../utils/dataManager.js';
-import { getImageUrl } from "../utils/images.js"; 
-import { HighlightedText } from "./HighlightedText.jsx";
+import { isFlashcardStyle } from '../utils/formatting';
+import { fetchQuestionImage, getCachedImage } from '../utils/dataManager';
+import { getImageUrl } from "../utils/images"; 
+import { HighlightedText } from "./HighlightedText";
 
-// OPRAVA: Změněno zpět na named export pro kompatibilitu s ostatními soubory
 export function QuestionCard({
   currentQuestion,
   mode,
@@ -22,64 +21,70 @@ export function QuestionCard({
   isExiting,
   optionRefsForCurrent 
 }) {
-  // --- 1. OPTIMALIZACE A NAČÍTÁNÍ OBRÁZKŮ ---
-  const [lazyImage, setLazyImage] = useState(null);
-  const [imageLoaded, setImageLoaded] = useState(false); // Nový state pro fade-in efekt
+  // 1. OPTIMALIZACE OBRÁZKŮ:
+  const [lazyImage, setLazyImage] = useState(() => {
+      if (currentQuestion?.image_base64) return currentQuestion.image_base64;
+      if (currentQuestion?.id) return getCachedImage(currentQuestion.id) || null;
+      const staticUrl = getImageUrl(currentSubject, currentQuestion?.number);
+      return staticUrl || null;
+  });
 
-  const [shuffledOptions, setShuffledOptions] = useState([]);
+  const [isReady, setIsReady] = useState(true);
 
-  // TINDER-LIKE SWIPE STATE
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [swipeDirection, setSwipeDirection] = useState(null); // 'left' | 'right' | null
-  const [isFlying, setIsFlying] = useState(false);
+    const [shuffledOptions, setShuffledOptions] = useState([]);
+    
+    // TINDER-LIKE SWIPE STATE
+    const [swipeOffset, setSwipeOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [swipeDirection, setSwipeDirection] = useState(null); // 'left' | 'right' | null
+    const [isFlying, setIsFlying] = useState(false);
 
-  // Logic to shuffle options whenever currentQuestion changes
-  useEffect(() => {
-    if (currentQuestion && currentQuestion.options) {
-      const optionsWithMeta = currentQuestion.options.map((opt, idx) => ({
-        text: opt,
-        originalIndex: idx,
-        isCorrect: idx === currentQuestion.correctIndex
-      }));
-
-      const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
-      let finalShuffled = [];
-
-      if (isMockOrRealTest) {
-        finalShuffled = optionsWithMeta;
-      } else {
-        // Fisher-Yates shuffle
-        const shuffled = [...optionsWithMeta];
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    // Logic to shuffle options whenever currentQuestion changes
+    useEffect(() => {
+        if (currentQuestion && currentQuestion.options) {
+            const optionsWithMeta = currentQuestion.options.map((opt, idx) => ({
+                text: opt,
+                originalIndex: idx,
+                isCorrect: idx === currentQuestion.correctIndex
+            }));
+            
+            const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
+            let finalShuffled = [];
+            
+            if (isMockOrRealTest) {
+                finalShuffled = optionsWithMeta;
+            } else {
+                // Fisher-Yates shuffle
+                const shuffled = [...optionsWithMeta];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                finalShuffled = shuffled;
+            }
+            setShuffledOptions(finalShuffled);
+            
+            // Pass the shuffled mapping back to parent for keyboard sync
+            if (window.setShuffledMappingForKeyboard) {
+                window.setShuffledMappingForKeyboard(finalShuffled.map(o => o.originalIndex));
+            }
+            
+            // Re-order option refs if they exist
+            if (optionRefsForCurrent && optionRefsForCurrent.current) {
+                optionRefsForCurrent.current = {};
+            }
         }
-        finalShuffled = shuffled;
-      }
-      setShuffledOptions(finalShuffled);
+    }, [currentQuestion.number, currentQuestion.id, mode]); // Removed dependency on userAnswer to prevent re-shuffle on click
+    
+    // Reset swipe state when question changes
+    useEffect(() => {
+        setSwipeOffset(0);
+        setIsDragging(false);
+        setSwipeDirection(null);
+        setIsFlying(false);
+    }, [currentQuestion?.id, currentQuestion?.number]);
 
-      // Pass the shuffled mapping back to parent for keyboard sync
-      if (window.setShuffledMappingForKeyboard) {
-        window.setShuffledMappingForKeyboard(finalShuffled.map(o => o.originalIndex));
-      }
-
-      // Re-order option refs if they exist
-      if (optionRefsForCurrent && optionRefsForCurrent.current) {
-        optionRefsForCurrent.current = {};
-      }
-    }
-  }, [currentQuestion?.number, currentQuestion?.id, mode]); 
-
-  // Reset swipe state when question changes
-  useEffect(() => {
-    setSwipeOffset(0);
-    setIsDragging(false);
-    setSwipeDirection(null);
-    setIsFlying(false);
-  }, [currentQuestion?.id, currentQuestion?.number]);
-
-  const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
+    const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
 
   const touchStart = useRef({ x: 0, y: 0 });
@@ -87,62 +92,38 @@ export function QuestionCard({
   const minSwipeDistance = 50; // Threshold pro odlet
   const flyAwayThreshold = 80; // Práh pro spuštění odletu
 
-  // --- 2. VYLEPŠENÉ NAČÍTÁNÍ OBRÁZKU (Líné načítání + Reset) ---
+  // 2. NAČÍTÁNÍ OBRÁZKU (Líné načítání na pozadí)
   useEffect(() => {
-    // Resetování stavu při změně otázky (zamezí zobrazení starého obrázku)
-    setImageLoaded(false);
-
-    // Zkusíme okamžitě získat obrázek (pokud je base64 nebo v cache)
-    let initialImage = null;
-    if (currentQuestion?.image_base64) {
-      initialImage = currentQuestion.image_base64;
-    } else if (currentQuestion?.id) {
-      initialImage = getCachedImage(currentQuestion.id);
+    if (currentQuestion?.id) {
+        const loadImage = async () => {
+            try {
+                const img = await fetchQuestionImage(currentQuestion.id);
+                if (img) setLazyImage(img);
+            } catch (err) {
+                console.error("Chyba při načítání obrázku v kartě:", err);
+            }
+        };
+        loadImage();
     }
+  }, [currentQuestion?.id]);
 
-    // Pokud nemáme cache, zkusíme statickou URL (pro starší data)
-    if (!initialImage && currentQuestion) {
-       initialImage = getImageUrl(currentSubject, currentQuestion.number);
-    }
-
-    setLazyImage(initialImage);
-
-    // Asynchronní načtení (pokud nebyl v cache/base64)
-    if (currentQuestion?.id && !currentQuestion.image_base64) {
-      const loadImage = async () => {
-        try {
-          const img = await fetchQuestionImage(currentQuestion.id);
-          if (img) {
-             setLazyImage(img);
-             // Poznámka: setImageLoaded nastavíme až v onLoad eventu <img> tagu
-          }
-        } catch (err) {
-          console.error("Chyba při načítání obrázku v kartě:", err);
-        }
-      };
-      // Pokud jsme nenašli image hned synchronně, zavoláme fetch
-      if (!initialImage || (initialImage && !initialImage.startsWith('data:'))) {
-          loadImage();
-      }
-    }
-  }, [currentQuestion?.id, currentQuestion?.number, currentQuestion?.image_base64, currentSubject]);
-
-  // --- 3. ZOOM LOGIKA ---
+  // 3. ZOOM LOGIKA
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
-      if (e.key === "f" || e.key === "F") {
-        if (lazyImage && onZoom) {
-          onZoom(lazyImage);
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+        if (e.key === "f" || e.key === "F") {
+            if (lazyImage && onZoom) {
+                onZoom(lazyImage);
+            }
         }
-      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lazyImage, onZoom]);
 
-  // --- 4. SCROLL (Zakomentováno dle původního kódu) ---
+  // 4. SCROLL
   useEffect(() => {
+    // Odstraněno automatické posouvání při výběru odpovědi, které způsobovalo skákání obrazovky na mobilech
     /*
     if (selectedAnswer !== null && optionRefsForCurrent && optionRefsForCurrent.current && optionRefsForCurrent.current[selectedAnswer]) {
       optionRefsForCurrent.current[selectedAnswer].scrollIntoView({
@@ -153,7 +134,7 @@ export function QuestionCard({
     */
   }, [selectedAnswer, optionRefsForCurrent]);
 
-  // --- 5. TOUCH EVENTY - TINDER-LIKE SWIPE (Optimalizováno pro 120Hz+) ---
+  // 5. TOUCH EVENTY - TINDER-LIKE SWIPE (Optimalizováno pro 120Hz+)
   useEffect(() => {
     const element = cardContainerRef.current;
     if (!element || isFlying) return;
@@ -186,7 +167,7 @@ export function QuestionCard({
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
           setSwipeOffset(diffX);
-
+          
           if (diffX > minSwipeDistance) {
             setSwipeDirection('right');
           } else if (diffX < -minSwipeDistance) {
@@ -201,7 +182,7 @@ export function QuestionCard({
     const handleTouchEnd = () => {
       if (rafId) cancelAnimationFrame(rafId);
       if (!touchStart.current.x || isFlying) return;
-
+      
       const distanceX = touchCurrent.current.x - touchStart.current.x;
       const absX = Math.abs(distanceX);
       const absY = Math.abs(touchCurrent.current.y - touchStart.current.y);
@@ -212,7 +193,7 @@ export function QuestionCard({
       if (absX > absY && absX > flyAwayThreshold && onSwipe) {
         const direction = distanceX > 0 ? 'right' : 'left';
         const isFlashcardOrSmart = mode === 'random' || mode === 'smart_learning';
-
+        
         if (isFlashcardOrSmart && direction === 'right') {
           setSwipeOffset(0);
           setSwipeDirection(null);
@@ -223,7 +204,7 @@ export function QuestionCard({
         setSwipeDirection(direction);
         const flyDistance = direction === 'right' ? window.innerWidth + 500 : -window.innerWidth - 500;
         setSwipeOffset(flyDistance);
-
+        
         setTimeout(() => {
           onSwipe(direction);
         }, 200);
@@ -245,17 +226,18 @@ export function QuestionCard({
     };
   }, [onSwipe, isFlying, mode]);
 
-  // --- 6. RENDER ---
+  // 6. RENDER
   if (!currentQuestion) return null;
 
-  // Podmínka pro zobrazení čísla otázky
+  // --- PODMÍNKA PRO ZOBRAZENÍ ČÍSLA OTÁZKY ---
+  // Číslo zobrazíme POUZE pokud je mode 'random' (Flashcards) nebo 'review' (Prohlížení)
   const shouldShowNumber = mode === 'random' || mode === 'review';
 
-  // Výpočet rotace pro Tinder-like efekt
+  // Výpočet rotace pro Tinder-like efekt (max ±15 stupňů)
   const rotation = isDragging ? (swipeOffset / window.innerWidth) * 15 : (isFlying ? (swipeDirection === 'right' ? 15 : -15) : 0);
   const opacity = isFlying ? 0 : 1;
-
-  // Dynamické styly pro swipe
+  
+  // Dynamické styly pro swipe - optimalizováno pro výkon a zamezení výběru textu
   const swipeStyles = {
     position: 'relative',
     touchAction: 'pan-y',
@@ -278,8 +260,11 @@ export function QuestionCard({
       <style>{`
         .fade-in-content { animation: fadeInQuick 0.3s ease-out; }
         @keyframes fadeInQuick { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        /* Odstranění barevného glow při swipování, které způsobovalo highlight efekt */
         .swiping-right { }
         .swiping-left { }
+        
+        /* Zajištění, že žádný prvek uvnitř karty nereaguje na tap-highlight */
         .questionCardContent * {
           -webkit-tap-highlight-color: transparent !important;
           outline: none !important;
@@ -299,42 +284,14 @@ export function QuestionCard({
 
       <div className="questionHeader">
         <div className="questionText">
-           {shouldShowNumber && <span className="questionNumber">#{currentQuestion.number} </span>}
-           {currentQuestion.question}
+            {/* Zde je změna: Podmíněné vykreslení čísla */}
+            {shouldShowNumber && <span className="questionNumber">#{currentQuestion.number} </span>}
+            {currentQuestion.question}
         </div>
 
-        {/* --- ÚPRAVA PRO IMAGE WRAPPER (Anti-flicker) --- */}
         {lazyImage && (
-          <div 
-            className="imageWrapper" 
-            onClick={() => onZoom && onZoom(lazyImage)}
-            style={{ 
-              minHeight: '200px', // Rezervuje místo
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              position: 'relative'
-            }}
-          >
-            {/* Loading placeholder pokud se načítá */}
-            {!imageLoaded && (
-               <div style={{ position: 'absolute', color: '#ccc' }}>...</div>
-            )}
-
-            <img 
-              src={lazyImage} 
-              alt="Otázka" 
-              className="questionImage" 
-              decoding="async"
-              onLoad={() => setImageLoaded(true)}
-              style={{
-                opacity: imageLoaded ? 1 : 0,
-                transition: 'opacity 0.3s ease-in-out',
-                maxHeight: '400px',
-                width: 'auto',
-                maxWidth: '100%'
-              }}
-            />
+          <div className="imageWrapper" onClick={() => onZoom && onZoom(lazyImage)}>
+            <img src={lazyImage} alt="Otázka" className="questionImage" decoding="async" />
             <div className="fullscreenHint mobile-hidden">Klikni nebo stiskni F</div>
           </div>
         )}
