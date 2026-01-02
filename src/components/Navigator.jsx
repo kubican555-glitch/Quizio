@@ -19,10 +19,18 @@ export function Navigator({
     // Automatický posun na aktivní otázku (jen když se změní index a uživatel nedrží myš)
     useEffect(() => {
         if (!isDown && listRef.current && listRef.current.children[currentIndex]) {
-            listRef.current.children[currentIndex].scrollIntoView({
-                behavior: "smooth",
-                block: "nearest",
-                inline: "center",
+            const container = listRef.current;
+            const element = container.children[currentIndex];
+            
+            const containerWidth = container.offsetWidth;
+            const elementOffset = element.offsetLeft;
+            const elementWidth = element.offsetWidth;
+            
+            const scrollTo = elementOffset - (containerWidth / 2) + (elementWidth / 2);
+            
+            container.scrollTo({
+                left: scrollTo,
+                behavior: 'smooth'
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
