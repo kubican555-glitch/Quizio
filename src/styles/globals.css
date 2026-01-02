@@ -516,6 +516,9 @@ html, body {
   user-select: none; -webkit-user-select: none; cursor: default;
   scrollbar-gutter: stable;
   
+  /* Zajištění protažení pozadí pod výřezy na iOS */
+  min-height: -webkit-fill-available;
+  
   /* OPRAVA DOUBLE SCROLLING - scroll pouze uvnitř .container */
   overflow: hidden;
   position: fixed;
