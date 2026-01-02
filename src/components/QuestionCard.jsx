@@ -293,8 +293,15 @@ export function QuestionCard({
       <style>{`
         .fade-in-content { animation: fadeInQuick 0.3s ease-out; }
         @keyframes fadeInQuick { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .swiping-right { box-shadow: 0 0 30px rgba(34, 197, 94, 0.4); }
-        .swiping-left { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
+        /* Odstranění barevného glow při swipování, které způsobovalo highlight efekt */
+        .swiping-right { }
+        .swiping-left { }
+        
+        /* Zajištění, že žádný prvek uvnitř karty nereaguje na tap-highlight */
+        .questionCardContent * {
+          -webkit-tap-highlight-color: transparent !important;
+          outline: none !important;
+        }
       `}</style>
 
       {isFlashcard && (showResult || selectedAnswer !== null) && !isExiting && (
