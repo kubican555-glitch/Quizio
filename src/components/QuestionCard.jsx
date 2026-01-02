@@ -225,8 +225,15 @@ export function QuestionCard({
 
       if (absX > absY && absX > flyAwayThreshold && onSwipe) {
         const direction = distanceX > 0 ? 'right' : 'left';
-        const isFlashcardOrSmart = mode === 'random' || mode === 'smart_learning';
         
+        // ZÁKAZ SWIPU ve Flashcard módech, pokud není zodpovězeno
+        const isFlashcardOrSmart = mode === 'random' || mode === 'test_practice' || mode === 'smart' || mode === 'mistakes';
+        if (isFlashcardOrSmart && !showResult) {
+          setSwipeOffset(0);
+          setSwipeDirection(null);
+          return;
+        }
+
         if (isFlashcardOrSmart && direction === 'right') {
           setSwipeOffset(0);
           setSwipeDirection(null);
