@@ -701,7 +701,7 @@ body.light-mode .optionButton { color: #334155; font-weight: 600; }
 .optionButton:focus-visible { outline: 3px solid var(--color-primary-light); outline-offset: 2px; border-color: var(--color-primary-light); }
 
 @media (hover: hover) {
-    .optionButton:hover { background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%); border-color: rgba(59, 130, 246, 0.5); transform: translateX(4px); }
+    .optionButton:hover { background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%); border-color: rgba(59, 130, 246, 0.5); }
     body.light-mode .optionButton:hover { border-color: var(--color-primary); }
 }
 
