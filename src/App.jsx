@@ -614,7 +614,12 @@ export default function App() {
                 }
                 return;
             }
-            if (finished || mode === "no_mistakes") { if (["Backspace", "Enter", "ArrowLeft"].includes(e.key)) setMode(null); return; }
+            if (finished || mode === "no_mistakes") { 
+                if (["Backspace", "Enter", "ArrowLeft", "a", "A", "Escape"].includes(e.key)) {
+                    setMode(null);
+                }
+                return; 
+            }
 
             if (!mode) {
                 const k = e.key.toLowerCase(); 
@@ -696,8 +701,13 @@ export default function App() {
                 }
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? 0 : (questionSet[currentIndex].userAnswer + 1) % opts);
             }
-            if (k === "a" || e.key === "ArrowLeft") { if (isFlashcardInput) return; moveToQuestion(currentIndex - 1); }
+            if (k === "a" || e.key === "ArrowLeft") { 
+                if (isFlashcardInput) return; 
+                if (mode === 'history') { setMode(null); return; }
+                moveToQuestion(currentIndex - 1); 
+            }
             if (k === "d" || e.key === "ArrowRight" || e.key === "Enter") {
+                if (mode === 'history') return; 
                 if (isFlashcardInput) { 
                     if (showResult) nextFlashcardQuestion(); 
                     else {
@@ -707,14 +717,21 @@ export default function App() {
                 } else moveToQuestion(currentIndex + 1);
             }
             if (e.key === " ") {
+                if (mode === 'history') return;
                 if (isFlashcardInput && !showResult) {
                     const finalIdx = visualSelection !== null ? (shuffledMapping[visualSelection] ?? selectedAnswer) : selectedAnswer;
                     clickFlashcardAnswer(finalIdx);
                 }
                 else if (!finished && mode === "mock") setShowConfirmSubmit(true); 
             }
-            if (e.key === "Backspace") clearAnswer();
-            if (e.key === "Escape") tryReturnToMenu();
+            if (e.key === "Backspace") {
+                if (mode === 'history') { setMode(null); return; }
+                clearAnswer();
+            }
+            if (e.key === "Escape") {
+                if (mode === 'history') { setMode(null); return; }
+                tryReturnToMenu();
+            }
         };
         window.addEventListener("keydown", handleKeyDown); return () => window.removeEventListener("keydown", handleKeyDown);
     }, [mode, questionSet, currentIndex, showResult, selectedAnswer, showConfirmSubmit, showConfirmExit, finished, menuSelection, subject, user, fullscreenImage, reportModalOpen, isSessionBlocked, testToStart, visualSelection, shuffledMapping]);
