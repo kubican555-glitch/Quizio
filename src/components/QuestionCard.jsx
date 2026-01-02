@@ -47,19 +47,30 @@ export function QuestionCard({
             
             // Fisher-Yates shuffle
             const shuffled = [...optionsWithMeta];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
+            
+            // Only shuffle if it's NOT a mock/real test, OR if it's a mock/real test but we haven't shuffled for this question yet
+            // We'll use a simple deterministic seed based on question number for tests to keep it stable during the session
+            if (isMockOrRealTest) {
+                // For tests, we want stable order. We can use the question number as a simple seed or just not shuffle.
+                // The user said "v testu nanecisto se to michat v prubehu testu uz vubec nema"
+                // This usually means keep original order OR keep it stable. 
+                // Given the context of "technical certification", original order is often preferred for mock tests.
+                setShuffledOptions(optionsWithMeta);
+            } else {
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                setShuffledOptions(shuffled);
             }
-            setShuffledOptions(shuffled);
             
             // Re-order option refs if they exist
             if (optionRefsForCurrent && optionRefsForCurrent.current) {
-                // Clear current refs to ensure new ones are set in correct visual order
                 optionRefsForCurrent.current = {};
             }
         }
-    }, [currentQuestion.number, currentQuestion.id, mode, currentQuestion.userAnswer === undefined]); // Re-shuffle when it's a "fresh" view (userAnswer is undefined)
+    }, [currentQuestion.number, currentQuestion.id, mode, currentQuestion.userAnswer === undefined]);
 
     const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
