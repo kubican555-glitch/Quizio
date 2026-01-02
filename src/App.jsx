@@ -441,6 +441,7 @@ export default function App() {
             setShowCustomImport(true);
             return;
         }
+        // OKAMŽITÁ ZMĚNA STAVU bez čekání
         setSubject(subj.toUpperCase()); 
         setMenuSelection(0);
         setMode(null);

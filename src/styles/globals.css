@@ -585,6 +585,10 @@ body.keyboard-mode-active * {
   scrollbar-width: none; 
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* Zajištění plynulého přechodu bez problikávání */
+  background: transparent;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .quizContentWrapper { 
