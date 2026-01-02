@@ -576,7 +576,27 @@ export default function App() {
 
             if (!isKeyboardMode) { setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active"); }
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "f", "F"].includes(e.key)) e.preventDefault();
-            if (showConfirmExit || showConfirmSubmit || showSmartSettings || showClearMistakesConfirm || recordToDelete || reportModalOpen) return;
+            if (showConfirmExit || showConfirmSubmit || showSmartSettings || showClearMistakesConfirm || recordToDelete || reportModalOpen || testToStart) {
+                if (e.key === "Escape") {
+                    setShowConfirmExit(false);
+                    setShowConfirmSubmit(false);
+                    setShowSmartSettings(false);
+                    setShowClearMistakesConfirm(false);
+                    setRecordToDelete(null);
+                    setReportModalOpen(false);
+                    setTestToStart(null);
+                    return;
+                }
+                if (e.key === "Enter") {
+                    if (showConfirmExit) tryReturnToMenu();
+                    if (showConfirmSubmit) submitTest();
+                    if (showClearMistakesConfirm) clearMistakes();
+                    if (recordToDelete) handleDeleteRecordConfirm();
+                    if (testToStart) confirmStartTest();
+                    return;
+                }
+                return;
+            }
 
             // --- UPRAVENÁ LOGIKA PRO f/F (Globální toggle) ---
             if (e.key === "f" || e.key === "F") {
@@ -588,7 +608,12 @@ export default function App() {
                 return;
             }
 
-            if (fullscreenImage) return;
+            if (fullscreenImage) {
+                if (e.key === "Escape" || e.key === "f" || e.key === "F" || e.key === "Enter") {
+                    setFullscreenImage(null);
+                }
+                return;
+            }
             if (finished || mode === "no_mistakes") { if (["Backspace", "Enter", "ArrowLeft"].includes(e.key)) setMode(null); return; }
 
             if (!mode && !subject) {
@@ -596,6 +621,9 @@ export default function App() {
                 const getNextIndex = (current, dir) => { let next = current; do { next = (next + dir + modeCount) % modeCount; } while (!isTeacher && next === 5); return next; };
                 if (k === "w" || k === "arrowup") setMenuSelection((p) => getNextIndex(p, -1));
                 else if (k === "s" || k === "arrowdown") setMenuSelection((p) => getNextIndex(p, 1));
+                else if (k === "a" || k === "arrowleft") {
+                    if (subject) setSubject(null);
+                }
                 else if (k === "d" || k === "arrowright" || e.key === "Enter") {
                     if (!subject) {
                         if (menuSelection === 0) handleSelectSubject("SPS");
