@@ -92,7 +92,7 @@ export function RealTestMode({
     };
 
     const submitTest = async (force = false) => {
-        if (isSubmittingRef.current || (finalResult && !force)) return;
+        if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
         setShowConfirmSubmit(false);
@@ -205,7 +205,7 @@ export function RealTestMode({
     };
 
     // --- RENDER ---
-    if (finalResult) {
+    if (finalResult && !showAutoSubmitModal) {
         return (
             <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
                 <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
