@@ -204,7 +204,7 @@ export function QuestionCard({
             if ((diffX > 0 && isFirst) || (diffX < 0 && isLast)) {
                 if (rafId) cancelAnimationFrame(rafId);
                 rafId = requestAnimationFrame(() => {
-                    setSwipeOffset(diffX * 0.1); // Jen mírný odpor místo plného posunu
+                    setSwipeOffset(diffX * 0.05); // Ještě menší odpor (téměř žádný pohyb)
                     setSwipeDirection(null);
                 });
                 return;

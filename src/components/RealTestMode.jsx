@@ -44,6 +44,12 @@ export function RealTestMode({
     useEffect(() => {
         window.currentTestIndex = currentIndex;
         window.totalTestQuestions = questionSet.length;
+        
+        // Cleanup při unmountu
+        return () => {
+            window.currentTestIndex = undefined;
+            window.totalTestQuestions = undefined;
+        };
     }, [currentIndex, questionSet.length]);
 
     // --- ČASOVAČ ---
