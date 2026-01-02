@@ -385,11 +385,11 @@ export function RealTestMode({
                                 </button>
                             ) : (
                                 <button 
-                                    className="navButton primary" 
-                                    onClick={() => setShowConfirmSubmit(true)}
-                                    disabled={finalResult !== null}
+                                    className="navButton" 
+                                    style={{ opacity: 0.5, cursor: 'not-allowed' }}
+                                    disabled={true}
                                 >
-                                    Odevzdat test
+                                    Další
                                 </button>
                             )}
                         </div>
