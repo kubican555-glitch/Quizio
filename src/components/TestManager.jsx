@@ -430,7 +430,7 @@ export function TestManager({ onBack, subject, isTeacher }) {
                                                                 <div>
                                                                     <div style={{ fontWeight: '700', fontSize: '1rem' }}>{res.student_name}</div>
                                                                     <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-                                                                        Čas: {Math.floor(res.time_spent / 60)}m {res.time_spent % 60}s | Cheat: {res.cheat_score}
+                                                                        Čas: {Math.floor(res.time_spent / 60)}m {res.time_spent % 60}s
                                                                     </div>
                                                                 </div>
                                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
