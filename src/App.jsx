@@ -543,6 +543,16 @@ export default function App() {
         updateHistory((prev) => [...prev, newRec]);
     };
     const tryReturnToMenu = () => { 
+        if (mode === "test_practice") {
+            setMode(null);
+            setCombo(0);
+            setShowResult(false);
+            setSelectedAnswer(null);
+            setVisualSelection(null);
+            setShuffledMapping([]);
+            setMenuSelection(1); // Set selection to Scheduled Tests
+            return;
+        }
         if (mode === "mock" && !finished) {
             setShowConfirmExit(true); 
         } else { 
@@ -557,13 +567,14 @@ export default function App() {
     };
     const confirmExit = () => { 
         setShowConfirmExit(false); 
+        const wasPractice = mode === "test_practice";
         setMode(null); 
         setCombo(0); 
         setShowResult(false);
         setSelectedAnswer(null);
         setVisualSelection(null);
         setShuffledMapping([]);
-        setMenuSelection(0);
+        setMenuSelection(wasPractice ? 1 : 0);
     };
     const handleFileUpload = (questions) => {
         if (!questions) return;
