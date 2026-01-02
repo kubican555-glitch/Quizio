@@ -197,7 +197,8 @@ export function QuestionCard({
         }
 
         // ZÁKAZ VIZUÁLNÍHO POSUNU na začátku/konci v testu
-        if (mode === 'real_test' || mode === 'mock') {
+        const isBoundaryLockedMode = mode === 'real_test' || mode === 'mock' || mode === 'random' || mode === 'training' || mode === 'smart' || mode === 'mistakes';
+        if (isBoundaryLockedMode) {
             const isFirst = window.currentTestIndex === 0;
             const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
             

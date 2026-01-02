@@ -139,6 +139,17 @@ export default function App() {
     const [timeLeft, setTimeLeft] = useState(0);
     const [finished, setFinished] = useState(false);
 
+    // Globální tracking pro QuestionCard swipe logiku (mock/random/atd.)
+    useEffect(() => {
+        window.currentTestIndex = currentIndex;
+        window.totalTestQuestions = questionSet.length;
+        
+        return () => {
+            window.currentTestIndex = undefined;
+            window.totalTestQuestions = undefined;
+        };
+    }, [currentIndex, questionSet.length]);
+
     const [maxSeenIndex, setMaxSeenIndex] = useState(0); 
     const [trainingTime, setTrainingTime] = useState(0); 
 
