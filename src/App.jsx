@@ -23,7 +23,13 @@ import {
     isFlashcardStyle 
 } from "./utils/formatting.js";
 import { getImageUrl } from "./utils/images.js";
-import { fetchQuestionsLightweight, clearImageCache, getCachedImage, fetchQuestionImage } from "./utils/dataManager.js"; 
+import { 
+    fetchQuestionsLightweight, 
+    clearImageCache, 
+    getCachedImage, 
+    fetchQuestionImage,
+    preloadTestImages 
+} from "./utils/dataManager.js"; 
 
 import { SubjectBadge } from "./components/SubjectBadge.jsx";
 import { UserBadgeDisplay } from "./components/UserBadgeDisplay.jsx";
@@ -309,14 +315,18 @@ export default function App() {
         fetchQuestions();
     }, [subject, customQuestions]);
 
-    const startTestPractice = (test) => {
+    const startTestPractice = async (test) => {
         const pool = activeQuestionsCache.filter(q => q.number >= test.topic_range_start && q.number <= test.topic_range_end);
         if (pool.length === 0) { alert("Žádné otázky v rozsahu."); return; }
         const shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
+        
+        setMode("loading");
+        await preloadTestImages(shuffled);
+        
         setQuestionSet(shuffled); setMode("test_practice"); setActiveTest(test); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setCombo(0);
     };
 
-    const confirmStartTest = () => {
+    const confirmStartTest = async () => {
         if (!testToStart) return;
         setTestToStart(null); 
 
@@ -324,6 +334,9 @@ export default function App() {
         const pool = activeQuestionsCache.filter(q => q.number >= test.topic_range_start && q.number <= test.topic_range_end);
         const selected = [...pool].sort(() => Math.random() - 0.5).slice(0, test.question_count);
         const prepared = prepareQuestionSet(selected, true);
+
+        setMode("loading");
+        await preloadTestImages(prepared);
 
         setQuestionSet(prepared); 
         setActiveTest(test); 
@@ -346,11 +359,16 @@ export default function App() {
         const shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
         setQuestionSet(shuffled); setMode("random"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setCombo(0);
     };
-    const startMockTest = () => {
+    const startMockTest = async () => {
         const pool = activeQuestionsCache;
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
         const sel = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(40, pool.length));
         const prepared = prepareQuestionSet(sel, true);
+        
+        // Přednačtení obrázků
+        setMode("loading"); // Dočasný stav pro preloading
+        await preloadTestImages(prepared);
+        
         setQuestionSet(prepared); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
     };
     const startMistakesMode = () => {
@@ -896,9 +914,9 @@ export default function App() {
                             <div className="navbar-group"><UserBadgeDisplay user={user} syncing={syncing} onLogout={handleLogout} /><ThemeToggle currentTheme={theme} toggle={toggleTheme} /></div>
                         </div>
                     )}
-                    {isLoadingQuestions ? (
+                    {isLoadingQuestions || mode === "loading" ? (
                         <div style={{ margin: "2rem", fontSize: "1.2rem", color: "#888", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>Načítám otázky z databáze...
+                            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>Načítám otázky a obrázky...
                         </div>
                     ) : (
                         <MainMenu
