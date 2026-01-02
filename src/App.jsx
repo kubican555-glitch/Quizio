@@ -774,7 +774,7 @@ export default function App() {
                                             <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
                                             <button 
                                                 className="report-btn-flash" 
-                                                onClick={(e) => { e.stopPropagation(); handleReportClick(q.number); }}
+                                                onClick={() => handleReportClick(q.number)}
                                                 style={{ 
                                                     position: 'absolute', 
                                                     top: '-10px', 
@@ -789,7 +789,7 @@ export default function App() {
                                                     justifyContent: 'center', 
                                                     cursor: 'pointer', 
                                                     fontSize: '1.2rem', 
-                                                    zIndex: 20, 
+                                                    zIndex: 100, 
                                                     opacity: 0.7 
                                                 }}
                                                 title="Nahlásit chybu v této otázce"
@@ -841,12 +841,12 @@ export default function App() {
             <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
             {(() => {
                 let activeReportQuestion = currentQuestion; 
-                if (questionToReport) { const found = questionSet.find(q => q.number === questionToReport); if (found) activeReportQuestion = found; }
+                if (questionToReport) { const found = activeQuestionsCache.find(q => q.number === questionToReport); if (found) activeReportQuestion = found; }
                 const qForModal = activeReportQuestion || {};
                 return (
                     <ReportModal 
                         isOpen={reportModalOpen} onClose={() => { setReportModalOpen(false); setQuestionToReport(null); }} theme={theme}
-                        questionText={qForModal.question} questionId={qForModal.id} subject={qForModal.subject} questionNumber={qForModal.number}
+                        questionText={qForModal.question} questionId={qForModal.id} subject={qForModal.subject || subject} questionNumber={qForModal.number}
                         mode={mode} options={qForModal.options} correctIndex={qForModal.correctIndex} userAnswer={qForModal.userAnswer} username={user} userId={dbId} isExiting={!!exitDirection}
                     />
                 );
