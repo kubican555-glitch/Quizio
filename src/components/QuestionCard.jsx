@@ -36,6 +36,12 @@ export function QuestionCard({
   });
 
     const [shuffledOptions, setShuffledOptions] = useState([]);
+    
+    // TINDER-LIKE SWIPE STATE
+    const [swipeOffset, setSwipeOffset] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [swipeDirection, setSwipeDirection] = useState(null); // 'left' | 'right' | null
+    const [isFlying, setIsFlying] = useState(false);
 
     // Logic to shuffle options whenever currentQuestion changes
     useEffect(() => {
@@ -73,13 +79,22 @@ export function QuestionCard({
             }
         }
     }, [currentQuestion.number, currentQuestion.id, mode]); // Removed dependency on userAnswer to prevent re-shuffle on click
+    
+    // Reset swipe state when question changes
+    useEffect(() => {
+        setSwipeOffset(0);
+        setIsDragging(false);
+        setSwipeDirection(null);
+        setIsFlying(false);
+    }, [currentQuestion?.id, currentQuestion?.number]);
 
     const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
 
   const touchStart = useRef({ x: 0, y: 0 });
   const touchCurrent = useRef({ x: 0, y: 0 });
-  const minSwipeDistance = 35;
+  const minSwipeDistance = 50; // Threshold pro odlet
+  const flyAwayThreshold = 80; // Práh pro spuštění odletu
 
   // 2. NAČÍTÁNÍ OBRÁZKU
   useEffect(() => {
@@ -144,49 +159,76 @@ export function QuestionCard({
     */
   }, [selectedAnswer, optionRefsForCurrent]);
 
-  // 5. TOUCH EVENTY
+  // 5. TOUCH EVENTY - TINDER-LIKE SWIPE
   useEffect(() => {
     const element = cardContainerRef.current;
-    if (!element) return;
+    if (!element || isFlying) return;
 
     const handleTouchStart = (e) => {
-      // Record initial touch point
+      if (isFlying) return;
       touchStart.current = { x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY };
       touchCurrent.current = { ...touchStart.current };
+      setIsDragging(true);
     };
 
     const handleTouchMove = (e) => {
-      if (!touchStart.current.x) return;
+      if (!touchStart.current.x || isFlying) return;
       const clientX = e.targetTouches[0].clientX;
       const clientY = e.targetTouches[0].clientY;
       touchCurrent.current = { x: clientX, y: clientY };
 
-      const diffX = Math.abs(clientX - touchStart.current.x);
+      const diffX = clientX - touchStart.current.x;
       const diffY = Math.abs(clientY - touchStart.current.y);
+      const absDiffX = Math.abs(diffX);
 
-      // If horizontal movement is dominant, prevent scrolling to capture the swipe
-      if (diffX > diffY && diffX > 10) {
+      // Pokud je horizontální pohyb dominantní, aktualizuj pozici karty
+      if (absDiffX > diffY && absDiffX > 10) {
         if (onSwipe && e.cancelable) {
           e.preventDefault();
+        }
+        // Aktualizuj offset karty v reálném čase
+        setSwipeOffset(diffX);
+        
+        // Nastav směr pro vizuální indikaci
+        if (diffX > minSwipeDistance) {
+          setSwipeDirection('right');
+        } else if (diffX < -minSwipeDistance) {
+          setSwipeDirection('left');
+        } else {
+          setSwipeDirection(null);
         }
       }
     };
 
     const handleTouchEnd = () => {
-      if (!touchStart.current.x) return;
+      if (!touchStart.current.x || isFlying) return;
       const distanceX = touchCurrent.current.x - touchStart.current.x;
       const distanceY = touchCurrent.current.y - touchStart.current.y;
       
       const absX = Math.abs(distanceX);
       const absY = Math.abs(distanceY);
 
-      // Reset touch start
       touchStart.current = { x: 0, y: 0 };
+      setIsDragging(false);
 
-      // Ensure horizontal swipe is dominant and meets threshold
-      if (absX > absY && absX > minSwipeDistance && onSwipe) {
-        if (distanceX > 0) onSwipe("right");
-        else onSwipe("left");
+      // Pokud byl swipe dostatečně silný, spusť animaci odletu
+      if (absX > absY && absX > flyAwayThreshold && onSwipe) {
+        const direction = distanceX > 0 ? 'right' : 'left';
+        setIsFlying(true);
+        setSwipeDirection(direction);
+        
+        // Animuj odlet karty
+        const flyDistance = direction === 'right' ? window.innerWidth + 200 : -window.innerWidth - 200;
+        setSwipeOffset(flyDistance);
+        
+        // Po dokončení animace zavolej onSwipe
+        setTimeout(() => {
+          onSwipe(direction);
+        }, 200);
+      } else {
+        // Vrať kartu zpět na místo
+        setSwipeOffset(0);
+        setSwipeDirection(null);
       }
     };
 
@@ -199,7 +241,7 @@ export function QuestionCard({
       element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [onSwipe]);
+  }, [onSwipe, isFlying]);
 
   // 6. RENDER
   if (!currentQuestion || !isReady) {
@@ -216,15 +258,31 @@ export function QuestionCard({
   // Číslo zobrazíme POUZE pokud je mode 'random' (Flashcards) nebo 'review' (Prohlížení)
   const shouldShowNumber = mode === 'random' || mode === 'review';
 
+  // Výpočet rotace pro Tinder-like efekt (max ±15 stupňů)
+  const rotation = isDragging ? (swipeOffset / window.innerWidth) * 15 : (isFlying ? (swipeDirection === 'right' ? 15 : -15) : 0);
+  const opacity = isFlying ? 0 : 1;
+  
+  // Dynamické styly pro swipe
+  const swipeStyles = {
+    position: 'relative',
+    touchAction: 'pan-y',
+    transform: `translateX(${swipeOffset}px) rotate(${rotation}deg)`,
+    transition: isDragging ? 'none' : 'transform 0.2s ease-out, opacity 0.2s ease-out',
+    opacity: opacity,
+    willChange: isDragging ? 'transform' : 'auto',
+  };
+
   return (
     <div
       ref={cardContainerRef}
-      style={{ position: 'relative', touchAction: 'pan-y' }}
-      className="questionCardContent fade-in-content"
+      style={swipeStyles}
+      className={`questionCardContent fade-in-content ${swipeDirection ? `swiping-${swipeDirection}` : ''}`}
     >
       <style>{`
         .fade-in-content { animation: fadeInQuick 0.3s ease-out; }
         @keyframes fadeInQuick { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .swiping-right { box-shadow: 0 0 30px rgba(34, 197, 94, 0.4); }
+        .swiping-left { box-shadow: 0 0 30px rgba(239, 68, 68, 0.4); }
       `}</style>
 
       {isFlashcard && (showResult || selectedAnswer !== null) && !isExiting && (
