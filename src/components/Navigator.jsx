@@ -53,7 +53,6 @@ export function Navigator({
         if (!isDown) return;
         if (e.pointerType === 'touch') return; // Jistota pro mobily
 
-        e.preventDefault();
         const x = e.pageX - listRef.current.offsetLeft;
         const walk = (x - startX); 
 
@@ -67,6 +66,7 @@ export function Navigator({
 
         // Posouvání
         if (isDragging || Math.abs(walk) > 5) {
+            e.preventDefault();
             // ZMĚNA: Rychlost pro myš nastavena na 1 (přirozené 1:1)
             // Mobil pojede nativně, takže zde nepotřebujeme 2x.
             listRef.current.scrollLeft = scrollLeft - walk * 1; 
