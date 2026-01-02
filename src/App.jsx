@@ -745,6 +745,18 @@ export default function App() {
         return (
             <>
                 <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+                {(() => {
+                    let activeReportQuestion = currentQuestion; 
+                    if (questionToReport) { const found = activeQuestionsCache.find(q => q.number === questionToReport); if (found) activeReportQuestion = found; }
+                    const qForModal = activeReportQuestion || {};
+                    return (
+                        <ReportModal 
+                            isOpen={reportModalOpen} onClose={() => { setReportModalOpen(false); setQuestionToReport(null); }} theme={theme}
+                            questionText={qForModal.question} questionId={qForModal.id} subject={qForModal.subject || subject} questionNumber={qForModal.number}
+                            mode={mode} options={qForModal.options} correctIndex={qForModal.correctIndex} userAnswer={qForModal.userAnswer} username={user} userId={dbId} isExiting={!!exitDirection}
+                        />
+                    );
+                })()}
                 <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
                     <div className="top-navbar" style={{ width: "100%" }}>
                         <div className="navbar-group">
