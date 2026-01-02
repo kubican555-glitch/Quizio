@@ -159,10 +159,12 @@ export function QuestionCard({
     */
   }, [selectedAnswer, optionRefsForCurrent]);
 
-  // 5. TOUCH EVENTY - TINDER-LIKE SWIPE
+  // 5. TOUCH EVENTY - TINDER-LIKE SWIPE (Optimalizováno pro 120Hz+)
   useEffect(() => {
     const element = cardContainerRef.current;
     if (!element || isFlying) return;
+
+    let rafId = null;
 
     const handleTouchStart = (e) => {
       if (isFlying) return;
@@ -181,43 +183,42 @@ export function QuestionCard({
       const diffY = Math.abs(clientY - touchStart.current.y);
       const absDiffX = Math.abs(diffX);
 
-      // Pokud je horizontální pohyb dominantní, aktualizuj pozici karty
-      if (absDiffX > diffY && absDiffX > 10) {
+      if (absDiffX > diffY && absDiffX > 5) {
         if (onSwipe && e.cancelable) {
           e.preventDefault();
         }
-        // Aktualizuj offset karty v reálném čase
-        setSwipeOffset(diffX);
-        
-        // Nastav směr pro vizuální indikaci
-        if (diffX > minSwipeDistance) {
-          setSwipeDirection('right');
-        } else if (diffX < -minSwipeDistance) {
-          setSwipeDirection('left');
-        } else {
-          setSwipeDirection(null);
-        }
+
+        // Použití requestAnimationFrame pro synchronizaci s obnovovací frekvencí displeje (60/120/144Hz)
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          setSwipeOffset(diffX);
+          
+          if (diffX > minSwipeDistance) {
+            setSwipeDirection('right');
+          } else if (diffX < -minSwipeDistance) {
+            setSwipeDirection('left');
+          } else {
+            setSwipeDirection(null);
+          }
+        });
       }
     };
 
     const handleTouchEnd = () => {
+      if (rafId) cancelAnimationFrame(rafId);
       if (!touchStart.current.x || isFlying) return;
-      const distanceX = touchCurrent.current.x - touchStart.current.x;
-      const distanceY = touchCurrent.current.y - touchStart.current.y;
       
+      const distanceX = touchCurrent.current.x - touchStart.current.x;
       const absX = Math.abs(distanceX);
-      const absY = Math.abs(distanceY);
+      const absY = Math.abs(touchCurrent.current.y - touchStart.current.y);
 
       touchStart.current = { x: 0, y: 0 };
       setIsDragging(false);
 
-      // Pokud byl swipe dostatečně silný, spusť animaci odletu
-      const isFlashcardOrSmart = mode === 'random' || mode === 'smart_learning';
-      
       if (absX > absY && absX > flyAwayThreshold && onSwipe) {
         const direction = distanceX > 0 ? 'right' : 'left';
+        const isFlashcardOrSmart = mode === 'random' || mode === 'smart_learning';
         
-        // Pokud je to flashcards/smart, povolíme pouze swipe doleva pro další otázku
         if (isFlashcardOrSmart && direction === 'right') {
           setSwipeOffset(0);
           setSwipeDirection(null);
@@ -226,17 +227,13 @@ export function QuestionCard({
 
         setIsFlying(true);
         setSwipeDirection(direction);
-        
-        // Animuj odlet karty
-        const flyDistance = direction === 'right' ? window.innerWidth + 200 : -window.innerWidth - 200;
+        const flyDistance = direction === 'right' ? window.innerWidth + 500 : -window.innerWidth - 500;
         setSwipeOffset(flyDistance);
         
-        // Po dokončení animace zavolej onSwipe
         setTimeout(() => {
           onSwipe(direction);
         }, 200);
       } else {
-        // Vrať kartu zpět na místo
         setSwipeOffset(0);
         setSwipeDirection(null);
       }
@@ -247,11 +244,12 @@ export function QuestionCard({
     element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId);
       element.removeEventListener('touchstart', handleTouchStart);
       element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [onSwipe, isFlying]);
+  }, [onSwipe, isFlying, mode]);
 
   // 6. RENDER
   if (!currentQuestion || !isReady) {
@@ -277,7 +275,7 @@ export function QuestionCard({
     position: 'relative',
     touchAction: 'pan-y',
     transform: `translate3d(${swipeOffset}px, 0, 0) rotate(${rotation}deg)`,
-    transition: isDragging ? 'none' : 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease-out',
+    transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.15s linear',
     opacity: opacity,
     willChange: 'transform, opacity',
     backfaceVisibility: 'hidden',
