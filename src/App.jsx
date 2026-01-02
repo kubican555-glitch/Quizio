@@ -133,8 +133,11 @@ export default function App() {
     const containerRef = useRef(null);
 
     const [sessionQuestionsCount, setSessionQuestionsCount] = useState(0);
+    const [readyQuestionId, setReadyQuestionId] = useState(null);
 
     const currentQuestion = questionSet[currentIndex] || { question: "", options: [], correctIndex: 0, number: 0, _localIndex: currentIndex };
+    const currentQuestionId = currentQuestion.id || currentQuestion.number || currentIndex;
+    const isContentReady = readyQuestionId === currentQuestionId;
     const isTeacher = user === 'admin' || user === 'Ucitel';
 
     useEffect(() => {
@@ -323,7 +326,7 @@ export default function App() {
         setMode("loading");
         await preloadTestImages(shuffled);
         
-        setQuestionSet(shuffled); setMode("test_practice"); setActiveTest(test); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setCombo(0);
+        setReadyQuestionId(null); setQuestionSet(shuffled); setMode("test_practice"); setActiveTest(test); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setCombo(0);
     };
 
     const confirmStartTest = async () => {
@@ -357,7 +360,7 @@ export default function App() {
         const pool = activeQuestionsCache;
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
         const shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
-        setQuestionSet(shuffled); setMode("random"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setCombo(0);
+        setReadyQuestionId(null); setQuestionSet(shuffled); setMode("random"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setCombo(0);
     };
     const startMockTest = async () => {
         const pool = activeQuestionsCache;
@@ -369,7 +372,7 @@ export default function App() {
         setMode("loading"); // Dočasný stav pro preloading
         await preloadTestImages(prepared);
         
-        setQuestionSet(prepared); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
+        setReadyQuestionId(null); setQuestionSet(prepared); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
     };
     const startMistakesMode = () => {
         const all = activeQuestionsCache;
@@ -378,7 +381,7 @@ export default function App() {
         const filtered = all.filter((q) => userMistakes.includes(q.number));
         if (filtered.length === 0) { setMode("no_mistakes"); return; }
         const shuffled = [...filtered].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
-        setQuestionSet(shuffled); setMode("mistakes"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setTrainingTime(0); setCombo(0);
+        setReadyQuestionId(null); setQuestionSet(shuffled); setMode("mistakes"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setTrainingTime(0); setCombo(0);
     };
     const startSmartMode = (count) => {
         setShowSmartSettings(false);
@@ -386,7 +389,7 @@ export default function App() {
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
         let shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
         if (count !== "all" && typeof count === "number") shuffled = shuffled.slice(0, count);
-        setQuestionSet(shuffled); setMode("smart"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setTrainingTime(0); setCombo(0);
+        setReadyQuestionId(null); setQuestionSet(shuffled); setMode("smart"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setTrainingTime(0); setCombo(0);
     };
     const startReviewMode = () => {
         const all = activeQuestionsCache;
@@ -508,8 +511,8 @@ export default function App() {
         const b = Math.max(0, Math.min(newIdx, questionSet.length - 1));
         if (b < currentIndex) setDirection("left"); else setDirection("right");
         
-        // Disable instant scrolling on transition to prevent "dosouvání"
-        // Only scroll if strictly necessary after content is stable
+        // Reset content ready state synchronously to prevent Navigator flash
+        setReadyQuestionId(null);
         setCurrentIndex(b); setSelectedAnswer(null);
     };
 
@@ -1133,13 +1136,14 @@ export default function App() {
                                 </>
                             )}
 
-                            <div className={`card ${isFlashcardStyle(mode) || mode==='test_practice' ? `stacked-card ${stackLevelClass}` : ""} ${shake ? "shake" : ""}`} ref={cardRef}>
+                            <div className={`card ${isFlashcardStyle(mode) || mode==='test_practice' ? `stacked-card ${stackLevelClass}` : ""} ${shake ? "shake" : ""}`} ref={cardRef} style={{ minHeight: '200px' }}>
                                 <div key={currentQuestion.id || currentQuestion.number || currentIndex} className={exitDirection ? (exitDirection === 'left' ? "card-exit-left" : "card-exit-right") : ((isFlashcardStyle(mode) || mode==='test_practice') ? "" : (direction === "left" ? "slide-in-left" : "slide-in-right"))} style={{width: '100%'}}>
                                     <QuestionCard
                                         currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} visualSelection={visualSelection}
                                         onSelect={(i) => (isFlashcardStyle(mode) || mode==='test_practice') ? clickFlashcardAnswer(i) : handleAnswer(i)}
                                         optionRefsForCurrent={optionRefsForCurrent} disabled={(isFlashcardStyle(mode) || mode==='test_practice') && showResult}
                                         isKeyboardMode={isKeyboardMode} currentSubject={subject} onZoom={setFullscreenImage} onSwipe={handleSwipe} score={score} onReport={handleReportClick} isExiting={!!exitDirection}
+                                        onContentReady={setReadyQuestionId}
                                     />
                                 </div>
                                 {(isFlashcardStyle(mode) || mode==='test_practice') && !showResult && (
@@ -1153,7 +1157,7 @@ export default function App() {
                                     </div>
                                 )}
                                 {!(isFlashcardStyle(mode) || mode==='test_practice') && (
-                                    <>
+                                    <div style={{ opacity: isContentReady ? 1 : 0, transition: 'opacity 0.1s ease-in' }}>
                                         <div className="actionButtons spaced">
                                             <button className="navButton" onClick={() => moveToQuestion(Math.max(0, currentIndex - 1))} disabled={currentIndex === 0}>Předchozí</button>
                                             <button className="navButton" onClick={() => moveToQuestion(currentIndex + 1)} disabled={currentIndex >= questionSet.length - 1}>Další</button>
@@ -1166,7 +1170,7 @@ export default function App() {
                                                 </div>
                                             )}
                                         </div>
-                                    </>
+                                    </div>
                                 )}
                             </div>
                         </div>

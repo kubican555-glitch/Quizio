@@ -19,8 +19,12 @@ export function QuestionCard({
   score,
   onReport,
   isExiting,
-  optionRefsForCurrent 
+  optionRefsForCurrent,
+  onContentReady
 }) {
+  // Track question ID for ready state
+  const [readyForQuestionId, setReadyForQuestionId] = useState(null);
+  
   // 1. OPTIMALIZACE OBRÁZKŮ:
   const [lazyImage, setLazyImage] = useState(() => {
       if (currentQuestion?.image_base64) return currentQuestion.image_base64;
@@ -75,6 +79,17 @@ export function QuestionCard({
             }
         }
     }, [currentQuestion.number, currentQuestion.id, mode]); // Removed dependency on userAnswer to prevent re-shuffle on click
+
+    // Signal content ready after options shuffled (image loading handled separately in lazy mode)
+    useEffect(() => {
+        if (shuffledOptions.length > 0 && currentQuestion) {
+            const qId = currentQuestion.id || currentQuestion.number;
+            setReadyForQuestionId(qId);
+            if (onContentReady) {
+                onContentReady(qId);
+            }
+        }
+    }, [shuffledOptions, currentQuestion?.id, currentQuestion?.number]);
     
     // Reset swipe state when question changes
     useEffect(() => {
@@ -270,12 +285,17 @@ export function QuestionCard({
     WebkitTouchCallout: 'none'
   };
 
+  // Check if content is truly ready (options shuffled for current question)
+  const currentQId = currentQuestion?.id || currentQuestion?.number;
+  const contentReady = shuffledOptions.length > 0 && readyForQuestionId === currentQId;
+
   return (
     <div
       ref={cardContainerRef}
       style={{
         ...swipeStyles,
-        visibility: isReady ? 'visible' : 'hidden'
+        opacity: contentReady ? opacity : 0,
+        transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.15s linear'
       }}
       className={`questionCardContent ${swipeDirection ? `swiping-${swipeDirection}` : ''}`}
     >
