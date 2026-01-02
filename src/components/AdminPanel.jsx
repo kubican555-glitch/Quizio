@@ -407,20 +407,20 @@ export function AdminPanel({ onBack }) {
                         {loading && questions.length === 0 ? <p style={{textAlign:'center', padding:'2rem'}}>Načítám všechna data...</p> : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                                 {currentQuestions.map(q => (
-                                    <div key={q.id} className="reviewCard" style={{ padding: '0.8rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: q.is_active === false ? 0.6 : 1, borderRadius: '12px' }}>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ marginBottom: '0.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                <span className={`admin-badge ${q.subject === "SPS" ? "badge-sps" : "badge-stt"}`} style={{ padding: '1px 5px', borderRadius: '4px', fontSize: '0.7rem', background: q.subject === 'SPS' ? 'rgba(59,130,246,0.2)' : 'rgba(236,72,153,0.2)', color: q.subject === 'SPS' ? '#60a5fa' : '#f472b6' }}>{q.subject}</span>
-                                                <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>#{q.number}</span>
-                                                {q.is_active === false && <span style={{ fontSize: '0.65rem', background: '#444', color: '#ccc', padding: '1px 4px', borderRadius: '3px' }}>Skryté</span>}
-                                                {q.image_base64 && <span title="Má obrázek v DB">🖼️</span>}
+                                    <div key={q.id} className="admin-card" style={{ opacity: q.is_active === false ? 0.7 : 1 }}>
+                                        <div className="admin-card-content">
+                                            <div className="admin-card-meta">
+                                                <span className={`admin-badge ${q.subject === "SPS" ? "badge-sps" : "badge-stt"}`}>{q.subject}</span>
+                                                <span style={{ fontWeight: '800', fontSize: '0.9rem', color: 'var(--color-primary-light)', minWidth: '45px' }}>#{q.number}</span>
+                                                {q.is_active === false && <span className="admin-badge badge-hidden">Skryté</span>}
+                                                {q.image_base64 && <span title="Má obrázek v DB" style={{fontSize: '1.1rem'}}>🖼️</span>}
                                             </div>
-                                            <div style={{ fontWeight: '500', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{q.question}</div>
+                                            <div className="admin-card-question">{q.question}</div>
                                         </div>
-                                        <div style={{ display: 'flex', gap: '0.4rem', marginLeft: '1rem' }}>
-                                            <button className="btn-icon" onClick={() => toggleActive(q)} title="Viditelnost" style={{ width: '32px', height: '32px' }}>{q.is_active === false ? '🚫' : '👁️'}</button>
-                                            <button className="btn-icon" onClick={() => handleEdit(q)} style={{ width: '32px', height: '32px' }}>✎</button>
-                                            <button className="btn-icon" onClick={() => handleDelete(q.id)} style={{ width: '32px', height: '32px' }}>🗑</button>
+                                        <div className="admin-actions">
+                                            <button className="btn-icon" onClick={() => toggleActive(q)} title="Viditelnost">{q.is_active === false ? '🚫' : '👁️'}</button>
+                                            <button className="btn-icon btn-edit" onClick={() => handleEdit(q)}>✎</button>
+                                            <button className="btn-icon btn-delete" onClick={() => handleDelete(q.id)}>🗑</button>
                                         </div>
                                     </div>
                                 ))}

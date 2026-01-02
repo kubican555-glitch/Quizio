@@ -254,17 +254,81 @@ body.light-mode .appHeader {
     background: var(--color-card-bg);
     border: 1px solid var(--color-card-border);
     border-radius: 12px;
-    padding: 1rem;
-    margin-bottom: 0.5rem;
+    padding: 0.6rem 1rem;
+    margin-bottom: 0.4rem;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     transition: all 0.2s ease;
 }
 
-@media (hover: hover) {
-    .admin-card:hover {
-        background: rgba(255, 255, 255, 0.05);
-        border-color: rgba(255, 255, 255, 0.15);
+.admin-card-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+.admin-card-question {
+    flex: 1;
+    font-weight: 500;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-text-main);
+}
+
+.admin-badge {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-sps { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+.badge-stt { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.2); }
+.badge-hidden { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+
+.admin-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-left: 1rem;
+}
+
+@media (max-width: 768px) {
+    .admin-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.8rem;
+    }
+    .admin-card-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        margin-bottom: 0.8rem;
+    }
+    .admin-card-question {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    .admin-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--color-card-border);
     }
 }
 
