@@ -781,28 +781,28 @@ export default function App() {
                             paginatedQuestions.map((q) => {
                                 const imageUrl = q.image_base64 || (q.id ? getCachedImage(q.id) : null) || getImageUrl(subject, q.number) || (q.image && q.image.length > 5 ? q.image : null);
                                 return (
-                                    <div key={q.number} className="reviewCard" style={{ position: 'relative' }}>
-                                        <div className="reviewHeader">
-                                            <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
+                                    <div key={q.number} className="reviewCard">
+                                        <div className="reviewHeader" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative' }}>
+                                            <div style={{ flex: 1 }}>
+                                                <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
+                                            </div>
                                             <button 
                                                 className="report-btn-flash" 
                                                 onClick={() => handleReportClick(q.number)}
                                                 style={{ 
-                                                    position: 'absolute', 
-                                                    top: '-10px', 
-                                                    right: '-10px', 
                                                     background: 'transparent', 
                                                     border: 'none', 
-                                                    padding: 0, 
-                                                    width: '40px', 
-                                                    height: '40px', 
+                                                    padding: '4px', 
+                                                    width: '32px', 
+                                                    height: '32px', 
                                                     display: 'flex', 
                                                     alignItems: 'center', 
                                                     justifyContent: 'center', 
                                                     cursor: 'pointer', 
-                                                    fontSize: '1.2rem', 
-                                                    zIndex: 100, 
-                                                    opacity: 0.7 
+                                                    fontSize: '1.1rem', 
+                                                    flexShrink: 0,
+                                                    opacity: 0.7,
+                                                    marginTop: '-2px'
                                                 }}
                                                 title="Nahlásit chybu v této otázce"
                                             >
