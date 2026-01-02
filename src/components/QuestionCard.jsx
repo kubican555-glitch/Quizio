@@ -34,7 +34,28 @@ export function QuestionCard({
       return false;
   });
 
-  const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
+    const [shuffledOptions, setShuffledOptions] = useState([]);
+
+    // Logic to shuffle options whenever currentQuestion changes
+    useEffect(() => {
+        if (currentQuestion && currentQuestion.options) {
+            const optionsWithMeta = currentQuestion.options.map((opt, idx) => ({
+                text: opt,
+                originalIndex: idx,
+                isCorrect: idx === currentQuestion.correctIndex
+            }));
+            
+            // Fisher-Yates shuffle
+            const shuffled = [...optionsWithMeta];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            setShuffledOptions(shuffled);
+        }
+    }, [currentQuestion]);
+
+    const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
 
   const touchStart = useRef({ x: 0, y: 0 });
@@ -214,9 +235,9 @@ export function QuestionCard({
       </div>
 
       <div className="options">
-        {(currentQuestion.options || []).map((option, index) => {
-          const isSelected = selectedAnswer === index;
-          const isCorrect = currentQuestion.correctIndex === index;
+        {shuffledOptions.map((optObj, index) => {
+          const isSelected = selectedAnswer === optObj.originalIndex;
+          const isCorrect = optObj.isCorrect;
 
           let className = "optionButton";
           let style = {};
@@ -234,27 +255,20 @@ export function QuestionCard({
           }
 
           // OPRAVA VIZUÁLNÍHO OZNAČENÍ V TESTU:
-          // Pokud je mode 'real_test' (nebo 'mock', 'training') a odpověď je uložená v currentQuestion.userAnswer,
-          // aplikujeme styl "selected".
-          if (!showResult && !isSelected && ((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === index)) {
+          if (!showResult && !isSelected && ((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === optObj.originalIndex)) {
              className += " selected"; 
           }
 
           return (
             <button
               key={index}
-              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[index] = el; }}
+              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[optObj.originalIndex] = el; }}
               className={className}
               style={style}
-              onClick={() => !disabled && onSelect(index)}
+              onClick={() => !disabled && onSelect(optObj.originalIndex)}
               disabled={disabled}
             >
-              {/* Odstraněno: <span className="optionIndex">{String.fromCharCode(65 + index)}.</span> */}
-              <HighlightedText text={option} />
-              {/* Odstraněny ikony: 
-                  {showResult && isCorrect && <span className="resultIcon">✓</span>}
-                  {showResult && isSelected && !isCorrect && <span className="resultIcon">✗</span>} 
-              */}
+              <HighlightedText text={optObj.text} />
             </button>
           );
         })}

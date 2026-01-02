@@ -781,7 +781,7 @@ export default function App() {
                             paginatedQuestions.map((q) => {
                                 const imageUrl = q.image_base64 || (q.id ? getCachedImage(q.id) : null) || getImageUrl(subject, q.number) || (q.image && q.image.length > 5 ? q.image : null);
                                 return (
-                                    <div key={q.number} className="reviewCard">
+                                    <div key={`${q.number}-${reviewPage}`} className="reviewCard">
                                         <div className="reviewHeader" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', position: 'relative' }}>
                                             <div style={{ flex: 1 }}>
                                                 <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
