@@ -584,7 +584,7 @@ body.light-mode #root {
   margin: 0 auto; 
   padding: 1rem;
   flex: 1;
-  height: 100%;
+  min-height: 0; /* Důležité pro správný flex scroll */
   scrollbar-width: none; 
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
