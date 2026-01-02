@@ -323,7 +323,11 @@ export default function App() {
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+        setTheme((prev) => {
+            const next = prev === "dark" ? "light" : "dark";
+            console.log("Přepínám režim na:", next);
+            return next;
+        });
     };
 
     const prepareQuestionSet = (baseQuestions, shouldShuffleOptions = false) => {

@@ -3,7 +3,11 @@ import React from 'react';
 export const ThemeToggle = ({ currentTheme, toggle }) => (
     <button
         className="menuBackButton theme-toggle-btn"
-        onClick={toggle}
+        onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggle();
+        }}
         title={currentTheme === "dark" ? "Přepnout na světlý" : "Přepnout na tmavý"}
         style={{
             fontSize: "1.2rem",
