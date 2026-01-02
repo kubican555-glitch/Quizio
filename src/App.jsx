@@ -254,9 +254,34 @@ export default function App() {
     useEffect(() => { localStorage.setItem("quizio_theme", theme); document.body.className = theme === "light" ? "light-mode" : ""; }, [theme]);
     const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
-    const prepareQuestionSet = (baseQuestions) => {
+    const prepareQuestionSet = (baseQuestions, shouldShuffleOptions = false) => {
         if (!Array.isArray(baseQuestions)) return [];
-        return baseQuestions.map((q, idx) => ({ ...q, options: [...(q.options || [])], userAnswer: undefined, _localIndex: idx, }));
+        return baseQuestions.map((q, idx) => {
+            let options = [...(q.options || [])];
+            let correctIndex = q.correctIndex;
+
+            if (shouldShuffleOptions) {
+                const optionsWithMeta = options.map((opt, i) => ({
+                    text: opt,
+                    isCorrect: i === correctIndex
+                }));
+                // Fisher-Yates shuffle
+                for (let i = optionsWithMeta.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [optionsWithMeta[i], optionsWithMeta[j]] = [optionsWithMeta[j], optionsWithMeta[i]];
+                }
+                options = optionsWithMeta.map(o => o.text);
+                correctIndex = optionsWithMeta.findIndex(o => o.isCorrect);
+            }
+
+            return { 
+                ...q, 
+                options, 
+                correctIndex,
+                userAnswer: undefined, 
+                _localIndex: idx, 
+            };
+        });
     };
 
     useEffect(() => {
@@ -297,9 +322,10 @@ export default function App() {
 
         const test = testToStart;
         const pool = activeQuestionsCache.filter(q => q.number >= test.topic_range_start && q.number <= test.topic_range_end);
-        const shuffled = [...pool].sort(() => Math.random() - 0.5).slice(0, test.question_count).map((q, idx) => ({ ...q, _localIndex: idx }));
+        const selected = [...pool].sort(() => Math.random() - 0.5).slice(0, test.question_count);
+        const prepared = prepareQuestionSet(selected, true);
 
-        setQuestionSet(shuffled); 
+        setQuestionSet(prepared); 
         setActiveTest(test); 
         setMode("real_test"); 
     };
@@ -323,8 +349,9 @@ export default function App() {
     const startMockTest = () => {
         const pool = activeQuestionsCache;
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
-        const sel = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(40, pool.length)).map((q, idx) => ({ ...q, _localIndex: idx }));
-        setQuestionSet(sel); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
+        const sel = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(40, pool.length));
+        const prepared = prepareQuestionSet(sel, true);
+        setQuestionSet(prepared); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
     };
     const startMistakesMode = () => {
         const all = activeQuestionsCache;
