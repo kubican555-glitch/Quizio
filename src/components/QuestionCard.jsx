@@ -183,16 +183,21 @@ export function QuestionCard({
 
     const handleTouchMove = (e) => {
       if (!touchStart.current.x || isFlying) return;
-      const clientX = e.targetTouches[0].clientX;
-      const clientY = e.targetTouches[0].clientY;
+      
+      // Optimalizace pro 120Hz: Čtení souřadnic co nejrychleji
+      const touch = e.targetTouches[0];
+      const clientX = touch.clientX;
+      const clientY = touch.clientY;
       touchCurrent.current = { x: clientX, y: clientY };
 
       const diffX = clientX - touchStart.current.x;
       const diffY = Math.abs(clientY - touchStart.current.y);
       const absDiffX = Math.abs(diffX);
 
-      if (absDiffX > diffY && absDiffX > 5) {
-        if (onSwipe && e.cancelable) {
+      // Pokud je pohyb primárně horizontální a dostatečně velký
+      if (absDiffX > diffY && absDiffX > 3) {
+        // Prevent default pouze u horizontálního pohybu pro plynulý vertikální scroll
+        if (e.cancelable) {
           e.preventDefault();
         }
 
@@ -205,21 +210,22 @@ export function QuestionCard({
             if ((diffX > 0 && isFirst) || (diffX < 0 && isLast)) {
                 if (rafId) cancelAnimationFrame(rafId);
                 rafId = requestAnimationFrame(() => {
-                    setSwipeOffset(diffX * 0.05); // Ještě menší odpor (téměř žádný pohyb)
+                    setSwipeOffset(diffX * 0.05);
                     setSwipeDirection(null);
                 });
                 return;
             }
         }
 
-        // Použití requestAnimationFrame pro synchronizaci s obnovovací frekvencí displeje (60/120/144Hz)
+        // 120Hz optimalizace: Použití requestAnimationFrame pro plynulý rendering
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
           setSwipeOffset(diffX);
           
-          if (diffX > minSwipeDistance) {
+          // Prahy pro indikaci směru (bez odletu)
+          if (diffX > 40) {
             setSwipeDirection('right');
-          } else if (diffX < -minSwipeDistance) {
+          } else if (diffX < -40) {
             setSwipeDirection('left');
           } else {
             setSwipeDirection(null);
@@ -310,7 +316,7 @@ export function QuestionCard({
     position: 'relative',
     touchAction: 'pan-y',
     transform: `translate3d(${swipeOffset}px, 0, 0) rotate(${rotation}deg)`,
-    transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.15s linear',
+    transition: isDragging ? 'none' : 'transform 0.1s cubic-bezier(0.1, 0, 0.1, 1), opacity 0.1s linear',
     opacity: opacity,
     willChange: 'transform, opacity',
     backfaceVisibility: 'hidden',
