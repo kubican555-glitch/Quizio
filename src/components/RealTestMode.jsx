@@ -112,6 +112,7 @@ export function RealTestMode({
                 timeLeft: 0
             });
 
+            // Vynutíme zobrazení modálu před ResultScreen
             setShowAutoSubmitModal(true);
 
         } catch (error) {
@@ -415,20 +416,10 @@ export function RealTestMode({
         );
     };
 
+    // --- RENDER ---
     return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
             <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
-
-            {showConfirmSubmit && (
-                <ConfirmModal 
-                    title="Odevzdat test?" 
-                    message="Opravdu chcete test ukončit a odevzdat? Tuto akci nelze vrátit."
-                    onCancel={() => setShowConfirmSubmit(false)} 
-                    onConfirm={() => submitTest()} 
-                    confirmText="ODEVZDAT" 
-                    danger={true} 
-                />
-            )}
 
             {showAutoSubmitModal && (
                 <ConfirmModal 
@@ -438,6 +429,17 @@ export function RealTestMode({
                     onConfirm={() => setShowAutoSubmitModal(false)} 
                     confirmText="Zobrazit výsledky" 
                     danger={false} 
+                />
+            )}
+
+            {showConfirmSubmit && (
+                <ConfirmModal 
+                    title="Odevzdat test?" 
+                    message="Opravdu chcete test ukončit a odevzdat? Tuto akci nelze vrátit."
+                    onCancel={() => setShowConfirmSubmit(false)} 
+                    onConfirm={() => submitTest()} 
+                    confirmText="ODEVZDAT" 
+                    danger={true} 
                 />
             )}
 
