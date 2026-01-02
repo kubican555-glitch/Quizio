@@ -45,14 +45,13 @@ export function QuestionCard({
                 isCorrect: idx === currentQuestion.correctIndex
             }));
             
-            // Fisher-Yates shuffle
-            const shuffled = [...optionsWithMeta];
             const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
             
-            // If it's a test, the options are already pre-shuffled and stable in App.jsx
             if (isMockOrRealTest) {
                 setShuffledOptions(optionsWithMeta);
             } else {
+                // Fisher-Yates shuffle
+                const shuffled = [...optionsWithMeta];
                 for (let i = shuffled.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -65,7 +64,7 @@ export function QuestionCard({
                 optionRefsForCurrent.current = {};
             }
         }
-    }, [currentQuestion.number, currentQuestion.id, mode, currentQuestion.userAnswer === undefined]);
+    }, [currentQuestion.number, currentQuestion.id, mode]); // Removed dependency on userAnswer to prevent re-shuffle on click
 
     const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
