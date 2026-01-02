@@ -773,26 +773,28 @@ export default function App() {
                                         <div className="reviewHeader">
                                             <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
                                             <button 
-                                                className="reportButton" 
-                                                onClick={() => handleReportClick(q.number)}
+                                                className="report-btn-flash" 
+                                                onClick={(e) => { e.stopPropagation(); handleReportClick(q.number); }}
                                                 style={{ 
-                                                    background: 'none', 
+                                                    position: 'absolute', 
+                                                    top: '-10px', 
+                                                    right: '-10px', 
+                                                    background: 'transparent', 
                                                     border: 'none', 
-                                                    cursor: 'pointer',
-                                                    fontSize: '1.2rem',
-                                                    padding: '4px',
-                                                    marginLeft: 'auto',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    opacity: 0.6,
-                                                    transition: 'opacity 0.2s'
+                                                    padding: 0, 
+                                                    width: '40px', 
+                                                    height: '40px', 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'center', 
+                                                    cursor: 'pointer', 
+                                                    fontSize: '1.2rem', 
+                                                    zIndex: 20, 
+                                                    opacity: 0.7 
                                                 }}
                                                 title="Nahlásit chybu v této otázce"
-                                                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                                                onMouseOut={(e) => e.currentTarget.style.opacity = 0.6}
                                             >
-                                                🚩
+                                                🏳️
                                             </button>
                                         </div>
                                         <ReviewImage q={q} subject={subject} setFullscreenImage={setFullscreenImage} />
