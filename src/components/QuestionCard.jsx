@@ -196,6 +196,21 @@ export function QuestionCard({
           e.preventDefault();
         }
 
+        // ZÁKAZ VIZUÁLNÍHO POSUNU na začátku/konci v testu
+        if (mode === 'real_test' || mode === 'mock') {
+            const isFirst = window.currentTestIndex === 0;
+            const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
+            
+            if ((diffX > 0 && isFirst) || (diffX < 0 && isLast)) {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(() => {
+                    setSwipeOffset(diffX * 0.1); // Jen mírný odpor místo plného posunu
+                    setSwipeDirection(null);
+                });
+                return;
+            }
+        }
+
         // Použití requestAnimationFrame pro synchronizaci s obnovovací frekvencí displeje (60/120/144Hz)
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {

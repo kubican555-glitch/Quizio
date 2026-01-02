@@ -254,7 +254,7 @@ export function RealTestMode({
                     <div key={currentIndex} className={direction === 'left' ? "slide-in-left" : "slide-in-right"} style={{width: '100%'}}>
                         <QuestionCard
                             currentQuestion={currentQuestion}
-                            mode="mock" 
+                            mode="real_test" 
                             showResult={false}
                             selectedAnswer={selectedAnswer}
                             onSelect={handleAnswer}
