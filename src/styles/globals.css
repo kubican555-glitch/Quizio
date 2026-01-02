@@ -551,10 +551,12 @@ body.light-mode #root {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 60%, #cbd5e1 100%);
 }
 
-/* === KONTEJNER (Scrollovací oblast) === */
+/* === KONTEJNER (Scrollovací oblast) --- */
 .container { 
   max-width: 960px; width: 100%; margin: 0 auto; 
   padding: 1rem;
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
   height: 100vh;
