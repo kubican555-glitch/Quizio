@@ -36,8 +36,12 @@ export const HistoryView = ({
         if (currentSubject) {
             data = data.filter(h => h.subject === currentSubject);
         }
-        return data.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, MAX_ITEMS);
+        return data.sort((a, b) => new Date(b.date) - new Date(a.date));
     }, [history, currentSubject]);
+
+    const statsHistory = useMemo(() => {
+        return filteredHistory.slice(0, MAX_ITEMS);
+    }, [filteredHistory]);
 
     const totalPages = Math.ceil(filteredHistory.length / ITEMS_PER_PAGE);
     const paginatedHistory = filteredHistory.slice(
@@ -66,14 +70,14 @@ export const HistoryView = ({
     }, [totalQuestionsMap, currentSubject, sessionQuestionsCount]);
 
     const detailedStats = useMemo(() => {
-        if (filteredHistory.length === 0) {
+        if (statsHistory.length === 0) {
             return { count: 0, average: 0, best: 0 };
         }
 
         let totalPercent = 0;
         let maxPercent = 0;
 
-        filteredHistory.forEach(item => {
+        statsHistory.forEach(item => {
             const total = item.score?.total || 1;
             const correct = item.score?.correct || 0;
             const percent = (correct / total) * 100;
@@ -84,10 +88,10 @@ export const HistoryView = ({
 
         return {
             count: filteredHistory.length,
-            average: Math.round(totalPercent / filteredHistory.length),
+            average: Math.round(totalPercent / statsHistory.length),
             best: Math.round(maxPercent)
         };
-    }, [filteredHistory]);
+    }, [filteredHistory, statsHistory]);
 
     const getModeIcon = (mode) => {
         switch(mode) {
@@ -211,15 +215,15 @@ export const HistoryView = ({
                         Vývoj úspěšnosti
                     </h3>
                     <div style={{ height: '220px', width: '100%' }}>
-                        <HistoryGraph data={filteredHistory} />
+                        <HistoryGraph data={statsHistory} />
                     </div>
                 </div>
 
                 <div className="historyListHeader">
-                    <h3 className="historyListTitle">Poslední aktivity</h3>
+                    <h3 className="historyListTitle">Historie aktivit</h3>
                     {totalPages > 1 && (
                         <span className="historyPageInfo">
-                            {currentPage + 1} / {totalPages}
+                            {currentPage * ITEMS_PER_PAGE + 1} – {Math.min((currentPage + 1) * ITEMS_PER_PAGE, filteredHistory.length)} z {filteredHistory.length}
                         </span>
                     )}
                 </div>
