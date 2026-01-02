@@ -28,25 +28,34 @@ export const HistoryGraph = ({ data = [] }) => {
         );
     }
 
-    // Funkce pro barvu sloupce podle procent (známky)
-    const getBarColor = (percentage) => {
+    // Funkce pro barvu bodu/čáry podle procent (známky)
+    const getPointColor = (percentage) => {
         if (percentage >= 84) return '#22c55e'; // 1 - Výborně (Zelená)
         if (percentage >= 67) return '#84cc16'; // 2 - Chvalitebně (Lime)
         if (percentage >= 50) return '#eab308'; // 3 - Dobře (Žlutá)
-        if (percentage >= 33) return '#f97316'; // 4 - Dostatečně (Oranžová)
+        if (percentage >= 43) return '#f97316'; // 4 - Dostatečně (Oranžová)
         return '#ef4444'; // 5 - Nedostatečně (Červená)
     };
 
     // Konfigurace SVG
     const width = 100;
     const height = 50;
+    const padding = 5; // Padding pro body aby nebyly na kraji
 
     // Výpočet Y pozic pro prahy (thresholds)
-    // Y souřadnice běží shora dolů (0 = 100%, 50 = 0%)
-    const y84 = height * (1 - 0.84); // Hranice pro 1
-    const y67 = height * (1 - 0.67); // Hranice pro 2
-    const y50 = height * (1 - 0.50); // Hranice pro 3
-    const y33 = height * (1 - 0.33); // Hranice pro 4
+    const y84 = height * (1 - 0.84);
+    const y67 = height * (1 - 0.67);
+    const y50 = height * (1 - 0.50);
+    const y33 = height * (1 - 0.33);
+
+    // Výpočet bodů pro čáru
+    const points = chartData.map((val, i) => {
+        const x = (i / (Math.max(1, chartData.length - 1))) * (width - padding * 2) + padding;
+        const y = height - (val / 100) * height;
+        return { x, y, val };
+    });
+
+    const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
     return (
         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -56,70 +65,56 @@ export const HistoryGraph = ({ data = [] }) => {
                 style={{ width: '100%', height: '100%', overflow: 'visible' }}
             >
                 {/* --- ZÓNY ZNÁMEK (PRUHY NA POZADÍ) --- */}
-
-                {/* 1 (84-100%) */}
-                <rect x="0" y="0" width={width} height={y84} fill="#22c55e" fillOpacity="0.1" />
-
-                {/* 2 (67-83%) */}
-                <rect x="0" y={y84} width={width} height={y67 - y84} fill="#84cc16" fillOpacity="0.05" />
-
-                {/* 3 (50-66%) */}
-                <rect x="0" y={y67} width={width} height={y50 - y67} fill="#eab308" fillOpacity="0.05" />
-
-                {/* 4 (33-49%) */}
-                <rect x="0" y={y50} width={width} height={y33 - y50} fill="#f97316" fillOpacity="0.04" />
-
-                {/* 5 (0-32%) */}
-                <rect x="0" y={y33} width={width} height={height - y33} fill="#ef4444" fillOpacity="0.03" />
+                <rect x="0" y="0" width={width} height={y84} fill="#22c55e" fillOpacity="0.08" />
+                <rect x="0" y={y84} width={width} height={y67 - y84} fill="#84cc16" fillOpacity="0.04" />
+                <rect x="0" y={y67} width={width} height={y50 - y67} fill="#eab308" fillOpacity="0.04" />
+                <rect x="0" y={y50} width={width} height={y33 - y50} fill="#f97316" fillOpacity="0.03" />
+                <rect x="0" y={y33} width={width} height={height - y33} fill="#ef4444" fillOpacity="0.02" />
 
                 {/* --- HRANIČNÍ ČÁRY (Thresholds) --- */}
-                {/* 84% */}
-                <line x1="0" y1={y84} x2={width} y2={y84} stroke="#22c55e" strokeOpacity="0.3" strokeWidth="0.2" strokeDasharray="1" /> 
-                {/* 67% */}
-                <line x1="0" y1={y67} x2={width} y2={y67} stroke="#84cc16" strokeOpacity="0.3" strokeWidth="0.2" strokeDasharray="1" /> 
-                {/* 50% */}
-                <line x1="0" y1={y50} x2={width} y2={y50} stroke="#eab308" strokeOpacity="0.3" strokeWidth="0.2" strokeDasharray="1" /> 
-                {/* 33% */}
-                <line x1="0" y1={y33} x2={width} y2={y33} stroke="#f97316" strokeOpacity="0.3" strokeWidth="0.2" strokeDasharray="1" /> 
+                <line x1="0" y1={y84} x2={width} y2={y84} stroke="#22c55e" strokeOpacity="0.2" strokeWidth="0.1" strokeDasharray="1" /> 
+                <line x1="0" y1={y67} x2={width} y2={y67} stroke="#84cc16" strokeOpacity="0.2" strokeWidth="0.1" strokeDasharray="1" /> 
+                <line x1="0" y1={y50} x2={width} y2={y50} stroke="#eab308" strokeOpacity="0.2" strokeWidth="0.1" strokeDasharray="1" /> 
+                <line x1="0" y1={y33} x2={width} y2={y33} stroke="#f97316" strokeOpacity="0.2" strokeWidth="0.1" strokeDasharray="1" /> 
 
-                {/* --- SLOUPCE (BARS) --- */}
-                {chartData.map((val, i) => {
-                    // Výpočet pozice X pro každý sloupec
-                    const availableWidth = width; 
-                    const itemWidth = availableWidth / chartData.length;
-                    const barW = Math.max(2, itemWidth * 0.6); // Sloupec zabírá 60% prostoru pro položku
-                    const x = (i * itemWidth) + (itemWidth - barW) / 2;
+                {/* --- SPOJNICE (LINE) --- */}
+                <path 
+                    d={linePath} 
+                    fill="none" 
+                    stroke="var(--color-primary)" 
+                    strokeWidth="0.8" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                    style={{ opacity: 0.6 }}
+                />
 
-                    const barHeight = (val / 100) * height;
-                    const y = height - barHeight;
-
-                    return (
-                        <g key={i}>
-                            <rect 
-                                x={x} 
-                                y={y} 
-                                width={barW} 
-                                height={barHeight} 
-                                fill={getBarColor(val)} 
-                                rx="0.5" // Jemně zaoblené rohy
-                            />
-                            {/* Hodnota nad sloupcem - zobrazujeme pouze pokud je málo dat */}
-                            {chartData.length <= 15 && (
-                                <text 
-                                    x={x + barW / 2} 
-                                    y={y - 2} 
-                                    textAnchor="middle" 
-                                    fontSize="2.5" 
-                                    fontWeight="bold"
-                                    fill="currentColor" 
-                                    opacity="0.7"
-                                >
-                                    {val}
-                                </text>
-                            )}
-                        </g>
-                    );
-                })}
+                {/* --- BODY (POINTS) --- */}
+                {points.map((p, i) => (
+                    <g key={i}>
+                        <circle 
+                            cx={p.x} 
+                            cy={p.y} 
+                            r="1.2" 
+                            fill={getPointColor(p.val)}
+                            stroke="rgba(255,255,255,0.2)"
+                            strokeWidth="0.3"
+                        />
+                        {/* Hodnota nad bodem - pouze pokud je málo dat */}
+                        {chartData.length <= 12 && (
+                            <text 
+                                x={p.x} 
+                                y={p.y - 2.5} 
+                                textAnchor="middle" 
+                                fontSize="2.2" 
+                                fontWeight="bold"
+                                fill="currentColor" 
+                                opacity="0.8"
+                            >
+                                {p.val}%
+                            </text>
+                        )}
+                    </g>
+                ))}
             </svg>
 
             {/* Popisky osy Y (Známky) - VPRAVO (Zarovnáno na střed zóny) */}
