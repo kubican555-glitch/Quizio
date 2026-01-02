@@ -56,7 +56,8 @@
 
 /* --- SVĚTLÝ MOTIV (VYLEPŠENÝ) --- */
 body.light-mode {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 60%, #cbd5e1 100%) !important;
+  background: #f8fafc !important; 
+  background-color: #f8fafc !important;
   color: #0f172a; 
 
   --color-bg-start: #f8fafc; 
@@ -563,7 +564,7 @@ body.light-mode {
 }
 
 body.light-mode #root {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 60%, #cbd5e1 100%);
+    background: #f8fafc;
     min-height: -webkit-fill-available;
 }
 

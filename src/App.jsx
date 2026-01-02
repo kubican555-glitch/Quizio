@@ -306,8 +306,25 @@ export default function App() {
         if (sessionTime >= 60 || sessionQuestionsCount >= 10) saveDataToCloud(undefined, undefined, sessionTime, sessionQuestionsCount);
     }, [sessionTime, sessionQuestionsCount]);
 
-    useEffect(() => { localStorage.setItem("quizio_theme", theme); document.body.className = theme === "light" ? "light-mode" : ""; }, [theme]);
-    const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+    useEffect(() => {
+        localStorage.setItem("quizio_theme", theme);
+        document.body.className = theme === "light" ? "light-mode" : "";
+        // Force update of data-theme attribute if used in CSS
+        document.documentElement.setAttribute('data-theme', theme);
+        // Dispatch event for components that might listen to theme changes
+        window.dispatchEvent(new Event('storage'));
+        
+        // Explicitly set background color to avoid issues with transitions
+        if (theme === 'light') {
+            document.documentElement.style.backgroundColor = '#f8fafc';
+        } else {
+            document.documentElement.style.backgroundColor = '#0a0e27';
+        }
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    };
 
     const prepareQuestionSet = (baseQuestions, shouldShuffleOptions = false) => {
         if (!Array.isArray(baseQuestions)) return [];
