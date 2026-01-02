@@ -705,13 +705,48 @@ body.light-mode .optionButton { color: #334155; font-weight: 600; }
     body.light-mode .optionButton:hover { border-color: var(--color-primary); }
 }
 
-.optionButton.selected { border-color: var(--color-primary); background: linear-gradient(135deg, var(--color-option-hover-bg-start) 0%, var(--color-option-hover-bg-end) 100%); box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); outline: none; transition: background 0.2s, border-color 0.2s, box-shadow 0.2s; }
-.optionButton.correct { border-color: var(--color-success) !important; background: rgba(34, 197, 94, 0.2) !important; color: white !important; outline: none; transition: background 0.2s, border-color 0.2s; }
-.optionButton.wrong { border-color: var(--color-error) !important; background: rgba(239, 68, 68, 0.2) !important; color: white !important; outline: none; transition: background 0.2s, border-color 0.2s; }
+.optionButton.selected { 
+    border-color: var(--color-primary); 
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.2) 100%); 
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); 
+    outline: none; 
+    transition: all 0.2s ease;
+    border-width: 2px;
+}
+.optionButton.correct { 
+    border-color: var(--color-success) !important; 
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.4) 0%, rgba(34, 197, 94, 0.2) 100%) !important; 
+    color: white !important; 
+    outline: none; 
+    transition: all 0.2s ease;
+    border-width: 2px;
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);
+}
+.optionButton.wrong { 
+    border-color: var(--color-error) !important; 
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.2) 100%) !important; 
+    color: white !important; 
+    outline: none; 
+    transition: all 0.2s ease;
+    border-width: 2px;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+}
 
-body.light-mode .optionButton.selected { border-color: var(--color-primary); background: rgba(59, 130, 246, 0.1); outline: none; }
-body.light-mode .optionButton.correct { background: rgba(34, 197, 94, 0.1) !important; color: #166534 !important; outline: none; }
-body.light-mode .optionButton.wrong { background: rgba(239, 68, 68, 0.1) !important; color: #991b1b !important; outline: none; }
+body.light-mode .optionButton.selected { 
+    border-color: var(--color-primary); 
+    background: rgba(59, 130, 246, 0.2); 
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+body.light-mode .optionButton.correct { 
+    background: rgba(34, 197, 94, 0.2) !important; 
+    color: #064e3b !important; 
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+}
+body.light-mode .optionButton.wrong { 
+    background: rgba(239, 68, 68, 0.2) !important; 
+    color: #7f1d1d !important; 
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
 
 .percentIndicator { display: inline-block; margin-left: 1rem; font-weight: 700; color: var(--color-text-main); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.9rem; background: rgba(255, 255, 255, 0.1); }
 .actionButtons { display: flex; gap: 1.2rem; margin-top: 2rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
