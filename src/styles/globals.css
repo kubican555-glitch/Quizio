@@ -219,7 +219,153 @@ body.light-mode .appHeader {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
 }
 
+/* === ADMIN PANEL BASE STYLES (DARK MODE) === */
+.admin-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--color-card-bg);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--color-card-border);
+    overflow-x: auto;
+}
+
+.admin-tabs .navButton {
+    flex: 1;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.admin-tabs .navButton:not(.primary):hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-tabs .navButton.primary {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border: none;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.admin-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+@media (hover: hover) {
+    .admin-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+}
+
+.btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+@media (hover: hover) {
+    .btn-icon:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: var(--color-text-main);
+        transform: scale(1.05);
+    }
+}
+
+.btn-icon.btn-edit:hover { color: var(--color-primary-light); border-color: var(--color-primary); }
+.btn-icon.btn-delete:hover { color: var(--color-error); border-color: var(--color-error); }
+
+.form-input-style {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-card-border);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.form-input-style:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.form-input-style::placeholder {
+    color: var(--color-text-secondary);
+    opacity: 0.7;
+}
+
+.admin-section-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+}
+
+.admin-section-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-description {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
 /* === ADMIN PANEL LIGHT MODE FIXES === */
+body.light-mode .admin-tabs {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+body.light-mode .admin-tabs .navButton {
+    background: #f8fafc;
+    color: #475569;
+}
+
+body.light-mode .admin-tabs .navButton:not(.primary):hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+body.light-mode .admin-tabs .navButton.primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
 body.light-mode .admin-toolbar { background: #f8fafc; border: 1px solid #e2e8f0; }
 body.light-mode .admin-toolbar input[type="text"] { background: #ffffff; color: #0f172a; border-color: #cbd5e1; }
 body.light-mode .admin-card { background: #ffffff; border-color: #e2e8f0; color: #0f172a; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -236,6 +382,12 @@ body.light-mode .btn-icon { background: #f1f5f9; color: #64748b; border-color: #
 
 body.light-mode .form-input-style { background: #ffffff; color: #0f172a; border-color: #cbd5e1; }
 body.light-mode .form-input-style:focus { background: #ffffff; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
+
+body.light-mode .admin-section-card {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
 
 body.light-mode .admin-toolbar .navButton { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
 

@@ -380,11 +380,11 @@ export function AdminPanel({ onBack }) {
 
             <div className="quizContentWrapper">
                 {/* --- TABS --- */}
-                <div style={{ display: "flex", gap: "0.5rem", padding: '0.5rem', background: 'var(--color-card-bg)', borderRadius: '16px', marginBottom: '1.5rem', border: '1px solid var(--color-card-border)', overflowX: 'auto' }}>
-                    <button className={`navButton ${activeTab === "questions" ? "primary" : ""}`} onClick={() => setActiveTab("questions")} style={{flex: 1, whiteSpace: 'nowrap'}}>Otázky ({questions.length})</button>
-                    <button className={`navButton ${activeTab === "new" ? "primary" : ""}`} onClick={() => { setEditingId(null); setEditForm({subject: "SPS", number: "", question: "", options: ["", "", "", ""], correct_index: null, is_active: true, image_base64: null}); setActiveTab("new"); }} style={{flex: 1}}>{editingId ? 'Upravit' : 'Nová'}</button>
-                    <button className={`navButton ${activeTab === "import" ? "primary" : ""}`} onClick={() => setActiveTab("import")} style={{flex: 1}}>Import</button>
-                    <button className={`navButton ${activeTab === "reports" ? "primary" : ""}`} onClick={() => setActiveTab("reports")} style={{flex: 1}}>Hlášení</button>
+                <div className="admin-tabs">
+                    <button className={`navButton ${activeTab === "questions" ? "primary" : ""}`} onClick={() => setActiveTab("questions")}>Otázky ({questions.length})</button>
+                    <button className={`navButton ${activeTab === "new" ? "primary" : ""}`} onClick={() => { setEditingId(null); setEditForm({subject: "SPS", number: "", question: "", options: ["", "", "", ""], correct_index: null, is_active: true, image_base64: null}); setActiveTab("new"); }}>{editingId ? 'Upravit' : 'Nová'}</button>
+                    <button className={`navButton ${activeTab === "import" ? "primary" : ""}`} onClick={() => setActiveTab("import")}>Import</button>
+                    <button className={`navButton ${activeTab === "reports" ? "primary" : ""}`} onClick={() => setActiveTab("reports")}>Hlášení</button>
                 </div>
 
                 {/* --- TAB: OTÁZKY (SEZNAM) --- */}
@@ -439,8 +439,8 @@ export function AdminPanel({ onBack }) {
 
                 {/* --- TAB: NOVÁ / UPRAVIT --- */}
                 {activeTab === "new" && (
-                    <div className="reviewCard fadeIn" style={{ padding: '2rem', background: 'var(--color-card-bg)', borderRadius: '20px' }}>
-                        <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-primary-light)' }}>{editingId ? "✏️ Upravit otázku" : "➕ Přidat novou otázku"}</h3>
+                    <div className="admin-section-card fadeIn">
+                        <h3 className="admin-section-title">{editingId ? "✏️ Upravit otázku" : "➕ Přidat novou otázku"}</h3>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                             <div style={{ display: 'flex', gap: '1rem' }}>
                                 <select className="form-input-style" value={editForm.subject} onChange={(e) => setEditForm({...editForm, subject: e.target.value})} style={{ flex: 1 }}>
@@ -498,9 +498,9 @@ export function AdminPanel({ onBack }) {
                 {activeTab === "import" && (
                     <div className="fadeIn" style={{ display: 'grid', gap: '2rem' }}>
                         {/* CSV IMPORT */}
-                        <div className="reviewCard" style={{ padding: '2rem', background: 'var(--color-card-bg)', borderRadius: '20px' }}>
-                            <h3 style={{ marginBottom: '1rem' }}>📂 CSV Import Otázek</h3>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>Nahraje otázky a automaticky skryje ty s neúplnými daty nebo bez indexu (A-D).</p>
+                        <div className="admin-section-card">
+                            <h3 className="admin-section-title">📂 CSV Import Otázek</h3>
+                            <p className="admin-description">Nahraje otázky a automaticky skryje ty s neúplnými daty nebo bez indexu (A-D).</p>
 
                             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                                 {['SPS', 'STT'].map(s => (
@@ -519,9 +519,9 @@ export function AdminPanel({ onBack }) {
                         </div>
 
                         {/* FOLDER IMPORT */}
-                        <div className="reviewCard" style={{ padding: '2rem', background: 'var(--color-card-bg)', borderRadius: '20px' }}>
-                            <h3 style={{ marginBottom: '1rem' }}>🖼️ Hromadný import obrázků</h3>
-                            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: '1.5rem' }}>Vyber předmět a pak zvol složku s obrázky. Názvy souborů musí být čísla (např. 1.jpg, 20.png). Vše bude převedeno na úsporný WebP.</p>
+                        <div className="admin-section-card">
+                            <h3 className="admin-section-title">🖼️ Hromadný import obrázků</h3>
+                            <p className="admin-description">Vyber předmět a pak zvol složku s obrázky. Názvy souborů musí být čísla (např. 1.jpg, 20.png). Vše bude převedeno na úsporný WebP.</p>
 
                             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                                 {['SPS', 'STT'].map(s => (
