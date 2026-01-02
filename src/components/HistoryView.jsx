@@ -3,15 +3,13 @@ import { HistoryGraph } from './HistoryGraph';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 
 const formatFullTime = (seconds) => {
-    if (!seconds) return "0s";
+    if (!seconds) return "0m";
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
 
     const parts = [];
     if (h > 0) parts.push(`${h}h`);
-    if (m > 0 || h > 0) parts.push(`${m}m`);
-    parts.push(`${s}s`);
+    if (m > 0 || h === 0) parts.push(`${m}m`);
 
     return parts.join(' ');
 };
