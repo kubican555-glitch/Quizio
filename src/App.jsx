@@ -1124,7 +1124,10 @@ export default function App() {
 
                 {finished && (
                     <ResultScreen
-                        mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} onBack={() => { setMode(null); setCombo(0); }} currentSubject={subject} timeLeftAtSubmit={timeLeftAtSubmit} onZoom={setFullscreenImage} user={user} syncing={syncing} onReport={handleReportClick}
+                        mode={mode} score={score} trainingTime={trainingTime} questionSet={questionSet} maxSeenIndex={maxSeenIndex} 
+                        onBack={() => { setMode(null); setCombo(0); }} currentSubject={subject} timeLeftAtSubmit={timeLeftAtSubmit} 
+                        onZoom={setFullscreenImage} user={user} syncing={syncing} onReport={handleReportClick}
+                        theme={theme} toggleTheme={toggleTheme}
                     />
                 )}
 

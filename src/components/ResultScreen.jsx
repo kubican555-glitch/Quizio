@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SubjectBadge } from './SubjectBadge';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 import { formatTime } from '../utils/formatting';
+import { ThemeToggle } from './ThemeToggle';
 // getImageUrl už nebude primárně potřeba, ale necháme ho jako fallback
 import { getImageUrl } from '../utils/images';
 import { HighlightedText } from './HighlightedText';
@@ -70,7 +71,9 @@ export const ResultScreen = ({
     onZoom,
     user,
     syncing,
-    onReport
+    onReport,
+    theme,
+    toggleTheme
 }) => {
     if (mode === 'real_test') {
         const percentage = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
@@ -86,6 +89,15 @@ export const ResultScreen = ({
 
         return (
             <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="top-navbar" style={{ width: '100%', maxWidth: '600px' }}>
+                    <div className="navbar-group">
+                        <SubjectBadge subject={currentSubject} />
+                    </div>
+                    <div className="navbar-group">
+                        <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile />
+                        <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
+                    </div>
+                </div>
                 <div className="resultScreen" style={{ maxWidth: '600px', width: '100%', marginTop: 0 }}>
                     <h1 className="title" style={{ marginBottom: '2rem' }}>Výsledek testu</h1>
 
@@ -200,6 +212,7 @@ export const ResultScreen = ({
                 </div>
                 <div className="navbar-group">
                     <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile />
+                    <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
                 </div>
             </div>
 
