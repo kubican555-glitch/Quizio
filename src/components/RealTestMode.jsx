@@ -52,6 +52,11 @@ export function RealTestMode({
         };
     }, [currentIndex, questionSet.length]);
 
+    const submitTestRef = useRef(null);
+    useEffect(() => {
+        submitTestRef.current = submitTest;
+    }, [questionSet, timeLeft]);
+
     // --- ČASOVAČ ---
     useEffect(() => {
         if (finalResult) return; 
@@ -59,7 +64,7 @@ export function RealTestMode({
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    submitTest(true); 
+                    if (submitTestRef.current) submitTestRef.current(true); 
                     return 0;
                 }
                 return prev - 1;
