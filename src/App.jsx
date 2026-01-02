@@ -366,12 +366,36 @@ export default function App() {
     const startRandomMode = () => {
         const pool = activeQuestionsCache;
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
+        
+        // Reset stavu před startem
+        setScore({ correct: 0, total: 0 });
+        setFinished(false);
+        setShowResult(false);
+        setSelectedAnswer(null);
+        setCurrentIndex(0);
+        setCombo(0);
+        setIsKeyboardMode(false);
+        setReadyQuestionId(null);
+
         const shuffled = [...pool].sort(() => Math.random() - 0.5).map((q, idx) => ({ ...q, _localIndex: idx }));
-        setReadyQuestionId(null); setQuestionSet(shuffled); setMode("random"); setCurrentIndex(0); setScore({ correct: 0, total: 0 }); setFinished(false); setSelectedAnswer(null); setShowResult(false); setIsKeyboardMode(false); setCombo(0);
+        setQuestionSet(shuffled); 
+        setMode("random"); 
     };
     const startMockTest = async () => {
         const pool = activeQuestionsCache;
         if (!pool || pool.length === 0) { alert("Žádné otázky nejsou k dispozici."); return; }
+        
+        // Reset stavu před startem
+        setScore({ correct: 0, total: 0 });
+        setFinished(false);
+        setShowResult(false);
+        setSelectedAnswer(null);
+        setCurrentIndex(0);
+        setMaxSeenIndex(0);
+        setCombo(0);
+        setIsKeyboardMode(false);
+        setReadyQuestionId(null);
+
         const sel = [...pool].sort(() => Math.random() - 0.5).slice(0, Math.min(40, pool.length));
         const prepared = prepareQuestionSet(sel, true);
         
@@ -382,7 +406,9 @@ export default function App() {
             setLoadingProgress(progress);
         });
         
-        setReadyQuestionId(null); setQuestionSet(prepared); setTimeLeft(1800); setMode("mock"); setCurrentIndex(0); setMaxSeenIndex(0); setFinished(false); setIsKeyboardMode(false); setCombo(0);
+        setQuestionSet(prepared); 
+        setTimeLeft(1800); 
+        setMode("mock"); 
     };
     const startMistakesMode = () => {
         const all = activeQuestionsCache;
