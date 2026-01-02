@@ -224,16 +224,13 @@ export function QuestionCard({
           if (showResult) {
             if (isCorrect) {
                 className += " correct";
-                if (isFlashcard) style = { background: "rgba(34,197,94,0.35)", borderColor: "#22c55e" };
             } else if (isSelected) {
                 className += " wrong";
-                if (isFlashcard) style = { background: "rgba(239,68,68,0.35)", borderColor: "#ef4444" };
             } else {
                 className += " dim";
             }
           } else if (isSelected) {
             className += " selected";
-            if (isFlashcard) style = { background: "rgba(59,130,246,0.35)", borderColor: "#60a5fa" };
           }
 
           // OPRAVA VIZUÁLNÍHO OZNAČENÍ V TESTU:
@@ -241,8 +238,6 @@ export function QuestionCard({
           // aplikujeme styl "selected".
           if (!showResult && !isSelected && ((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === index)) {
              className += " selected"; 
-             // Zde přidávám explicitní silnější styl, aby to bylo vidět
-             style = { background: "rgba(59, 130, 246, 0.4)", borderColor: "#3b82f6", borderWidth: "2px" };
           }
 
           return (
