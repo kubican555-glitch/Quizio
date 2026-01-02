@@ -37,6 +37,8 @@ import { ConfirmModal, SmartSettingsModal } from "./components/Modals.jsx";
 import { NoMistakesScreen } from "./components/NoMistakesScreen.jsx"; 
 import { ReportModal } from "./components/ReportModal.jsx";
 
+import { CustomImportGuide } from "./components/CustomImportGuide.jsx";
+
 /* ---------- Main App ---------- */
 
 const ReviewImage = ({ q, subject, setFullscreenImage }) => {
@@ -564,6 +566,20 @@ export default function App() {
         return () => clearInterval(interval);
     }, [mode, finished]);
     useEffect(() => { if ((mode === "mock") && timeLeft === 0 && !finished) submitTest(); }, [timeLeft, mode, finished]);
+
+    const [showCustomImport, setShowCustomImport] = useState(false);
+
+    useEffect(() => {
+        window.handleCustomImport = (questions) => {
+            handleFileUpload(questions);
+            setShowCustomImport(false);
+        };
+        return () => delete window.handleCustomImport;
+    }, [activeQuestionsCache]);
+
+    if (showCustomImport) {
+        return <CustomImportGuide onBack={() => setShowCustomImport(false)} />;
+    }
 
     if (!user) return (
         <>

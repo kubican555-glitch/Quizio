@@ -111,21 +111,15 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
             <div className="subjectDesc">Strojírenská technologie</div>
           </button>
 
-          <label 
+          <button
             ref={(el) => subjectButtonsRef.current[2] = el}
             className={`subjectButton uploadButton ${menuSelection === 2 && isKeyboardMode ? "selected" : ""}`}
-            onClick={() => setIsKeyboardMode(false)}>
+            onClick={() => { setIsKeyboardMode(false); onSelectSubject("CUSTOM"); }}
+          >
             <div className="subjectIcon">📤</div>
             <div className="subjectName">Vlastní soubor</div>
             <div className="subjectDesc">JSON nebo CSV</div>
-            <input
-              type="file"
-              accept=".json,.csv"
-              onChange={handleFileUpload}
-              disabled={uploading}
-              style={{ display: "none" }}
-            />
-          </label>
+          </button>
         </div>
 
         {uploadError && <div className="uploadError">{uploadError}</div>}
