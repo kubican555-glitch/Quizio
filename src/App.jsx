@@ -506,8 +506,23 @@ export default function App() {
         const newRec = { date: new Date().toISOString(), mode: mode, score: s, subject: subject, id: Date.now() + "-" + Math.random(), };
         updateHistory((prev) => [...prev, newRec]);
     };
-    const tryReturnToMenu = () => { if (mode === "mock" && !finished) setShowConfirmExit(true); else { setMode(null); setCombo(0); } };
-    const confirmExit = () => { setShowConfirmExit(false); setMode(null); setCombo(0); };
+    const tryReturnToMenu = () => { 
+        if (mode === "mock" && !finished) {
+            setShowConfirmExit(true); 
+        } else { 
+            setMode(null); 
+            setCombo(0); 
+            setShowResult(false);
+            setSelectedAnswer(null);
+        } 
+    };
+    const confirmExit = () => { 
+        setShowConfirmExit(false); 
+        setMode(null); 
+        setCombo(0); 
+        setShowResult(false);
+        setSelectedAnswer(null);
+    };
     const handleFileUpload = (questions) => {
         if (!questions) return;
         const norm = questions.map((q, i) => ({ number: q.number ?? i + 1, question: q.question ?? `Otázka ${i + 1}`, options: q.options || [], correctIndex: q.correctIndex ?? 0, }));
