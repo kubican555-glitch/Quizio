@@ -275,21 +275,36 @@ export function ScheduledTestsList({
                                                         ? '2px solid var(--color-success)' 
                                                         : (isOpen ? 'none' : '2px solid var(--color-card-border)'),
                                                     fontSize: '1rem',
-                                                    fontWeight: '700',
+                                                    fontWeight: '800', // Zvýšena váha písma
                                                     cursor: (!isOpen || isCompleted) ? 'not-allowed' : 'pointer',
                                                     background: isCompleted 
                                                         ? 'var(--color-card-bg)' 
-                                                        : (isOpen ? 'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))' : 'var(--color-card-bg)'),
+                                                        : (isOpen ? 'linear-gradient(135deg, var(--color-primary), var(--color-secondary))' : 'var(--color-card-bg)'), // Výraznější gradient
                                                     color: isCompleted 
                                                         ? 'var(--color-success)' 
                                                         : (isOpen ? '#ffffff' : 'var(--color-text-neutral)'),
-                                                    boxShadow: isOpen && !isCompleted ? '0 4px 15px rgba(59, 130, 246, 0.4)' : 'none',
+                                                    boxShadow: isOpen && !isCompleted ? '0 8px 25px rgba(59, 130, 246, 0.5)' : 'none', // Silnější stín
                                                     opacity: (!isOpen && !isCompleted) ? 0.6 : 1,
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     gap: '0.5rem',
-                                                    transition: 'all 0.2s'
+                                                    transition: 'all 0.2s',
+                                                    transform: isOpen && !isCompleted ? 'scale(1.02)' : 'none', // Mírné zvětšení pro důraz
+                                                    textTransform: 'uppercase', // Kapitálky pro důraz
+                                                    letterSpacing: '1px'
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (isOpen && !isCompleted) {
+                                                        e.currentTarget.style.transform = 'scale(1.05)';
+                                                        e.currentTarget.style.boxShadow = '0 10px 30px rgba(59, 130, 246, 0.6)';
+                                                    }
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (isOpen && !isCompleted) {
+                                                        e.currentTarget.style.transform = 'scale(1.02)';
+                                                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.5)';
+                                                    }
                                                 }}
                                             >
                                                 {isCompleted ? (
