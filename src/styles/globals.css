@@ -708,10 +708,9 @@ body.light-mode .optionButton { color: #334155; font-weight: 600; }
 .optionButton.selected { 
     border-color: var(--color-primary); 
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.2) 100%); 
-    box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); 
+    box-shadow: inset 0 0 0 1px var(--color-primary), 0 0 25px rgba(59, 130, 246, 0.5); 
     outline: none; 
     transition: all 0.2s ease;
-    border-width: 2px;
 }
 .optionButton.correct { 
     border-color: var(--color-success) !important; 
@@ -719,8 +718,7 @@ body.light-mode .optionButton { color: #334155; font-weight: 600; }
     color: white !important; 
     outline: none; 
     transition: all 0.2s ease;
-    border-width: 2px;
-    box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);
+    box-shadow: inset 0 0 0 1px var(--color-success), 0 0 25px rgba(34, 197, 94, 0.5);
 }
 .optionButton.wrong { 
     border-color: var(--color-error) !important; 
@@ -728,8 +726,7 @@ body.light-mode .optionButton { color: #334155; font-weight: 600; }
     color: white !important; 
     outline: none; 
     transition: all 0.2s ease;
-    border-width: 2px;
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.5);
+    box-shadow: inset 0 0 0 1px var(--color-error), 0 0 25px rgba(239, 68, 68, 0.5);
 }
 
 body.light-mode .optionButton.selected { 
