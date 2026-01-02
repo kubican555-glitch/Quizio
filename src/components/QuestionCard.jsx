@@ -53,7 +53,7 @@ export function QuestionCard({
             }
             setShuffledOptions(shuffled);
         }
-    }, [currentQuestion]);
+    }, [currentQuestion.number, currentQuestion.id, mode]); // Only re-shuffle when the question itself or mode changes
 
     const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
