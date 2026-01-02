@@ -352,7 +352,13 @@ export default function App() {
     const addMistake = (qNumber) => updateMistakes((prev) => { const cur = prev[subject] || []; return !cur.includes(qNumber) ? { ...prev, [subject]: [...cur, qNumber] } : prev; });
     const removeMistake = (qNumber) => updateMistakes((prev) => { const cur = prev[subject] || []; return cur.includes(qNumber) ? { ...prev, [subject]: cur.filter((n) => n !== qNumber) } : prev; });
     const clearMistakes = () => { updateMistakes((prev) => ({ ...prev, [subject]: [] })); setShowClearMistakesConfirm(false); };
-    const handleSelectSubject = (subj) => { setSubject(subj.toUpperCase()); };
+    const handleSelectSubject = (subj) => { 
+        if (subj === "CUSTOM") {
+            setShowCustomImport(true);
+            return;
+        }
+        setSubject(subj.toUpperCase()); 
+    };
     const handleStartMode = (startFn, modeName) => { if (modeName === "smart") { setShowSmartSettings(true); return; } startFn(); };
 
     const handleReportClick = (questionNumber) => { setQuestionToReport(questionNumber); setReportModalOpen(true); };
