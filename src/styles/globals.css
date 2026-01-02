@@ -554,8 +554,7 @@ body.light-mode #root {
 /* === KONTEJNER (Scrollovací oblast) === */
 .container { 
   max-width: 960px; width: 100%; margin: 0 auto; 
-  padding: 1rem;
-  padding-top: max(1rem, env(safe-area-inset-top));
+  padding: 0 1rem;
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 20px)); 
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
@@ -621,20 +620,33 @@ body.light-mode #root {
 .top-navbar, .navbar, .appHeader {
     width: 100%;
     max-width: 960px;
-    position: relative; 
+    position: sticky; 
+    top: 0;
     z-index: 1000;
     margin: 0 auto 1rem auto; 
     padding: 0.8rem 1rem;
+    padding-top: max(0.8rem, env(safe-area-inset-top));
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(10, 14, 39, 0.95);
-    border-radius: 12px;
-    backdrop-filter: blur(15px);
+    background: rgba(10, 14, 39, 0.8);
+    border-radius: 0 0 12px 12px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;
     border: none; 
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Light mode navbar override */
+body.light-mode .top-navbar, 
+body.light-mode .navbar, 
+body.light-mode .appHeader { 
+    background: rgba(255, 255, 255, 0.8); 
+    border: 1px solid rgba(0, 0, 0, 0.1); 
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15); 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
 }
 
 .navbar-group {
