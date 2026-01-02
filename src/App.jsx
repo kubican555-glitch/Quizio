@@ -86,6 +86,11 @@ export default function App() {
     const [customQuestions, setCustomQuestions] = useState(null);
 
     const [theme, setTheme] = useState(() => localStorage.getItem("quizio_theme") || "dark");
+    const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
+    const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+    const [isTransitioningSubject, setIsTransitioningSubject] = useState(false);
+    const [menuSelection, setMenuSelection] = useState(-1);
+    const [mode, setMode] = useState(null);
 
     // --- Browser History Integration ---
     useEffect(() => {
@@ -119,12 +124,6 @@ export default function App() {
         }
     }, [subject, mode]);
     // ------------------------------------
-
-    const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
-    const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
-    const [isTransitioningSubject, setIsTransitioningSubject] = useState(false);
-    const [menuSelection, setMenuSelection] = useState(-1);
-    const [mode, setMode] = useState(null);
 
     const [showSmartSettings, setShowSmartSettings] = useState(false);
     const [showClearMistakesConfirm, setShowClearMistakesConfirm] = useState(false);
