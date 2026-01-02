@@ -116,9 +116,9 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
             className={`subjectButton uploadButton ${menuSelection === 2 && isKeyboardMode ? "selected" : ""}`}
             onClick={() => { setIsKeyboardMode(false); onSelectSubject("CUSTOM"); }}
           >
-            <div className="subjectIcon">📤</div>
-            <div className="subjectName">Vlastní soubor</div>
-            <div className="subjectDesc">JSON nebo CSV</div>
+            <div className="subjectIcon">📊</div>
+            <div className="subjectName">Vlastní import</div>
+            <div className="subjectDesc">Excel / CSV</div>
           </button>
         </div>
 
