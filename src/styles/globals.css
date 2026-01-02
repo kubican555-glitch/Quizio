@@ -558,10 +558,13 @@ body.light-mode {
     padding-top: 0; 
     overflow: hidden;
     background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+    /* Zajištění, že se gradient proáhne pod home bar na iOS */
+    min-height: -webkit-fill-available;
 }
 
 body.light-mode #root {
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 60%, #cbd5e1 100%);
+    min-height: -webkit-fill-available;
 }
 
 /* === KONTEJNER (Scrollovací oblast) --- */
