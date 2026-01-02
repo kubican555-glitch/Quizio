@@ -86,6 +86,40 @@ export default function App() {
     const [customQuestions, setCustomQuestions] = useState(null);
 
     const [theme, setTheme] = useState(() => localStorage.getItem("quizio_theme") || "dark");
+
+    // --- Browser History Integration ---
+    useEffect(() => {
+        const syncStateFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            const s = params.get("s");
+            const m = params.get("m");
+            
+            if (s) setSubject(s.toUpperCase());
+            else setSubject(null);
+            
+            if (m) setMode(m);
+            else setMode(null);
+        };
+
+        window.addEventListener("popstate", syncStateFromUrl);
+        // Initial sync
+        syncStateFromUrl();
+        
+        return () => window.removeEventListener("popstate", syncStateFromUrl);
+    }, []);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (subject) params.set("s", subject.toLowerCase());
+        if (mode) params.set("m", mode);
+        
+        const newUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "");
+        if (window.location.search !== "?" + params.toString() && !(window.location.search === "" && params.toString() === "")) {
+            window.history.pushState({ subject, mode }, "", newUrl);
+        }
+    }, [subject, mode]);
+    // ------------------------------------
+
     const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
     const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
     const [isTransitioningSubject, setIsTransitioningSubject] = useState(false);
