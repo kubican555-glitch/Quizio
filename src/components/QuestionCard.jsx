@@ -52,8 +52,14 @@ export function QuestionCard({
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
             setShuffledOptions(shuffled);
+            
+            // Re-order option refs if they exist
+            if (optionRefsForCurrent && optionRefsForCurrent.current) {
+                // Clear current refs to ensure new ones are set in correct visual order
+                optionRefsForCurrent.current = {};
+            }
         }
-    }, [currentQuestion.number, currentQuestion.id, mode]); // Only re-shuffle when the question itself or mode changes
+    }, [currentQuestion.number, currentQuestion.id, mode, currentQuestion.userAnswer === undefined]); // Re-shuffle when it's a "fresh" view (userAnswer is undefined)
 
     const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
@@ -262,7 +268,7 @@ export function QuestionCard({
           return (
             <button
               key={index}
-              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[optObj.originalIndex] = el; }}
+              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[index] = el; }}
               className={className}
               style={style}
               onClick={() => !disabled && onSelect(optObj.originalIndex)}
