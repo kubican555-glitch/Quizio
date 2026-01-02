@@ -656,7 +656,7 @@ export default function App() {
             if (e.key === "Escape") tryReturnToMenu();
         };
         window.addEventListener("keydown", handleKeyDown); return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [mode, questionSet, currentIndex, showResult, selectedAnswer, showConfirmSubmit, showConfirmExit, finished, menuSelection, subject, user, fullscreenImage, reportModalOpen, isSessionBlocked, testToStart]);
+    }, [mode, questionSet, currentIndex, showResult, selectedAnswer, showConfirmSubmit, showConfirmExit, finished, menuSelection, subject, user, fullscreenImage, reportModalOpen, isSessionBlocked, testToStart, visualSelection, shuffledMapping]);
 
     useEffect(() => {
         if (finished || (mode !== "mock" && mode !== "smart" && mode !== "mistakes")) return;
