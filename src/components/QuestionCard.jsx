@@ -29,11 +29,7 @@ export function QuestionCard({
       return staticUrl || null;
   });
 
-  const [isReady, setIsReady] = useState(() => {
-      if (lazyImage) return true;
-      if (!currentQuestion?.id) return true;
-      return false;
-  });
+  const [isReady, setIsReady] = useState(true);
 
     const [shuffledOptions, setShuffledOptions] = useState([]);
     
@@ -96,41 +92,20 @@ export function QuestionCard({
   const minSwipeDistance = 50; // Threshold pro odlet
   const flyAwayThreshold = 80; // Práh pro spuštění odletu
 
-  // 2. NAČÍTÁNÍ OBRÁZKU
+  // 2. NAČÍTÁNÍ OBRÁZKU (Líné načítání na pozadí)
   useEffect(() => {
-    let isMounted = true;
-    if (isReady) return;
-
     if (currentQuestion?.id) {
-        const timeoutId = setTimeout(() => {
-            if (isMounted) {
-                console.log("QuestionCard: Timeout načítání obrázku, zobrazuji kartu.");
-                setIsReady(true);
-            }
-        }, 3000);
-
         const loadImage = async () => {
             try {
                 const img = await fetchQuestionImage(currentQuestion.id);
-                if (isMounted) {
-                    if (img) setLazyImage(img);
-                    setIsReady(true);
-                }
+                if (img) setLazyImage(img);
             } catch (err) {
                 console.error("Chyba při načítání obrázku v kartě:", err);
-                if (isMounted) setIsReady(true);
             }
         };
         loadImage();
-
-        return () => { 
-            isMounted = false; 
-            clearTimeout(timeoutId);
-        };
-    } else {
-        setIsReady(true);
     }
-  }, [currentQuestion, isReady]);
+  }, [currentQuestion?.id]);
 
   // 3. ZOOM LOGIKA
   useEffect(() => {
@@ -252,15 +227,7 @@ export function QuestionCard({
   }, [onSwipe, isFlying, mode]);
 
   // 6. RENDER
-  if (!currentQuestion || !isReady) {
-    return (
-      <div style={{ padding: "4rem 2rem", textAlign: "center", color: "var(--color-text-secondary)" }}>
-        <div className="spinner" style={{margin: "0 auto 10px auto", width: "24px", height: "24px", border: "3px solid rgba(255,255,255,0.3)", borderTopColor: "var(--color-primary)", borderRadius: "50%", animation: "spin 1s linear infinite"}}></div>
-        <span>Načítám...</span>
-        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
+  if (!currentQuestion) return null;
 
   // --- PODMÍNKA PRO ZOBRAZENÍ ČÍSLA OTÁZKY ---
   // Číslo zobrazíme POUZE pokud je mode 'random' (Flashcards) nebo 'review' (Prohlížení)
