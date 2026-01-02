@@ -73,7 +73,7 @@ export function RealTestMode({
     const handleTimeExpiredRef = useRef(null);
     
     // Funkce volaná při vypršení času
-    const executeAutoSubmit = async () => {
+    const executeAutoSubmit = () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
@@ -92,39 +92,37 @@ export function RealTestMode({
 
         const timeSpent = test.time_limit * 60; // Celý čas byl využit
 
-        try {
-            await supabase.from('test_results').insert([{
-                test_id: test.id,
-                student_name: user,
-                user_id: userId,
-                score_correct: correctCount,
-                score_total: totalCount,
-                answers: answersToSave,
-                time_spent: timeSpent,
-                cheat_score: 0 
-            }]);
+        // DŮLEŽITÉ: Nejprve nastavíme UI stav OKAMŽITĚ (bez čekání na databázi)
+        // To zajistí zobrazení modálu na mobilu i při pomalém připojení
+        setFinalResult({
+            score: { correct: correctCount, total: totalCount },
+            timeSpent: timeSpent,
+            timeLeft: 0
+        });
+        setShowAutoSubmitModal(true);
 
-            if (onTestCompleted) onTestCompleted(test.id);
+        if (onTestCompleted) onTestCompleted(test.id);
 
-            setFinalResult({
-                score: { correct: correctCount, total: totalCount },
-                timeSpent: timeSpent,
-                timeLeft: 0
-            });
-
-            // Vynutíme zobrazení modálu před ResultScreen
-            setShowAutoSubmitModal(true);
-
-        } catch (error) {
-            console.error("Chyba při automatickém ukládání:", error);
-            // I při chybě zobrazíme výsledky uživateli, aby o ně nepřišel vizuálně
-            setFinalResult({
-                score: { correct: correctCount, total: totalCount },
-                timeSpent: timeSpent,
-                timeLeft: 0
-            });
-            setShowAutoSubmitModal(true);
-        }
+        // Ukládání do databáze provedeme ASYNCHRONNĚ na pozadí
+        (async () => {
+            try {
+                await supabase.from('test_results').insert([{
+                    test_id: test.id,
+                    student_name: user,
+                    user_id: userId,
+                    score_correct: correctCount,
+                    score_total: totalCount,
+                    answers: answersToSave,
+                    time_spent: timeSpent,
+                    cheat_score: 0 
+                }]);
+                console.log("Test úspěšně uložen do databáze.");
+            } catch (error) {
+                console.error("Chyba při ukládání do databáze:", error);
+            } finally {
+                setIsSubmitting(false);
+            }
+        })();
     };
 
     handleTimeExpiredRef.current = executeAutoSubmit;
