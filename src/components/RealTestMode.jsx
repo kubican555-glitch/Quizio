@@ -73,7 +73,7 @@ export function RealTestMode({
     const handleTimeExpiredRef = useRef(null);
     
     // Funkce volaná při vypršení času
-    handleTimeExpiredRef.current = async () => {
+    const executeAutoSubmit = async () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
@@ -90,9 +90,9 @@ export function RealTestMode({
             correct: q.correctIndex
         }));
 
+        const timeSpent = test.time_limit * 60; // Celý čas byl využit
+
         try {
-            const timeSpent = test.time_limit * 60; // Celý čas byl využit
-            
             await supabase.from('test_results').insert([{
                 test_id: test.id,
                 student_name: user,
@@ -115,17 +115,18 @@ export function RealTestMode({
             setShowAutoSubmitModal(true);
 
         } catch (error) {
-            console.error("Chyba při ukládání:", error);
-            isSubmittingRef.current = false;
-            // I při chybě zobrazíme výsledky
+            console.error("Chyba při automatickém ukládání:", error);
+            // I při chybě zobrazíme výsledky uživateli, aby o ně nepřišel vizuálně
             setFinalResult({
                 score: { correct: correctCount, total: totalCount },
-                timeSpent: test.time_limit * 60,
+                timeSpent: timeSpent,
                 timeLeft: 0
             });
             setShowAutoSubmitModal(true);
         }
     };
+
+    handleTimeExpiredRef.current = executeAutoSubmit;
 
     // --- ČASOVAČ (s podporou pro mobily a pozastavené browsery) ---
     useEffect(() => {
@@ -295,10 +296,10 @@ export function RealTestMode({
     };
 
     // --- RENDER ---
-    if (finalResult && !showAutoSubmitModal) {
-        return (
-            <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
-                <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+    // Na mobilu chceme vidět modál i přes ResultScreen, pokud byl vyvolán automaticky
+    const renderContent = () => {
+        if (finalResult && !showAutoSubmitModal) {
+            return (
                 <ResultScreen 
                     mode="real_test"
                     score={finalResult.score}
@@ -313,9 +314,106 @@ export function RealTestMode({
                     syncing={syncing}
                     onReport={onReport}
                 />
-            </div>
+            );
+        }
+
+        return (
+            <>
+                <div className="top-navbar">
+                    <div className="navbar-group">
+                        <span style={{fontWeight:'bold', color:'var(--color-primary)', display:'flex', alignItems:'center', gap:'0.5rem', fontSize: '0.9rem'}}>
+                            📝 TEST PROBÍHÁ
+                        </span>
+                        <div className="mobile-hidden">
+                            <SubjectBadge subject={test.subject} compact />
+                        </div>
+                    </div>
+                    <div className="navbar-group">
+                        <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>
+                            {formatTime(timeLeft)}
+                        </div>
+                        <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile={true} />
+                        <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
+                    </div>
+                </div>
+
+                <div className="quizContentWrapper">
+                    <h1 className="title">{test.title}</h1>
+                    <div className="progressBarContainer">
+                        <div className="progressBarFill" style={{ width: `${((currentIndex + 1) / questionSet.length) * 100}%` }}></div>
+                    </div>
+                    <div className="progressText">Otázka {currentIndex + 1} / {questionSet.length}</div>
+
+                    <div className="card" ref={cardRef}>
+                        <div key={currentIndex} className={direction === 'left' ? "slide-in-left" : "slide-in-right"} style={{width: '100%'}}>
+                            <QuestionCard
+                                currentQuestion={currentQuestion}
+                                mode="real_test" 
+                                showResult={false}
+                                selectedAnswer={selectedAnswer}
+                                onSelect={handleAnswer}
+                                optionRefsForCurrent={optionRefsForCurrent}
+                                disabled={finalResult !== null}
+                                isKeyboardMode={true}
+                                currentSubject={test.subject}
+                                onZoom={setFullscreenImage}
+                                onSwipe={handleSwipe}
+                                score={{correct:0, total:0}}
+                            />
+                        </div>
+
+                        <div className="actionButtons spaced">
+                            <button 
+                                className="navButton" 
+                                onClick={() => moveToQuestion(currentIndex - 1)} 
+                                disabled={currentIndex === 0 || finalResult !== null}
+                            >
+                                Předchozí
+                            </button>
+
+                            {currentIndex < questionSet.length - 1 ? (
+                                <button 
+                                    className="navButton" 
+                                    onClick={() => moveToQuestion(currentIndex + 1)}
+                                    disabled={finalResult !== null}
+                                >
+                                    Další
+                                </button>
+                            ) : (
+                                <button 
+                                    className="navButton primary" 
+                                    onClick={() => setShowConfirmSubmit(true)}
+                                    disabled={finalResult !== null}
+                                >
+                                    Odevzdat test
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="navigatorPlaceholder">
+                            <Navigator 
+                                questionSet={questionSet} 
+                                currentIndex={currentIndex} 
+                                setCurrentIndex={moveToQuestion} 
+                                mode="real_test" 
+                                maxSeenIndex={questionSet.length}
+                            />
+                            <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center" }}>
+                                <button 
+                                    className="navButton primary" 
+                                    style={{ padding: "10px 30px", fontSize: "0.95rem", minWidth: "150px" }} 
+                                    onClick={() => setShowConfirmSubmit(true)}
+                                    disabled={finalResult !== null}
+                                >
+                                    Odevzdat test
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
         );
-    }
+    };
 
     return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
@@ -343,97 +441,7 @@ export function RealTestMode({
                 />
             )}
 
-            <div className="top-navbar">
-                <div className="navbar-group">
-                    <span style={{fontWeight:'bold', color:'var(--color-primary)', display:'flex', alignItems:'center', gap:'0.5rem', fontSize: '0.9rem'}}>
-                        📝 TEST PROBÍHÁ
-                    </span>
-                    <div className="mobile-hidden">
-                        <SubjectBadge subject={test.subject} compact />
-                    </div>
-                </div>
-                <div className="navbar-group">
-                    <div className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}>
-                        {formatTime(timeLeft)}
-                    </div>
-                    <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile={true} />
-                    <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-                </div>
-            </div>
-
-            <div className="quizContentWrapper">
-                <h1 className="title">{test.title}</h1>
-                <div className="progressBarContainer">
-                    <div className="progressBarFill" style={{ width: `${((currentIndex + 1) / questionSet.length) * 100}%` }}></div>
-                </div>
-                <div className="progressText">Otázka {currentIndex + 1} / {questionSet.length}</div>
-
-                <div className="card" ref={cardRef}>
-                    <div key={currentIndex} className={direction === 'left' ? "slide-in-left" : "slide-in-right"} style={{width: '100%'}}>
-                        <QuestionCard
-                            currentQuestion={currentQuestion}
-                            mode="real_test" 
-                            showResult={false}
-                            selectedAnswer={selectedAnswer}
-                            onSelect={handleAnswer}
-                            optionRefsForCurrent={optionRefsForCurrent}
-                            disabled={false}
-                            isKeyboardMode={true}
-                            currentSubject={test.subject}
-                            onZoom={setFullscreenImage}
-                            onSwipe={handleSwipe}
-                            score={{correct:0, total:0}}
-                        />
-                    </div>
-
-                    <div className="actionButtons spaced">
-                        <button 
-                            className="navButton" 
-                            onClick={() => moveToQuestion(currentIndex - 1)} 
-                            disabled={currentIndex === 0}
-                        >
-                            Předchozí
-                        </button>
-
-                        {currentIndex < questionSet.length - 1 ? (
-                            <button 
-                                className="navButton" 
-                                onClick={() => moveToQuestion(currentIndex + 1)}
-                            >
-                                Další
-                            </button>
-                        ) : (
-                            <button 
-                                className="navButton primary" 
-                                onClick={() => setShowConfirmSubmit(true)}
-                            >
-                                Odevzdat test
-                            </button>
-                        )}
-                    </div>
-
-                    <div className="navigatorPlaceholder">
-                        <Navigator 
-                            questionSet={questionSet} 
-                            currentIndex={currentIndex} 
-                            setCurrentIndex={moveToQuestion} 
-                            mode="real_test" 
-                            maxSeenIndex={questionSet.length}
-                        />
-                        <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center" }}>
-                            <button 
-                                className="navButton primary" 
-                                style={{ padding: "10px 30px", fontSize: "0.95rem", minWidth: "150px" }} 
-                                onClick={() => setShowConfirmSubmit(true)}
-                            >
-                                Odevzdat test
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* HiddenPreloader byl odstraněn, protože u Base64 obrázků v DB již není potřeba */}
+            {renderContent()}
             <div className="footer"></div>
         </div>
     );
