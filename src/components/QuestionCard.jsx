@@ -9,6 +9,7 @@ export function QuestionCard({
   mode,
   showResult,
   selectedAnswer,
+  visualSelection,
   onSelect,
   disabled,
   isKeyboardMode,

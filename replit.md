@@ -103,7 +103,27 @@ Full keyboard navigation for accessibility and power users:
 - **Enter**: Confirm actions
 - **Escape**: Cancel dialogs / clear results
 
-## Recent Improvements (Session 2)
+## Recent Improvements (Session 3)
+
+### Answer Shuffling System
+- Answer options shuffle dynamically when questions display
+- Fisher-Yates algorithm ensures fair randomization
+- Mock/real tests: answers shuffle once at test start, remain fixed throughout
+- Smart learning mode: re-shuffles answers when same question reappears
+- Answers remain stable during single question interaction
+
+### Keyboard Navigation Improvements
+- Visual selection tracking (`visualSelection` state) syncs with shuffled answers
+- `shuffledMapping` array communicates between QuestionCard and App
+- W/S and arrow keys navigate through visual positions correctly
+- State properly resets when returning to menu
+
+### Bug Fixes
+- Fixed duplicate "border" key warning in ScheduledTestsList.jsx
+- Added `visualSelection` prop to QuestionCard component
+- Fixed state cleanup when exiting modes (visualSelection, shuffledMapping reset)
+
+## Previous Improvements (Session 2)
 
 ### Design Enhancements
 - Complete visual redesign with modern gradient theme

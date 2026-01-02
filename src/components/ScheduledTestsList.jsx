@@ -251,7 +251,9 @@ export function ScheduledTestsList({
                                                 style={{
                                                     padding: '1rem',
                                                     borderRadius: '12px',
-                                                    border: 'none',
+                                                    border: isCompleted 
+                                                        ? '2px solid var(--color-success)' 
+                                                        : (isOpen ? 'none' : '2px solid var(--color-card-border)'),
                                                     fontSize: '1rem',
                                                     fontWeight: '700',
                                                     cursor: (!isOpen || isCompleted) ? 'not-allowed' : 'pointer',
@@ -261,9 +263,6 @@ export function ScheduledTestsList({
                                                     color: isCompleted 
                                                         ? 'var(--color-success)' 
                                                         : (isOpen ? '#ffffff' : 'var(--color-text-neutral)'),
-                                                    border: isCompleted 
-                                                        ? '2px solid var(--color-success)' 
-                                                        : (isOpen ? 'none' : '2px solid var(--color-card-border)'),
                                                     boxShadow: isOpen && !isCompleted ? '0 4px 15px rgba(59, 130, 246, 0.4)' : 'none',
                                                     opacity: (!isOpen && !isCompleted) ? 0.6 : 1,
                                                     display: 'flex',
