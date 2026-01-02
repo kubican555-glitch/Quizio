@@ -419,6 +419,7 @@ export default function App() {
 
         setQuestionSet(prepared); 
         setActiveTest(test); 
+        setReadyQuestionId(null);
         setMode("real_test"); 
     };
 

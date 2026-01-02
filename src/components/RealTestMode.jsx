@@ -26,6 +26,7 @@ export function RealTestMode({
     // --- STATE ---
     const [questionSet, setQuestionSet] = useState(initialQuestions);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [readyQuestionId, setReadyQuestionId] = useState(null);
     const [timeLeft, setTimeLeft] = useState(test.time_limit * 60);
     const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,6 +56,8 @@ export function RealTestMode({
     }, [timeLeft]);
 
     const currentQuestion = questionSet[currentIndex];
+    const currentQuestionId = currentQuestion?.id || currentQuestion?.number || currentIndex;
+    const isContentReady = readyQuestionId === currentQuestionId;
     const selectedAnswer = currentQuestion?.userAnswer !== undefined ? currentQuestion.userAnswer : null;
 
     // Globální tracking pro QuestionCard swipe logiku
@@ -191,6 +194,7 @@ export function RealTestMode({
 
     const moveToQuestion = (index) => {
         if (index < 0 || index >= questionSet.length) return;
+        setReadyQuestionId(null);
         setDirection(index < currentIndex ? 'left' : 'right');
         setCurrentIndex(index);
     };
@@ -349,7 +353,7 @@ export function RealTestMode({
                     <div className="progressText">Otázka {currentIndex + 1} / {questionSet.length}</div>
 
                     <div className="card" ref={cardRef}>
-                        <div key={currentIndex} className={direction === 'left' ? "slide-in-left" : "slide-in-right"} style={{width: '100%'}}>
+                        <div key={currentIndex} className={direction === 'left' ? "slide-in-left" : "slide-in-right"} style={{width: '100%', visibility: isContentReady ? 'visible' : 'hidden'}}>
                             <QuestionCard
                                 currentQuestion={currentQuestion}
                                 mode="real_test" 
@@ -363,8 +367,15 @@ export function RealTestMode({
                                 onZoom={setFullscreenImage}
                                 onSwipe={handleSwipe}
                                 score={{correct:0, total:0}}
+                                onReady={() => setReadyQuestionId(currentQuestionId)}
                             />
                         </div>
+
+                        {!isContentReady && (
+                            <div className="card-loading-overlay">
+                                <div className="loadingSpinner small"></div>
+                            </div>
+                        )}
 
                         <div className="actionButtons spaced">
                             <button 
