@@ -86,6 +86,8 @@ export function RealTestMode({
         }));
 
         try {
+            const timeSpent = (test.time_limit * 60) - Math.max(0, timeLeft);
+            
             await supabase.from('test_results').insert([{
                 test_id: test.id,
                 student_name: user,
@@ -93,7 +95,7 @@ export function RealTestMode({
                 score_correct: correctCount,
                 score_total: totalCount,
                 answers: answersToSave,
-                time_spent: (test.time_limit * 60) - timeLeft,
+                time_spent: timeSpent,
                 cheat_score: 0 
             }]);
 
@@ -101,16 +103,25 @@ export function RealTestMode({
 
             setFinalResult({
                 score: { correct: correctCount, total: totalCount },
-                timeSpent: (test.time_limit * 60) - timeLeft,
-                timeLeft: timeLeft
+                timeSpent: timeSpent,
+                timeLeft: Math.max(0, timeLeft)
             });
 
             if (force) alert("Čas vypršel! Test byl automaticky odeslán.");
 
         } catch (error) {
             console.error("Chyba při ukládání:", error);
-            alert("Chyba při ukládání výsledků. Zkuste to prosím znovu.");
-            setIsSubmitting(false);
+            if (!force) {
+                alert("Chyba při ukládání výsledků. Zkuste to prosím znovu.");
+                setIsSubmitting(false);
+            } else {
+                // In case of force submit and error, we still show the result screen to the user
+                setFinalResult({
+                    score: { correct: correctCount, total: totalCount },
+                    timeSpent: (test.time_limit * 60) - Math.max(0, timeLeft),
+                    timeLeft: 0
+                });
+            }
         }
     };
 
