@@ -738,7 +738,7 @@ export default function App() {
 
     if (!mode) {
         if (!subject) return (
-            <div className="container fadeIn" style={{ height: "var(--vh)", overflow: "hidden", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'space-between', paddingBottom: "1.5rem" }}>
+            <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: 'space-between', paddingBottom: "1.5rem" }}>
                 {!isLoadingQuestions && (
                     <div className="top-navbar" style={{ width: "100%" }}>
                         <div className="navbar-group">
