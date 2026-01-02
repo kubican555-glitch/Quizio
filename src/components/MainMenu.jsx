@@ -111,7 +111,32 @@ export const MainMenu = ({
                     ) : (<span style={{ opacity: 0.6 }}>✓</span>)}
                 </button>
 
-                <button className={`navButton primary-style ${menuSelection % 8 === 7 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenHistory} style={{ marginTop: '1rem', width: '100%', padding: '1rem', fontSize: '1rem', display: 'flex', justifyContent: 'center', border: menuSelection % 8 === 7 && isKeyboardMode ? '2px solid var(--color-primary)' : '1px solid transparent', boxShadow: menuSelection % 8 === 7 && isKeyboardMode ? '0 0 15px var(--color-primary)' : 'none' }}>Historie výsledků 📊</button>
+                <div 
+                    className={`history-footer-btn ${menuSelection % 8 === 7 && isKeyboardMode ? "selected" : ""}`} 
+                    onClick={onOpenHistory} 
+                    style={{ 
+                        marginTop: '1.5rem', 
+                        padding: '0.8rem 1.2rem', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '8px',
+                        cursor: 'pointer',
+                        borderRadius: '12px',
+                        background: 'rgba(255, 255, 255, 0.03)',
+                        border: menuSelection % 8 === 7 && isKeyboardMode ? '1px solid var(--color-primary)' : '1px solid rgba(255, 255, 255, 0.1)',
+                        transition: 'all 0.2s ease',
+                        color: 'var(--color-text-secondary)',
+                        fontSize: '0.9rem',
+                        fontWeight: '500',
+                        width: 'fit-content',
+                        margin: '1.5rem auto 0 auto',
+                        boxShadow: menuSelection % 8 === 7 && isKeyboardMode ? '0 0 15px rgba(59, 130, 246, 0.2)' : 'none'
+                    }}
+                >
+                    <span>Historie výsledků</span>
+                    <span style={{ opacity: 0.8 }}>📊</span>
+                </div>
                 <div className="keyboard-hints" style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6", flexShrink: 0, marginBottom: "1rem" }}>
                     Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />Mezerník – potvrzení • Enter – potvrzení / další • Esc – zrušit
                 </div>
