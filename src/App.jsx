@@ -544,13 +544,13 @@ export default function App() {
     };
     const tryReturnToMenu = () => { 
         if (mode === "test_practice") {
-            setMode(null);
+            setMode("scheduled"); // Set mode to scheduled tests view
             setCombo(0);
             setShowResult(false);
             setSelectedAnswer(null);
             setVisualSelection(null);
             setShuffledMapping([]);
-            setMenuSelection(1); // Set selection to Scheduled Tests
+            setMenuSelection(1);
             return;
         }
         if (mode === "mock" && !finished) {
@@ -568,7 +568,7 @@ export default function App() {
     const confirmExit = () => { 
         setShowConfirmExit(false); 
         const wasPractice = mode === "test_practice";
-        setMode(null); 
+        setMode(wasPractice ? "scheduled" : null); 
         setCombo(0); 
         setShowResult(false);
         setSelectedAnswer(null);
