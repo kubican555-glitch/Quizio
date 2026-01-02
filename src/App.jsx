@@ -770,31 +770,31 @@ export default function App() {
                                 const imageUrl = q.image_base64 || (q.id ? getCachedImage(q.id) : null) || getImageUrl(subject, q.number) || (q.image && q.image.length > 5 ? q.image : null);
                                 return (
                                     <div key={q.number} className="reviewCard" style={{ position: 'relative' }}>
-                                        <button 
-                                            className="reportButton" 
-                                            onClick={() => handleReportClick(q.number)}
-                                            style={{ 
-                                                position: 'absolute', 
-                                                top: '12px', 
-                                                right: '12px', 
-                                                background: 'rgba(255,255,255,0.05)', 
-                                                border: '1px solid var(--color-card-border)', 
-                                                borderRadius: '8px', 
-                                                padding: '4px 8px', 
-                                                cursor: 'pointer',
-                                                fontSize: '0.9rem',
-                                                color: 'var(--color-text-secondary)',
-                                                transition: 'all 0.2s ease',
-                                                zIndex: 5,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}
-                                            title="Nahlásit chybu v této otázce"
-                                        >
-                                            🚩
-                                        </button>
-                                        <div className="reviewHeader"><strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} /></div>
+                                        <div className="reviewHeader">
+                                            <strong>#{q.number}.</strong> <HighlightedText text={q.question} highlightRegex={highlightRegex} />
+                                            <button 
+                                                className="reportButton" 
+                                                onClick={() => handleReportClick(q.number)}
+                                                style={{ 
+                                                    background: 'none', 
+                                                    border: 'none', 
+                                                    cursor: 'pointer',
+                                                    fontSize: '1.2rem',
+                                                    padding: '4px',
+                                                    marginLeft: 'auto',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    opacity: 0.6,
+                                                    transition: 'opacity 0.2s'
+                                                }}
+                                                title="Nahlásit chybu v této otázce"
+                                                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                                                onMouseOut={(e) => e.currentTarget.style.opacity = 0.6}
+                                            >
+                                                🚩
+                                            </button>
+                                        </div>
                                         <ReviewImage q={q} subject={subject} setFullscreenImage={setFullscreenImage} />
                                         <div style={{ marginTop: "1rem", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                                             {q.options.map((opt, idx) => (
