@@ -212,8 +212,18 @@ export function QuestionCard({
       setIsDragging(false);
 
       // Pokud byl swipe dostatečně silný, spusť animaci odletu
+      const isFlashcardOrSmart = mode === 'random' || mode === 'smart_learning';
+      
       if (absX > absY && absX > flyAwayThreshold && onSwipe) {
         const direction = distanceX > 0 ? 'right' : 'left';
+        
+        // Pokud je to flashcards/smart, povolíme pouze swipe doleva pro další otázku
+        if (isFlashcardOrSmart && direction === 'right') {
+          setSwipeOffset(0);
+          setSwipeDirection(null);
+          return;
+        }
+
         setIsFlying(true);
         setSwipeDirection(direction);
         
