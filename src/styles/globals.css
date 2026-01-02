@@ -506,7 +506,8 @@ body.light-mode .backArrowBtn { color: #0f172a; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
-  width: 100%; min-height: 100%;
+  width: 100%; 
+  height: 100%;
   background: var(--color-bg-start);
   background-attachment: fixed; background-size: cover;
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
@@ -514,6 +515,14 @@ html, body {
   transition: background-color 0.4s ease, color 0.4s ease;
   user-select: none; -webkit-user-select: none; cursor: default;
   scrollbar-gutter: stable;
+  
+  /* OPRAVA DOUBLE SCROLLING - scroll pouze uvnitř .container */
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
   /* --- OPRAVY PRO MOBILNÍ DOTYKOVÉ CHOVÁNÍ --- */
   -webkit-touch-callout: none;      /* Zabrání vyvolání kontextového menu na iOS (lupa) */
@@ -540,10 +549,11 @@ body.light-mode {
 
 #root { 
     width: 100%; 
-    min-height: 100vh; 
+    height: 100%;
     display: flex; 
     flex-direction: column; 
     padding-top: 0; 
+    overflow: hidden;
     background: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
 }
 
