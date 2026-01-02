@@ -40,6 +40,12 @@ export function RealTestMode({
     const currentQuestion = questionSet[currentIndex];
     const selectedAnswer = currentQuestion?.userAnswer !== undefined ? currentQuestion.userAnswer : null;
 
+    // Globální tracking pro QuestionCard swipe logiku
+    useEffect(() => {
+        window.currentTestIndex = currentIndex;
+        window.totalTestQuestions = questionSet.length;
+    }, [currentIndex, questionSet.length]);
+
     // --- ČASOVAČ ---
     useEffect(() => {
         if (finalResult) return; 
@@ -170,10 +176,14 @@ export function RealTestMode({
     const handleSwipe = (dir) => {
         if (finalResult || showConfirmSubmit || isSubmitting) return;
         
-        if (dir === "left" && currentIndex < questionSet.length - 1) {
-            moveToQuestion(currentIndex + 1);
-        } else if (dir === "right" && currentIndex > 0) {
-            moveToQuestion(currentIndex - 1);
+        if (dir === "left") {
+            if (currentIndex < questionSet.length - 1) {
+                moveToQuestion(currentIndex + 1);
+            }
+        } else if (dir === "right") {
+            if (currentIndex > 0) {
+                moveToQuestion(currentIndex - 1);
+            }
         }
     };
 

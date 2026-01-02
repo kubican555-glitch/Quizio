@@ -240,6 +240,18 @@ export function QuestionCard({
           return;
         }
 
+        // NOVÉ: Zákaz swipu na začátku/konci v testu
+        if (mode === 'real_test' || mode === 'mock') {
+            const isFirst = window.currentTestIndex === 0;
+            const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
+            
+            if ((direction === 'right' && isFirst) || (direction === 'left' && isLast)) {
+                setSwipeOffset(0);
+                setSwipeDirection(null);
+                return;
+            }
+        }
+
         setIsFlying(true);
         setSwipeDirection(direction);
         const flyDistance = direction === 'right' ? window.innerWidth + 500 : -window.innerWidth - 500;
