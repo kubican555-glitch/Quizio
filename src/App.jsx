@@ -385,6 +385,8 @@ export default function App() {
             return;
         }
         setSubject(subj.toUpperCase()); 
+        setMenuSelection(0);
+        setMode(null);
     };
     const handleStartMode = (startFn, modeName) => { if (modeName === "smart") { setShowSmartSettings(true); return; } startFn(); };
 
@@ -550,6 +552,7 @@ export default function App() {
             setSelectedAnswer(null);
             setVisualSelection(null);
             setShuffledMapping([]);
+            setMenuSelection(0);
         } 
     };
     const confirmExit = () => { 
@@ -560,6 +563,7 @@ export default function App() {
         setSelectedAnswer(null);
         setVisualSelection(null);
         setShuffledMapping([]);
+        setMenuSelection(0);
     };
     const handleFileUpload = (questions) => {
         if (!questions) return;
@@ -617,6 +621,7 @@ export default function App() {
             if (finished || mode === "no_mistakes") { 
                 if (["Backspace", "Enter", "ArrowLeft", "a", "A", "Escape"].includes(e.key)) {
                     setMode(null);
+                    setMenuSelection(0);
                 }
                 return; 
             }
