@@ -273,15 +273,17 @@ export function QuestionCard({
   return (
     <div
       ref={cardContainerRef}
-      style={swipeStyles}
-      className={`questionCardContent fade-in-content ${swipeDirection ? `swiping-${swipeDirection}` : ''}`}
+      style={{
+        ...swipeStyles,
+        visibility: isReady ? 'visible' : 'hidden'
+      }}
+      className={`questionCardContent ${swipeDirection ? `swiping-${swipeDirection}` : ''}`}
     >
       <style>{`
-        .fade-in-content { animation: fadeInQuick 0.3s ease-out; }
-        @keyframes fadeInQuick { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        /* Odstranění barevného glow při swipování, které způsobovalo highlight efekt */
-        .swiping-right { }
-        .swiping-left { }
+        /* Odstranění vnitřní animace fadeInQuick, která se tloukla s hlavní animací přechodu */
+        .questionCardContent {
+          contain: content;
+        }
         
         /* Zajištění, že žádný prvek uvnitř karty nereaguje na tap-highlight */
         .questionCardContent * {

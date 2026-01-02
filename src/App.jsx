@@ -507,17 +507,10 @@ export default function App() {
     const moveToQuestion = (newIdx) => {
         const b = Math.max(0, Math.min(newIdx, questionSet.length - 1));
         if (b < currentIndex) setDirection("left"); else setDirection("right");
-        setCurrentIndex(b); setSelectedAnswer(null);
         
-        // Mobilní zarovnání na začátek otázky
-        if (window.innerWidth <= 768) {
-            setTimeout(() => {
-                const container = document.querySelector('.container');
-                if (container) {
-                    container.scrollTo({ top: 0, behavior: 'instant' });
-                }
-            }, 50);
-        }
+        // Disable instant scrolling on transition to prevent "dosouvání"
+        // Only scroll if strictly necessary after content is stable
+        setCurrentIndex(b); setSelectedAnswer(null);
     };
 
     const handleSwipe = (dir) => {
