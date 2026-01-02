@@ -9,6 +9,7 @@ import { UserBadgeDisplay } from './UserBadgeDisplay';
 import { ThemeToggle } from './ThemeToggle';
 import { formatTime } from '../utils/formatting';
 import { ResultScreen } from './ResultScreen'; 
+import HiddenPreloader from './HiddenPreloader'; 
 
 export function RealTestMode({ 
     test, 
@@ -38,6 +39,9 @@ export function RealTestMode({
     const optionRefsForCurrent = useRef({});
 
     const currentQuestion = questionSet[currentIndex];
+    // Zjistíme následující otázku pro preloader
+    const nextQuestion = questionSet[currentIndex + 1];
+
     const selectedAnswer = currentQuestion?.userAnswer !== undefined ? currentQuestion.userAnswer : null;
 
     // --- ČASOVAČ ---
@@ -158,7 +162,7 @@ export function RealTestMode({
 
     const handleSwipe = (dir) => {
         if (finalResult || showConfirmSubmit || isSubmitting) return;
-        
+
         if (dir === "left") {
             moveToQuestion(currentIndex + 1);
         } else if (dir === "right") {
@@ -192,6 +196,11 @@ export function RealTestMode({
     return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
             <CustomImageModal src={fullscreenImage} onClose={() => setFullscreenImage(null)} />
+
+            {/* --- PRELOADER --- */}
+            {/* Tajně načítá obrázek pro následující otázku, aby při přechodu neproblikával */}
+            {/* OPRAVA: Přidán props 'subject', který getImageUrl potřebuje */}
+            {nextQuestion && <HiddenPreloader question={nextQuestion} subject={test.subject} />}
 
             {showConfirmSubmit && (
                 <ConfirmModal 
@@ -294,7 +303,6 @@ export function RealTestMode({
                 </div>
             </div>
 
-            {/* HiddenPreloader byl odstraněn, protože u Base64 obrázků v DB již není potřeba */}
             <div className="footer"></div>
         </div>
     );

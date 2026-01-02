@@ -1,37 +1,67 @@
-import React, { useEffect } from 'react';
-import { fetchQuestionImage } from '../utils/dataManager';
+import React, { useEffect, useState } from 'react';
+import { getImageUrl } from '../utils/images.js';
+import { fetchQuestionImage } from '../utils/dataManager.js';
 
-export const HiddenPreloader = ({ questionSet, currentIndex, subject, mode }) => {
+/**
+ * Komponenta pro přednačítání obrázků.
+ * Podporuje jak statické obrázky (přes getImageUrl), tak databázové (přes fetchQuestionImage).
+ */
+const HiddenPreloader = ({ question, subject }) => {
+  const [src, setSrc] = useState(null);
 
   useEffect(() => {
-    if (!questionSet || questionSet.length === 0) return;
+    if (!question) return;
 
-    const preloadImages = async () => {
-      // ZVÝŠENO: Přednačítáme více dopředu pro plynulejší průchod
-      const PRELOAD_COUNT = 7; 
+    // 1. Pokud má otázka Base64 obrázek přímo v sobě
+    if (question.image_base64) {
+      setSrc(question.image_base64);
+      return;
+    }
 
-      for (let i = 1; i <= PRELOAD_COUNT; i++) {
-        const nextIndex = currentIndex + i;
+    let imageFound = false;
 
-        if (nextIndex < questionSet.length) {
-          const nextQuestion = questionSet[nextIndex];
-
-          if (nextQuestion && nextQuestion.id) {
-            // Paralelní stahování bez blokování
-            fetchQuestionImage(nextQuestion.id).catch(() => {});
-          }
-        }
+    // 2. Zkusíme statickou URL (pro starší sady otázek)
+    // getImageUrl obvykle vyžaduje objekt subject a číslo otázky
+    if (subject && question.number) {
+      const staticUrl = getImageUrl(subject, question.number);
+      if (staticUrl) {
+        setSrc(staticUrl);
+        imageFound = true;
       }
-    };
+    }
 
-    // ZKRÁCENO: Téměř okamžitý start přednačítání
-    const timer = setTimeout(() => {
-      preloadImages();
-    }, 100);
+    // 3. Pokud nemáme statický, nebo chceme jistotu pro DB obrázky,
+    // zavoláme fetchQuestionImage. I když se `src` nastaví až po fetchi,
+    // hlavní je, že se data dostanou do cache prohlížeče/aplikace.
+    if (!imageFound && question.id) {
+      fetchQuestionImage(question.id).then((imgData) => {
+        if (imgData) {
+          setSrc(imgData);
+        }
+      }).catch(() => {
+        // Chyby při preloadingu ignorujeme
+      });
+    }
 
-    return () => clearTimeout(timer);
+  }, [question, subject]);
 
-  }, [currentIndex, questionSet]);
+  if (!src) return null;
 
-  return null;
+  return (
+    <img
+      src={src}
+      alt="preload"
+      style={{
+        display: 'none',
+        width: 0,
+        height: 0,
+        opacity: 0,
+        position: 'absolute',
+        pointerEvents: 'none'
+      }}
+      aria-hidden="true"
+    />
+  );
 };
+
+export default HiddenPreloader;
