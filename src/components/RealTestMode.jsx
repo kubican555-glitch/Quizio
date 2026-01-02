@@ -97,16 +97,20 @@ export function RealTestMode({
         setIsSubmitting(true);
         setShowConfirmSubmit(false);
 
-        const correctCount = questionSet.filter(q => q.userAnswer === q.correctIndex).length;
-        const totalCount = questionSet.length;
-        const answersToSave = questionSet.map(q => ({
+        // Získání aktuálních dat z questionSet a timeLeft
+        const currentQuestions = questionSet;
+        const currentTimeLeft = timeLeft;
+
+        const correctCount = currentQuestions.filter(q => q.userAnswer === q.correctIndex).length;
+        const totalCount = currentQuestions.length;
+        const answersToSave = currentQuestions.map(q => ({
             qNum: q.number,
             user: q.userAnswer,
             correct: q.correctIndex
         }));
 
         try {
-            const timeSpent = (test.time_limit * 60) - Math.max(0, timeLeft);
+            const timeSpent = (test.time_limit * 60) - Math.max(0, currentTimeLeft);
             
             await supabase.from('test_results').insert([{
                 test_id: test.id,
@@ -124,7 +128,7 @@ export function RealTestMode({
             setFinalResult({
                 score: { correct: correctCount, total: totalCount },
                 timeSpent: timeSpent,
-                timeLeft: Math.max(0, timeLeft)
+                timeLeft: Math.max(0, currentTimeLeft)
             });
 
             if (force) {
@@ -141,7 +145,7 @@ export function RealTestMode({
                 // In case of force submit and error, we still show the result screen to the user
                 setFinalResult({
                     score: { correct: correctCount, total: totalCount },
-                    timeSpent: (test.time_limit * 60) - Math.max(0, timeLeft),
+                    timeSpent: (test.time_limit * 60) - Math.max(0, currentTimeLeft),
                     timeLeft: 0
                 });
             }
