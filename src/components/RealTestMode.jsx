@@ -92,7 +92,7 @@ export function RealTestMode({
     };
 
     const submitTest = async (force = false) => {
-        if (isSubmittingRef.current || finalResult) return;
+        if (isSubmittingRef.current || (finalResult && !force)) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
         setShowConfirmSubmit(false);
