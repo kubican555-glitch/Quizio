@@ -38,6 +38,17 @@ export function RealTestMode({
     // Refs
     const cardRef = useRef(null);
     const optionRefsForCurrent = useRef({});
+    const questionSetRef = useRef(questionSet);
+    const timeLeftRef = useRef(timeLeft);
+
+    // Udržování aktuálních hodnot v refs
+    useEffect(() => {
+        questionSetRef.current = questionSet;
+    }, [questionSet]);
+    
+    useEffect(() => {
+        timeLeftRef.current = timeLeft;
+    }, [timeLeft]);
 
     const currentQuestion = questionSet[currentIndex];
     const selectedAnswer = currentQuestion?.userAnswer !== undefined ? currentQuestion.userAnswer : null;
@@ -54,10 +65,63 @@ export function RealTestMode({
         };
     }, [currentIndex, questionSet.length]);
 
-    const submitTestRef = useRef(null);
-    useEffect(() => {
-        submitTestRef.current = submitTest;
-    }, [questionSet, timeLeft]);
+    // Ref pro funkci vypršení času (aby timer měl vždy aktuální verzi)
+    const handleTimeExpiredRef = useRef(null);
+    
+    // Funkce volaná při vypršení času
+    handleTimeExpiredRef.current = async () => {
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
+        setIsSubmitting(true);
+        setShowConfirmSubmit(false);
+
+        // Použití refs pro aktuální hodnoty
+        const currentQuestions = questionSetRef.current;
+
+        const correctCount = currentQuestions.filter(q => q.userAnswer === q.correctIndex).length;
+        const totalCount = currentQuestions.length;
+        const answersToSave = currentQuestions.map(q => ({
+            qNum: q.number,
+            user: q.userAnswer,
+            correct: q.correctIndex
+        }));
+
+        try {
+            const timeSpent = test.time_limit * 60; // Celý čas byl využit
+            
+            await supabase.from('test_results').insert([{
+                test_id: test.id,
+                student_name: user,
+                user_id: userId,
+                score_correct: correctCount,
+                score_total: totalCount,
+                answers: answersToSave,
+                time_spent: timeSpent,
+                cheat_score: 0 
+            }]);
+
+            if (onTestCompleted) onTestCompleted(test.id);
+
+            setFinalResult({
+                score: { correct: correctCount, total: totalCount },
+                timeSpent: timeSpent,
+                timeLeft: 0
+            });
+
+            setShowAutoSubmitModal(true);
+
+        } catch (error) {
+            console.error("Chyba při ukládání:", error);
+            isSubmittingRef.current = false;
+            // I při chybě zobrazíme výsledky
+            setFinalResult({
+                score: { correct: correctCount, total: totalCount },
+                timeSpent: test.time_limit * 60,
+                timeLeft: 0
+            });
+            setShowAutoSubmitModal(true);
+        }
+    };
 
     // --- ČASOVAČ ---
     useEffect(() => {
@@ -66,7 +130,10 @@ export function RealTestMode({
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    if (submitTestRef.current) submitTestRef.current(true); 
+                    // Volání přes ref pro aktuální verzi funkce
+                    if (handleTimeExpiredRef.current) {
+                        handleTimeExpiredRef.current();
+                    }
                     return 0;
                 }
                 return prev - 1;
@@ -91,13 +158,13 @@ export function RealTestMode({
         setCurrentIndex(index);
     };
 
-    const submitTest = async (force = false) => {
+    // Ruční odeslání testu
+    const submitTest = async () => {
         if (isSubmittingRef.current) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
         setShowConfirmSubmit(false);
 
-        // Získání aktuálních dat z questionSet a timeLeft
         const currentQuestions = questionSet;
         const currentTimeLeft = timeLeft;
 
@@ -131,24 +198,11 @@ export function RealTestMode({
                 timeLeft: Math.max(0, currentTimeLeft)
             });
 
-            if (force) {
-                setShowAutoSubmitModal(true);
-            }
-
         } catch (error) {
             console.error("Chyba při ukládání:", error);
             isSubmittingRef.current = false;
-            if (!force) {
-                alert("Chyba při ukládání výsledků. Zkuste to prosím znovu.");
-                setIsSubmitting(false);
-            } else {
-                // In case of force submit and error, we still show the result screen to the user
-                setFinalResult({
-                    score: { correct: correctCount, total: totalCount },
-                    timeSpent: (test.time_limit * 60) - Math.max(0, currentTimeLeft),
-                    timeLeft: 0
-                });
-            }
+            alert("Chyba při ukládání výsledků. Zkuste to prosím znovu.");
+            setIsSubmitting(false);
         }
     };
 
@@ -240,7 +294,7 @@ export function RealTestMode({
                     title="Odevzdat test?" 
                     message="Opravdu chcete test ukončit a odevzdat? Tuto akci nelze vrátit."
                     onCancel={() => setShowConfirmSubmit(false)} 
-                    onConfirm={() => submitTest(false)} 
+                    onConfirm={() => submitTest()} 
                     confirmText="ODEVZDAT" 
                     danger={true} 
                 />
