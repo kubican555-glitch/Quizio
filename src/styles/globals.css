@@ -574,20 +574,20 @@ body.light-mode #root {
   padding-left: max(1rem, env(safe-area-inset-left));
   padding-right: max(1rem, env(safe-area-inset-right));
   padding-top: max(1rem, env(safe-area-inset-top));
-  padding-bottom: env(safe-area-inset-bottom); /* Sníženo pro využití místa dole */
+  padding-bottom: 0 !important; 
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   scrollbar-width: none; 
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
-.container::-webkit-scrollbar { display: none; }
 
 .quizContentWrapper { 
   max-width: 960px; 
   width: 100%; 
   margin: 0 auto; 
   padding: 0 1rem; 
+  padding-bottom: max(5rem, calc(env(safe-area-inset-bottom) + 3rem)) !important;
   display: flex;
   flex-direction: column;
 }
