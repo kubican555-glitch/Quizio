@@ -82,7 +82,7 @@ export default function App() {
     const [theme, setTheme] = useState(() => localStorage.getItem("quizio_theme") || "dark");
     const [activeQuestionsCache, setActiveQuestionsCache] = useState([]);
     const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
-    const [menuSelection, setMenuSelection] = useState(0);
+    const [menuSelection, setMenuSelection] = useState(-1);
     const [mode, setMode] = useState(null);
 
     const [showSmartSettings, setShowSmartSettings] = useState(false);
