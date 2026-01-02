@@ -46,9 +46,10 @@ export function QuestionCard({
             }));
             
             const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
+            let finalShuffled = [];
             
             if (isMockOrRealTest) {
-                setShuffledOptions(optionsWithMeta);
+                finalShuffled = optionsWithMeta;
             } else {
                 // Fisher-Yates shuffle
                 const shuffled = [...optionsWithMeta];
@@ -56,7 +57,13 @@ export function QuestionCard({
                     const j = Math.floor(Math.random() * (i + 1));
                     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
                 }
-                setShuffledOptions(shuffled);
+                finalShuffled = shuffled;
+            }
+            setShuffledOptions(finalShuffled);
+            
+            // Pass the shuffled mapping back to parent for keyboard sync
+            if (window.setShuffledMappingForKeyboard) {
+                window.setShuffledMappingForKeyboard(finalShuffled.map(o => o.originalIndex));
             }
             
             // Re-order option refs if they exist
@@ -247,7 +254,7 @@ export function QuestionCard({
 
       <div className="options">
         {shuffledOptions.map((optObj, index) => {
-          const isSelected = selectedAnswer === optObj.originalIndex;
+          const isSelected = selectedAnswer === optObj.originalIndex || (visualSelection === index && !showResult);
           const isCorrect = optObj.isCorrect;
 
           let className = "optionButton";

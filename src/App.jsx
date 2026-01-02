@@ -390,6 +390,17 @@ export default function App() {
 
     const handleReportClick = (questionNumber) => { setQuestionToReport(questionNumber); setReportModalOpen(true); };
 
+    const [visualSelection, setVisualSelection] = useState(null);
+    const [shuffledMapping, setShuffledMapping] = useState([]);
+
+    useEffect(() => {
+        window.setShuffledMappingForKeyboard = (mapping) => {
+            setShuffledMapping(mapping);
+            setVisualSelection(null);
+        };
+        return () => delete window.setShuffledMappingForKeyboard;
+    }, []);
+
     const handleAnswer = (idx) => {
         if (finished || mode === "review") return;
         setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active");
@@ -400,11 +411,13 @@ export default function App() {
 
     const clickFlashcardAnswer = (idx) => {
         if (finished || showResult) return;
+        if (idx === null) return;
         const currentQ = questionSet[currentIndex];
         const isCorrect = idx === currentQ.correctIndex;
         const newSet = [...questionSet];
         if (newSet[currentIndex]) newSet[currentIndex] = { ...newSet[currentIndex], userAnswer: idx };
         setQuestionSet(newSet); setSelectedAnswer(idx); setShowResult(true); setSessionQuestionsCount(prev => prev + 1);
+        setVisualSelection(null);
 
         if (mode === 'test_practice' && activeTest) {
             const currentStats = testPracticeStats[activeTest.id] || [];
@@ -447,7 +460,14 @@ export default function App() {
         }
     };
     const confirmFlashcardAnswer = () => { if (!finished && !showResult) clickFlashcardAnswer(selectedAnswer !== null ? selectedAnswer : -1); };
-    const selectRandomAnswer = (idx) => { if (!finished && !showResult) { triggerHaptic('light'); setSelectedAnswer(idx); setIsKeyboardMode(true); document.body.classList.add("keyboard-mode-active"); } };
+    const selectRandomAnswer = (idx) => { 
+        if (!finished && !showResult) { 
+            triggerHaptic('light'); 
+            setVisualSelection(idx); 
+            setIsKeyboardMode(true); 
+            document.body.classList.add("keyboard-mode-active"); 
+        } 
+    };
     const clearAnswer = () => { setQuestionSet((prev) => { const c = [...prev]; if (c[currentIndex]) c[currentIndex] = { ...c[currentIndex], userAnswer: undefined }; return c; }); setSelectedAnswer(null); setShowResult(false); };
 
     const moveToQuestion = (newIdx) => {
@@ -584,19 +604,36 @@ export default function App() {
             const k = e.key.toLowerCase();
 
             if (k === "w" || e.key === "ArrowUp") {
-                if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? opts - 1 : (selectedAnswer - 1 + opts) % opts);
+                const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
+                if (isFlashcardInput && !showResult) {
+                    const nextVisual = visualSelection === null ? opts - 1 : (visualSelection - 1 + opts) % opts;
+                    selectRandomAnswer(nextVisual);
+                }
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? opts - 1 : (questionSet[currentIndex].userAnswer - 1 + opts) % opts);
             }
             if (k === "s" || e.key === "ArrowDown") {
-                if (isFlashcardInput && !showResult) selectRandomAnswer(selectedAnswer === null ? 0 : (selectedAnswer + 1) % opts);
+                const isFlashcardInput = isFlashcardStyle(mode) || mode === 'test_practice';
+                if (isFlashcardInput && !showResult) {
+                    const nextVisual = visualSelection === null ? 0 : (visualSelection + 1) % opts;
+                    selectRandomAnswer(nextVisual);
+                }
                 else if (!isFlashcardInput) handleAnswer(questionSet[currentIndex].userAnswer === undefined ? 0 : (questionSet[currentIndex].userAnswer + 1) % opts);
             }
             if (k === "a" || e.key === "ArrowLeft") { if (isFlashcardInput) return; moveToQuestion(currentIndex - 1); }
             if (k === "d" || e.key === "ArrowRight" || e.key === "Enter") {
-                if (isFlashcardInput) { if (showResult) nextFlashcardQuestion(); else confirmFlashcardAnswer(); } else moveToQuestion(currentIndex + 1);
+                if (isFlashcardInput) { 
+                    if (showResult) nextFlashcardQuestion(); 
+                    else {
+                        const finalIdx = visualSelection !== null ? shuffledMapping[visualSelection] : selectedAnswer;
+                        clickFlashcardAnswer(finalIdx);
+                    }
+                } else moveToQuestion(currentIndex + 1);
             }
             if (e.key === " ") {
-                if (isFlashcardInput && !showResult) confirmFlashcardAnswer();
+                if (isFlashcardInput && !showResult) {
+                    const finalIdx = visualSelection !== null ? shuffledMapping[visualSelection] : selectedAnswer;
+                    clickFlashcardAnswer(finalIdx);
+                }
                 else if (!finished && mode === "mock") setShowConfirmSubmit(true); 
             }
             if (e.key === "Backspace") clearAnswer();
@@ -965,7 +1002,7 @@ export default function App() {
                             <div className={`card ${isFlashcardStyle(mode) || mode==='test_practice' ? `stacked-card ${stackLevelClass}` : ""} ${shake ? "shake" : ""}`} ref={cardRef}>
                                 <div key={currentQuestion.id || currentQuestion.number || currentIndex} className={exitDirection ? (exitDirection === 'left' ? "card-exit-left" : "card-exit-right") : ((isFlashcardStyle(mode) || mode==='test_practice') ? "" : (direction === "left" ? "slide-in-left" : "slide-in-right"))} style={{width: '100%'}}>
                                     <QuestionCard
-                                        currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer}
+                                        currentQuestion={currentQuestion} mode={mode} showResult={showResult} selectedAnswer={selectedAnswer} visualSelection={visualSelection}
                                         onSelect={(i) => (isFlashcardStyle(mode) || mode==='test_practice') ? clickFlashcardAnswer(i) : handleAnswer(i)}
                                         optionRefsForCurrent={optionRefsForCurrent} disabled={(isFlashcardStyle(mode) || mode==='test_practice') && showResult}
                                         isKeyboardMode={isKeyboardMode} currentSubject={subject} onZoom={setFullscreenImage} onSwipe={handleSwipe} score={score} onReport={handleReportClick} isExiting={!!exitDirection}
