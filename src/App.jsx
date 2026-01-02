@@ -1066,7 +1066,7 @@ export default function App() {
                 );
             })()}
 
-            <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
+            <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "5rem" }}>
                 {showConfirmSubmit && <ConfirmModal title={mode==='real_test'?"Odevzdat test?":"Odevzdat?"} message={mode==='real_test'?"Po odevzdání už nepůjde odpovědi změnit.":"Opravdu odevzdat?"} onCancel={() => setShowConfirmSubmit(false)} onConfirm={mode==='real_test'?()=>{}:submitTest} confirmText={mode==='real_test'?"ODEVZDAT":"Ano"} danger={mode==='real_test'} />}
                 {showConfirmExit && <ConfirmModal title="Ukončit?" message="Ztracené odpovědi nebudou uloženy." onCancel={() => setShowConfirmExit(false)} onConfirm={confirmExit} confirmText="Ukončit" />}
 
