@@ -93,7 +93,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
         <div className="subjectGrid">
           <button
             ref={(el) => subjectButtonsRef.current[0] = el}
-            className={`subjectButton ${menuSelection === 0 && isKeyboardMode ? "selected" : ""}`}
+            className={`subjectButton ${menuSelection === 0 ? "selected" : ""}`}
             onClick={() => { setIsKeyboardMode(false); onSelectSubject("sps"); }}
           >
             <div className="subjectIcon">📚</div>
@@ -103,7 +103,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
 
           <button
             ref={(el) => subjectButtonsRef.current[1] = el}
-            className={`subjectButton ${menuSelection === 1 && isKeyboardMode ? "selected" : ""}`}
+            className={`subjectButton ${menuSelection === 1 ? "selected" : ""}`}
             onClick={() => { setIsKeyboardMode(false); onSelectSubject("stt"); }}
           >
             <div className="subjectIcon">⚙️</div>
@@ -113,7 +113,7 @@ export function SubjectSelector({ onSelectSubject, onUploadFile, menuSelection =
 
           <button
             ref={(el) => subjectButtonsRef.current[2] = el}
-            className={`subjectButton uploadButton ${menuSelection === 2 && isKeyboardMode ? "selected" : ""}`}
+            className={`subjectButton uploadButton ${menuSelection === 2 ? "selected" : ""}`}
             onClick={() => { setIsKeyboardMode(false); onSelectSubject("CUSTOM"); }}
           >
             <div className="subjectIcon">📊</div>

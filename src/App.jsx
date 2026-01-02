@@ -629,8 +629,19 @@ export default function App() {
             if (!mode) {
                 const k = e.key.toLowerCase(); 
                 
-                // Dynamically calculate available menu items
-                // 0: Mock, 1: Scheduled (if exists), 2: Smart, 3: Random, 4: Mistakes, 5: Review, 6: Teacher (if teacher), 7: History
+                if (!subject) {
+                    // Subject Selection Mode
+                    const subjectCount = 3;
+                    if (k === "w" || k === "arrowup") setMenuSelection((p) => (p - 1 + subjectCount) % subjectCount);
+                    else if (k === "s" || k === "arrowdown") setMenuSelection((p) => (p + 1) % subjectCount);
+                    else if (k === "d" || k === "arrowright" || e.key === "Enter" || e.key === " ") {
+                        const subjects = ["sps", "stt", "CUSTOM"];
+                        handleSelectSubject(subjects[menuSelection]);
+                    }
+                    return;
+                }
+
+                // Main Menu Mode
                 const hasScheduled = scheduledTests.length > 0;
                 const menuMapping = [];
                 menuMapping.push({ id: 'mock', index: 0 });
