@@ -99,20 +99,6 @@ export const HistoryGraph = ({ data = [] }) => {
                             stroke="rgba(255,255,255,0.2)"
                             strokeWidth="0.3"
                         />
-                        {/* Hodnota nad bodem - pouze pokud je málo dat */}
-                        {chartData.length <= 12 && (
-                            <text 
-                                x={p.x} 
-                                y={p.y - 2.5} 
-                                textAnchor="middle" 
-                                fontSize="2.2" 
-                                fontWeight="bold"
-                                fill="currentColor" 
-                                opacity="0.8"
-                            >
-                                {p.val}%
-                            </text>
-                        )}
                     </g>
                 ))}
             </svg>
