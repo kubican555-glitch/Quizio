@@ -95,17 +95,35 @@ export function QuestionCard({
   // 2. NAČÍTÁNÍ OBRÁZKU (Líné načítání na pozadí)
   useEffect(() => {
     if (currentQuestion?.id) {
+        // Resetujeme lazyImage POKUD víme, že nová otázka má jiný ID/obrázek, 
+        // ale ponecháme starý pro plynulejší přechod, pokud se mění jen obsah.
+        // Pro plynulost: Pokud má otázka base64, použijeme ji hned.
+        if (currentQuestion.image_base64) {
+            setLazyImage(currentQuestion.image_base64);
+            return;
+        }
+
+        const cached = getCachedImage(currentQuestion.id);
+        if (cached) {
+            setLazyImage(cached);
+            return;
+        }
+
         const loadImage = async () => {
             try {
                 const img = await fetchQuestionImage(currentQuestion.id);
                 if (img) setLazyImage(img);
+                else setLazyImage(null);
             } catch (err) {
                 console.error("Chyba při načítání obrázku v kartě:", err);
+                setLazyImage(null);
             }
         };
         loadImage();
+    } else {
+        setLazyImage(null);
     }
-  }, [currentQuestion?.id]);
+  }, [currentQuestion?.id, currentQuestion?.number]);
 
   // 3. ZOOM LOGIKA
   useEffect(() => {
@@ -246,6 +264,7 @@ export function QuestionCard({
     opacity: opacity,
     willChange: 'transform, opacity',
     backfaceVisibility: 'hidden',
+    perspective: 1000,
     userSelect: 'none',
     WebkitUserSelect: 'none',
     WebkitTouchCallout: 'none'
