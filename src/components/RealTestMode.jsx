@@ -402,7 +402,23 @@ export function RealTestMode({
                                 mode="real_test" 
                                 maxSeenIndex={questionSet.length}
                             />
-                            <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center" }}>
+                            <div style={{ marginTop: "2rem", width: "100%", display: "flex", justifyContent: "center", gap: "1rem" }}>
+                                <button 
+                                    className="navButton" 
+                                    style={{ padding: "10px 30px", fontSize: "0.95rem", minWidth: "150px" }} 
+                                    onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+                                    disabled={currentIndex === 0 || finalResult !== null}
+                                >
+                                    Předchozí
+                                </button>
+                                <button 
+                                    className="navButton" 
+                                    style={{ padding: "10px 30px", fontSize: "0.95rem", minWidth: "150px" }} 
+                                    onClick={() => setCurrentIndex(prev => Math.min(questionSet.length - 1, prev + 1))}
+                                    disabled={currentIndex === questionSet.length - 1 || finalResult !== null}
+                                >
+                                    Další
+                                </button>
                                 <button 
                                     className="navButton primary" 
                                     style={{ padding: "10px 30px", fontSize: "0.95rem", minWidth: "150px" }} 
