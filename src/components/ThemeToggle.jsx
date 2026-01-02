@@ -6,7 +6,11 @@ export const ThemeToggle = ({ currentTheme, toggle }) => (
         onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            toggle();
+            if (typeof toggle === 'function') {
+                toggle();
+            } else {
+                console.warn("ThemeToggle: toggle prop is not a function");
+            }
         }}
         title={currentTheme === "dark" ? "Přepnout na světlý" : "Přepnout na tmavý"}
         style={{
