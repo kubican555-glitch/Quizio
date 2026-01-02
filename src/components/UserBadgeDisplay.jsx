@@ -12,6 +12,7 @@ export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alw
         if (syncing) {
             setShowCloud(true);
         } else {
+            // Zajistí zobrazení po dobu alespoň 500ms
             timeout = setTimeout(() => setShowCloud(false), 500);
         }
         return () => clearTimeout(timeout);
