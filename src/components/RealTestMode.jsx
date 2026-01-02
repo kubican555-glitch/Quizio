@@ -57,8 +57,24 @@ export function RealTestMode({
 
     const currentQuestion = questionSet[currentIndex];
     const currentQuestionId = currentQuestion?.id || currentQuestion?.number || currentIndex;
-    const isContentReady = readyQuestionId === currentQuestionId;
+    const isContentReady = readyQuestionId === currentQuestionId || !currentQuestion?.image_base64;
     const selectedAnswer = currentQuestion?.userAnswer !== undefined ? currentQuestion.userAnswer : null;
+
+    useEffect(() => {
+        if (!currentQuestion?.image_base64) {
+            setReadyQuestionId(currentQuestionId);
+        }
+    }, [currentQuestionId, currentQuestion?.image_base64]);
+
+    useEffect(() => {
+        // Fallback pro případ, že se onReady nezavolá do 2 sekund
+        const timer = setTimeout(() => {
+            if (readyQuestionId !== currentQuestionId) {
+                setReadyQuestionId(currentQuestionId);
+            }
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [currentQuestionId, readyQuestionId]);
 
     // Globální tracking pro QuestionCard swipe logiku
     useEffect(() => {
