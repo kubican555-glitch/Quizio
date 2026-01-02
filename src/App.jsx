@@ -616,9 +616,11 @@ export default function App() {
             }
             if (finished || mode === "no_mistakes") { if (["Backspace", "Enter", "ArrowLeft"].includes(e.key)) setMode(null); return; }
 
-            if (!mode && !subject) {
-                const k = e.key.toLowerCase(); const modeCount = 8;
+            if (!mode) {
+                const k = e.key.toLowerCase(); 
+                const modeCount = 8;
                 const getNextIndex = (current, dir) => { let next = current; do { next = (next + dir + modeCount) % modeCount; } while (!isTeacher && next === 5); return next; };
+                
                 if (k === "w" || k === "arrowup") setMenuSelection((p) => getNextIndex(p, -1));
                 else if (k === "s" || k === "arrowdown") setMenuSelection((p) => getNextIndex(p, 1));
                 else if (k === "a" || k === "arrowleft") {
