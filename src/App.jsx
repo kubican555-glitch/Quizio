@@ -618,8 +618,39 @@ export default function App() {
 
             if (!mode) {
                 const k = e.key.toLowerCase(); 
+                
+                // Dynamically calculate available menu items
+                // 0: Mock, 1: Scheduled (if exists), 2: Smart, 3: Random, 4: Mistakes, 5: Review, 6: Teacher (if teacher), 7: History
+                const hasScheduled = scheduledTests.length > 0;
+                const menuMapping = [];
+                menuMapping.push({ id: 'mock', index: 0 });
+                if (hasScheduled) menuMapping.push({ id: 'scheduled', index: 1 });
+                menuMapping.push({ id: 'smart', index: 2 });
+                menuMapping.push({ id: 'random', index: 3 });
+                menuMapping.push({ id: 'mistakes', index: 4 });
+                menuMapping.push({ id: 'review', index: 5 });
+                if (isTeacher) menuMapping.push({ id: 'teacher', index: 6 });
+                menuMapping.push({ id: 'history', index: 7 });
+
                 const modeCount = 8;
-                const getNextIndex = (current, dir) => { let next = current; do { next = (next + dir + modeCount) % modeCount; } while (!isTeacher && next === 5); return next; };
+                const getNextIndex = (current, dir) => { 
+                    let next = current; 
+                    let safety = 0;
+                    do { 
+                        next = (next + dir + modeCount) % modeCount; 
+                        safety++;
+                        const isVisible = (next === 0) || // Mock is always visible
+                                        (next === 1 && hasScheduled) || 
+                                        (next === 2) || // Smart always visible
+                                        (next === 3) || // Random always visible
+                                        (next === 4) || // Mistakes always visible
+                                        (next === 5) || // Review always visible
+                                        (next === 6 && isTeacher) || 
+                                        (next === 7); // History always visible
+                        if (isVisible) return next;
+                    } while (safety < 20); 
+                    return next; 
+                };
                 
                 if (k === "w" || k === "arrowup") setMenuSelection((p) => getNextIndex(p, -1));
                 else if (k === "s" || k === "arrowdown") setMenuSelection((p) => getNextIndex(p, 1));
@@ -635,7 +666,7 @@ export default function App() {
                     } else {
                         let selection = menuSelection % modeCount; if (selection < 0) selection += modeCount;
                         if (selection === 0) handleStartMode(startMockTest, "mock");
-                        else if (selection === 1) setMode('scheduled_list');
+                        else if (selection === 1 && hasScheduled) setMode('scheduled_list');
                         else if (selection === 2) handleStartMode(startSmartMode, "smart");
                         else if (selection === 3) handleStartMode(startRandomMode, "random");
                         else if (selection === 4) handleStartMode(startReviewMode, "review");
