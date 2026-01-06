@@ -67,7 +67,7 @@ export function ConfirmModal({
         >
             <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <h3>{title}</h3>
-                <p>{message}</p>
+                <div style={{ marginBottom: '1.5rem' }}>{message}</div>
                 {!hideButtons && (
                     <div
                         className="modalButtons"
@@ -86,8 +86,9 @@ export function ConfirmModal({
                             style={
                                 danger
                                     ? {
-                                          backgroundColor: "var(--error)",
-                                          borderColor: "var(--error)",
+                                          backgroundColor: "#ef4444",
+                                          borderColor: "#ef4444",
+                                          color: "white"
                                       }
                                     : {}
                             }
@@ -102,8 +103,9 @@ export function ConfirmModal({
     );
 }
 
-export function SmartSettingsModal({ onStart, onCancel, totalQuestions }) {
+export function SmartSettingsModal({ onStart, onCancel, totalQuestions, saveLimit = 100 }) {
     const options = [10, 20, 50, 100, 200, "all"];
+
     return createPortal(
         <div
             className="modalOverlay"
@@ -113,34 +115,79 @@ export function SmartSettingsModal({ onStart, onCancel, totalQuestions }) {
             <div
                 className="modal settingsModal"
                 onClick={(e) => e.stopPropagation()}
+                style={{ maxWidth: '500px', width: '95%' }}
             >
                 <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
                     <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>
                         🎓
                     </div>
                     <h3>Nastavení chytrého učení</h3>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+                        Vyber počet otázek pro tento blok.
+                    </p>
                 </div>
-                <div className="smartGrid">
-                    {options.map((opt) => (
-                        <button
-                            key={opt}
-                            className="smartOptionButton"
-                            onClick={() => onStart(opt)}
-                        >
-                            <span
+
+                <div className="smartGrid" style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(2, 1fr)', 
+                    gap: '10px' 
+                }}>
+                    {options.map((opt) => {
+                        // Zjistíme reálný počet otázek pro danou volbu
+                        const count = opt === "all" ? totalQuestions : opt;
+
+                        // Zjistíme, zda překračuje limit pro ukládání
+                        // Pokud je 'all' a celkový počet je malý (např. 50), tak to limit nepřekračuje
+                        // const isOverLimit = (opt === "all" && totalQuestions > saveLimit) || (typeof opt === "number" && opt > saveLimit);
+                        const isOverLimit = count > saveLimit;
+
+                        return (
+                            <button
+                                key={opt}
+                                className="smartOptionButton"
+                                onClick={() => onStart(opt)}
                                 style={{
-                                    fontSize: "1.2rem",
-                                    fontWeight: "bold",
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: '1rem',
+                                    minHeight: '80px',
+                                    // Stylizace pro varování
+                                    borderColor: isOverLimit ? '#ef4444' : undefined,
+                                    backgroundColor: isOverLimit ? 'rgba(239, 68, 68, 0.08)' : undefined,
+                                    color: isOverLimit ? '#ef4444' : undefined,
                                 }}
                             >
-                                {opt === "all" ? totalQuestions : opt}
-                            </span>
-                            <span style={{ fontSize: "0.8rem", opacity: 0.8 }}>
-                                {opt === "all" ? "Všechny otázky" : "otázek"}
-                            </span>
-                        </button>
-                    ))}
+                                <span
+                                    style={{
+                                        fontSize: "1.2rem",
+                                        fontWeight: "bold",
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    {opt === "all" ? totalQuestions : opt}
+                                </span>
+                                <span style={{ fontSize: "0.8rem", opacity: 0.8, marginBottom: isOverLimit ? '4px' : 0 }}>
+                                    {opt === "all" ? "Všechny" : "otázek"}
+                                </span>
+
+                                {isOverLimit && (
+                                    <span style={{ 
+                                        fontSize: "0.7rem", 
+                                        fontWeight: "bold",
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                    }}>
+                                        ⚠️ Neukládá postup
+                                    </span>
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
+
                 <div style={{ marginTop: "2rem", width: "100%" }}>
                     <button
                         className="navButton"

@@ -1,7 +1,7 @@
 {
   "name": "Quizio",
   "short_name": "Quizio",
-  "description": "Quiz aplikace pro přípravu na technické certifikace",
+  "description": "Quiz aplikace pro přípravu na maturitní zkoušku",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

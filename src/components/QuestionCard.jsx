@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { isFlashcardStyle } from '../utils/formatting';
 import { fetchQuestionImage, getCachedImage } from '../utils/dataManager';
 import { getImageUrl } from "../utils/images"; 
@@ -20,155 +20,137 @@ export function QuestionCard({
   onReport,
   isExiting,
   optionRefsForCurrent,
-  onContentReady
+  onContentReady,
+  isActive = true,
+  shouldLoadImage = true
 }) {
-  // Track question ID for ready state
   const [readyForQuestionId, setReadyForQuestionId] = useState(null);
-  
-  // 1. OPTIMALIZACE OBRÁZKŮ:
+
+  // 1. OPTIMALIZACE OBRÁZKŮ
   const [lazyImage, setLazyImage] = useState(() => {
       if (currentQuestion?.image_base64) return currentQuestion.image_base64;
-      if (currentQuestion?.id) return getCachedImage(currentQuestion.id) || null;
+      if (shouldLoadImage && currentQuestion?.id) return getCachedImage(currentQuestion.id) || null;
       const staticUrl = getImageUrl(currentSubject, currentQuestion?.number);
       return staticUrl || null;
   });
 
-  const [isReady, setIsReady] = useState(true);
+  // --- 2. OKAMŽITÉ MÍCHÁNÍ ODPOVĚDÍ (useMemo místo useEffect) ---
+  // Toto odstraní efekt "probliknutí" pořadí odpovědí.
+  // Vypočítá se to HNED při renderu, ne až po něm.
+  const shuffledOptions = useMemo(() => {
+      if (!currentQuestion || !currentQuestion.options) return [];
 
-    const [shuffledOptions, setShuffledOptions] = useState([]);
-    
-    // TINDER-LIKE SWIPE STATE
-    const [swipeOffset, setSwipeOffset] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
-    const [swipeDirection, setSwipeDirection] = useState(null); // 'left' | 'right' | null
-    const [isFlying, setIsFlying] = useState(false);
+      const optionsWithMeta = currentQuestion.options.map((opt, idx) => ({
+          text: opt,
+          originalIndex: idx,
+          isCorrect: idx === currentQuestion.correctIndex
+      }));
 
-    // Logic to shuffle options whenever currentQuestion changes
-    useEffect(() => {
-        if (currentQuestion && currentQuestion.options) {
-            const optionsWithMeta = currentQuestion.options.map((opt, idx) => ({
-                text: opt,
-                originalIndex: idx,
-                isCorrect: idx === currentQuestion.correctIndex
-            }));
-            
-            const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
-            let finalShuffled = [];
-            
-            if (isMockOrRealTest) {
-                finalShuffled = optionsWithMeta;
-            } else {
-                // Fisher-Yates shuffle
-                const shuffled = [...optionsWithMeta];
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                }
-                finalShuffled = shuffled;
-            }
-            setShuffledOptions(finalShuffled);
-            
-            // Pass the shuffled mapping back to parent for keyboard sync
-            if (window.setShuffledMappingForKeyboard) {
-                window.setShuffledMappingForKeyboard(finalShuffled.map(o => o.originalIndex));
-            }
-            
-            // Re-order option refs if they exist
-            if (optionRefsForCurrent && optionRefsForCurrent.current) {
-                optionRefsForCurrent.current = {};
-            }
-        }
-    }, [currentQuestion.number, currentQuestion.id, mode]); // Removed dependency on userAnswer to prevent re-shuffle on click
+      const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
 
-    // Signal content ready after options shuffled (image loading handled separately in lazy mode)
-    useEffect(() => {
-        if (shuffledOptions.length > 0 && currentQuestion) {
-            const qId = currentQuestion.id || currentQuestion.number;
-            setReadyForQuestionId(qId);
-            if (onContentReady) {
-                onContentReady(qId);
-            }
-        }
-    }, [shuffledOptions, currentQuestion?.id, currentQuestion?.number]);
-    
-    // Reset swipe state when question changes
-    useEffect(() => {
-        setSwipeOffset(0);
-        setIsDragging(false);
-        setSwipeDirection(null);
-        setIsFlying(false);
-    }, [currentQuestion?.id, currentQuestion?.number]);
+      if (isMockOrRealTest) {
+          return optionsWithMeta;
+      } else {
+          // Fisher-Yates shuffle
+          const shuffled = [...optionsWithMeta];
+          for (let i = shuffled.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          return shuffled;
+      }
+  }, [currentQuestion?.id, currentQuestion?.number, mode]); // Přepočítá se jen při změně otázky
 
-    const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
+  // --- 3. SYNC PRO KLÁVESNICI (Side Effects) ---
+  // Samotné míchání už proběhlo nahoře, tady jen posíláme info ven
+  useEffect(() => {
+      if (isActive && shuffledOptions.length > 0) {
+          if (window.setShuffledMappingForKeyboard) {
+              window.setShuffledMappingForKeyboard(shuffledOptions.map(o => o.originalIndex));
+          }
+          if (optionRefsForCurrent && optionRefsForCurrent.current) {
+              optionRefsForCurrent.current = {};
+          }
+      }
+  }, [shuffledOptions, isActive]);
+
+  // Signal content ready
+  useEffect(() => {
+      if (shuffledOptions.length > 0 && currentQuestion) {
+          const qId = currentQuestion.id || currentQuestion.number;
+          setReadyForQuestionId(qId);
+          if (onContentReady && isActive) {
+              onContentReady(qId);
+          }
+      }
+  }, [shuffledOptions, currentQuestion?.id, currentQuestion?.number, isActive]);
+
+  // TINDER-LIKE SWIPE STATE
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [swipeDirection, setSwipeDirection] = useState(null); 
+  const [isFlying, setIsFlying] = useState(false);
+
+  // Reset swipe state when not active
+  useEffect(() => {
+      if (!isActive) {
+          setSwipeOffset(0);
+          setIsDragging(false);
+          setSwipeDirection(null);
+          setIsFlying(false);
+      }
+  }, [isActive]);
+
+  const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
-
   const touchStart = useRef({ x: 0, y: 0 });
   const touchCurrent = useRef({ x: 0, y: 0 });
-  const minSwipeDistance = 50; // Threshold pro odlet
-  const flyAwayThreshold = 80; // Práh pro spuštění odletu
+  const flyAwayThreshold = 80; 
 
-  // 2. NAČÍTÁNÍ OBRÁZKU (Líné načítání na pozadí)
+  // 4. NAČÍTÁNÍ OBRÁZKU (Líné načítání)
   useEffect(() => {
+    if (!shouldLoadImage) return;
+
     if (currentQuestion?.id) {
-        // Resetujeme lazyImage POKUD víme, že nová otázka má jiný ID/obrázek, 
-        // ale ponecháme starý pro plynulejší přechod, pokud se mění jen obsah.
-        // Pro plynulost: Pokud má otázka base64, použijeme ji hned.
         if (currentQuestion.image_base64) {
             setLazyImage(currentQuestion.image_base64);
             return;
         }
-
         const cached = getCachedImage(currentQuestion.id);
         if (cached) {
             setLazyImage(cached);
             return;
         }
-
         const loadImage = async () => {
             try {
                 const img = await fetchQuestionImage(currentQuestion.id);
                 if (img) setLazyImage(img);
                 else setLazyImage(null);
-            } catch (err) {
-                console.error("Chyba při načítání obrázku v kartě:", err);
-                setLazyImage(null);
-            }
+            } catch (err) { setLazyImage(null); }
         };
         loadImage();
     } else {
         setLazyImage(null);
     }
-  }, [currentQuestion?.id, currentQuestion?.number]);
+  }, [currentQuestion?.id, shouldLoadImage]);
 
-  // 3. ZOOM LOGIKA
+  // 5. ZOOM LOGIKA
   useEffect(() => {
+    if (!isActive) return;
     const handleKeyDown = (e) => {
         if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
         if (e.key === "f" || e.key === "F") {
-            if (lazyImage && onZoom) {
-                onZoom(lazyImage);
-            }
+            if (lazyImage && onZoom) onZoom(lazyImage);
         }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [lazyImage, onZoom]);
+  }, [lazyImage, onZoom, isActive]);
 
-  // 4. SCROLL
+  // 6. TOUCH EVENTY (Swipe)
   useEffect(() => {
-    // Odstraněno automatické posouvání při výběru odpovědi, které způsobovalo skákání obrazovky na mobilech
-    /*
-    if (selectedAnswer !== null && optionRefsForCurrent && optionRefsForCurrent.current && optionRefsForCurrent.current[selectedAnswer]) {
-      optionRefsForCurrent.current[selectedAnswer].scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }
-    */
-  }, [selectedAnswer, optionRefsForCurrent]);
+    if (!isActive) return;
 
-  // 5. TOUCH EVENTY - TINDER-LIKE SWIPE (Optimalizováno pro 120Hz+)
-  useEffect(() => {
     const element = cardContainerRef.current;
     if (!element || isFlying) return;
 
@@ -183,53 +165,41 @@ export function QuestionCard({
 
     const handleTouchMove = (e) => {
       if (!touchStart.current.x || isFlying) return;
-      
-      // Optimalizace pro 120Hz: Čtení souřadnic co nejrychleji
-      const touch = e.targetTouches[0];
-      const clientX = touch.clientX;
-      const clientY = touch.clientY;
-      touchCurrent.current = { x: clientX, y: clientY };
 
-      const diffX = clientX - touchStart.current.x;
-      const diffY = Math.abs(clientY - touchStart.current.y);
+      const touch = e.targetTouches[0];
+      // Optimalizace: Použití changedTouches pro rychlejší odezvu
+      const currentX = touch.clientX;
+      const currentY = touch.clientY;
+      touchCurrent.current = { x: currentX, y: currentY };
+
+      const diffX = currentX - touchStart.current.x;
+      const diffY = Math.abs(currentY - touchStart.current.y);
       const absDiffX = Math.abs(diffX);
 
-      // Pokud je pohyb primárně horizontální a dostatečně velký
-      if (absDiffX > diffY && absDiffX > 3) {
-        // Prevent default pouze u horizontálního pohybu pro plynulý vertikální scroll
-        if (e.cancelable) {
-          e.preventDefault();
-        }
+      if (absDiffX > diffY && absDiffX > 5) { // Mírně zvýšený práh pro lepší detekci scrollu vs swipe
+        if (e.cancelable) e.preventDefault();
 
-        // ZÁKAZ VIZUÁLNÍHO POSUNU na začátku/konci v testu
+        // Zámek na okrajích
         const isBoundaryLockedMode = mode === 'real_test' || mode === 'mock' || mode === 'random' || mode === 'training' || mode === 'smart' || mode === 'mistakes';
         if (isBoundaryLockedMode) {
             const isFirst = window.currentTestIndex === 0;
             const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
-            
             if ((diffX > 0 && isFirst) || (diffX < 0 && isLast)) {
                 if (rafId) cancelAnimationFrame(rafId);
                 rafId = requestAnimationFrame(() => {
-                    setSwipeOffset(diffX * 0.05);
+                    setSwipeOffset(diffX * 0.05); 
                     setSwipeDirection(null);
                 });
                 return;
             }
         }
 
-        // 120Hz optimalizace: Použití requestAnimationFrame pro plynulý rendering
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
           setSwipeOffset(diffX);
-          
-          // Prahy pro indikaci směru (bez odletu)
-          if (diffX > 40) {
-            setSwipeDirection('right');
-          } else if (diffX < -40) {
-            setSwipeDirection('left');
-          } else {
-            setSwipeDirection(null);
-          }
+          if (diffX > 40) setSwipeDirection('right');
+          else if (diffX < -40) setSwipeDirection('left');
+          else setSwipeDirection(null);
         });
       }
     };
@@ -237,40 +207,27 @@ export function QuestionCard({
     const handleTouchEnd = () => {
       if (rafId) cancelAnimationFrame(rafId);
       if (!touchStart.current.x || isFlying) return;
-      
+
       const distanceX = touchCurrent.current.x - touchStart.current.x;
       const absX = Math.abs(distanceX);
-      const absY = Math.abs(touchCurrent.current.y - touchStart.current.y);
 
       touchStart.current = { x: 0, y: 0 };
       setIsDragging(false);
 
-      if (absX > absY && absX > flyAwayThreshold && onSwipe) {
+      if (absX > flyAwayThreshold && onSwipe) {
         const direction = distanceX > 0 ? 'right' : 'left';
-        
-        // ZÁKAZ SWIPU ve Flashcard módech, pokud není zodpovězeno
+
         const isFlashcardOrSmart = mode === 'random' || mode === 'test_practice' || mode === 'smart' || mode === 'mistakes';
-        if (isFlashcardOrSmart && !showResult) {
-          setSwipeOffset(0);
-          setSwipeDirection(null);
-          return;
+        // Zákaz swipu doprava (zpět) u flashcards, nebo pokud není zodpovězeno
+        if ((isFlashcardOrSmart && !showResult) || (isFlashcardOrSmart && direction === 'right')) {
+          setSwipeOffset(0); setSwipeDirection(null); return;
         }
 
-        if (isFlashcardOrSmart && direction === 'right') {
-          setSwipeOffset(0);
-          setSwipeDirection(null);
-          return;
-        }
-
-        // NOVÉ: Zákaz swipu na začátku/konci v testu
         if (mode === 'real_test' || mode === 'mock') {
             const isFirst = window.currentTestIndex === 0;
             const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
-            
             if ((direction === 'right' && isFirst) || (direction === 'left' && isLast)) {
-                setSwipeOffset(0);
-                setSwipeDirection(null);
-                return;
+                setSwipeOffset(0); setSwipeDirection(null); return;
             }
         }
 
@@ -278,10 +235,9 @@ export function QuestionCard({
         setSwipeDirection(direction);
         const flyDistance = direction === 'right' ? window.innerWidth + 500 : -window.innerWidth - 500;
         setSwipeOffset(flyDistance);
-        
-        setTimeout(() => {
-          onSwipe(direction);
-        }, 200);
+
+        // Zrychlená reakce - okamžitě spustit callback, pokud je animace nastavená
+        setTimeout(() => { onSwipe(direction); }, 200); // 200ms odpovídá CSS transition
       } else {
         setSwipeOffset(0);
         setSwipeDirection(null);
@@ -298,62 +254,37 @@ export function QuestionCard({
       element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [onSwipe, isFlying, mode]);
+  }, [onSwipe, isFlying, mode, isActive]);
 
-  // 6. RENDER
   if (!currentQuestion) return null;
 
-  // --- PODMÍNKA PRO ZOBRAZENÍ ČÍSLA OTÁZKY ---
-  // Číslo zobrazíme POUZE pokud je mode 'random' (Flashcards) nebo 'review' (Prohlížení)
   const shouldShowNumber = mode === 'random' || mode === 'review';
-
-  // Výpočet rotace pro Tinder-like efekt (max ±15 stupňů)
   const rotation = isDragging ? (swipeOffset / window.innerWidth) * 15 : (isFlying ? (swipeDirection === 'right' ? 15 : -15) : 0);
-  const opacity = isFlying ? 0 : 1;
-  
-  // Dynamické styly pro swipe - optimalizováno pro výkon a zamezení výběru textu
-  const swipeStyles = {
-    position: 'relative',
+
+  const cardStyles = {
     touchAction: 'pan-y',
     transform: `translate3d(${swipeOffset}px, 0, 0) rotate(${rotation}deg)`,
-    transition: isDragging ? 'none' : 'transform 0.1s cubic-bezier(0.1, 0, 0.1, 1), opacity 0.1s linear',
-    opacity: opacity,
-    willChange: 'transform, opacity',
+    // Zrychlená transition pro návrat karty (0.2s -> 0.15s)
+    transition: (isDragging || isFlying) ? 'transform 0.15s cubic-bezier(0.1, 0, 0.1, 1)' : 'none',
+    willChange: 'transform',
     backfaceVisibility: 'hidden',
     perspective: 1000,
-    userSelect: 'none',
-    WebkitUserSelect: 'none',
-    WebkitTouchCallout: 'none'
+    width: '100%', 
+    pointerEvents: isActive ? 'auto' : 'none'
   };
-
-  // Check if content is truly ready (options shuffled for current question)
-  const currentQId = currentQuestion?.id || currentQuestion?.number;
-  const contentReady = shuffledOptions.length > 0 && readyForQuestionId === currentQId;
 
   return (
     <div
       ref={cardContainerRef}
-      style={{
-        ...swipeStyles,
-        opacity: contentReady ? opacity : 0,
-        transition: isDragging ? 'none' : 'transform 0.15s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.15s linear'
-      }}
+      style={cardStyles}
       className={`questionCardContent ${swipeDirection ? `swiping-${swipeDirection}` : ''}`}
     >
       <style>{`
-        /* Odstranění vnitřní animace fadeInQuick, která se tloukla s hlavní animací přechodu */
-        .questionCardContent {
-          contain: content;
-        }
-        
-        /* Zajištění, že žádný prvek uvnitř karty nereaguje na tap-highlight */
-        .questionCardContent * {
-          -webkit-tap-highlight-color: transparent !important;
-          outline: none !important;
-        }
+        .questionCardContent { contain: content; }
+        .questionCardContent * { -webkit-tap-highlight-color: transparent !important; outline: none !important; }
       `}</style>
 
-      {isFlashcard && (showResult || selectedAnswer !== null) && !isExiting && (
+      {isActive && isFlashcard && (showResult || selectedAnswer !== null) && !isExiting && (
         <button
           onClick={(e) => { e.stopPropagation(); onReport(currentQuestion.number); }}
           title="Nahlásit chybu"
@@ -366,13 +297,12 @@ export function QuestionCard({
 
       <div className="questionHeader">
         <div className="questionText">
-            {/* Zde je změna: Podmíněné vykreslení čísla */}
             {shouldShowNumber && <span className="questionNumber">#{currentQuestion.number} </span>}
             {currentQuestion.question}
         </div>
 
         {lazyImage && (
-          <div className="imageWrapper" onClick={() => onZoom && onZoom(lazyImage)}>
+          <div className="imageWrapper" onClick={() => isActive && onZoom && onZoom(lazyImage)}>
             <img src={lazyImage} alt="Otázka" className="questionImage" decoding="async" />
             <div className="fullscreenHint mobile-hidden">Klikni nebo stiskni F</div>
           </div>
@@ -385,21 +315,15 @@ export function QuestionCard({
           const isCorrect = optObj.isCorrect;
 
           let className = "optionButton";
-          let style = {};
 
           if (showResult) {
-            if (isCorrect) {
-                className += " correct";
-            } else if (isSelected) {
-                className += " wrong";
-            } else {
-                className += " dim";
-            }
+            if (isCorrect) className += " correct";
+            else if (isSelected) className += " wrong";
+            else className += " dim";
           } else if (isSelected) {
             className += " selected";
           }
 
-          // OPRAVA VIZUÁLNÍHO OZNAČENÍ V TESTU:
           if (!showResult && !isSelected && ((mode === "mock" || mode === "training" || mode === "real_test") && currentQuestion.userAnswer === optObj.originalIndex)) {
              className += " selected"; 
           }
@@ -407,11 +331,10 @@ export function QuestionCard({
           return (
             <button
               key={index}
-              ref={(el) => { if (optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[index] = el; }}
+              ref={(el) => { if (isActive && optionRefsForCurrent && optionRefsForCurrent.current) optionRefsForCurrent.current[index] = el; }}
               className={className}
-              style={style}
-              onClick={() => !disabled && onSelect(optObj.originalIndex)}
-              disabled={disabled}
+              onClick={() => isActive && !disabled && onSelect(optObj.originalIndex)}
+              disabled={disabled || !isActive}
             >
               <HighlightedText text={optObj.text} />
             </button>

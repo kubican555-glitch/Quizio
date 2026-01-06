@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { HistoryGraph } from './HistoryGraph';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 
@@ -20,24 +20,49 @@ const MAX_ITEMS = 20;
 export const HistoryView = ({ 
     history = [], 
     totalTimeMap = {}, 
-    totalQuestionsMap = {},
-    sessionTime = 0,
-    sessionQuestionsCount = 0,
+    totalQuestionsMap = {}, 
+    sessionTime = 0, 
+    sessionQuestionsCount = 0, 
     onBack, 
     onDeleteRecord,
     user,
     syncing,
-    currentSubject 
+    currentSubject,
+    onRefreshRequest // Funkce pro refresh z App.js
 }) => {
     const [currentPage, setCurrentPage] = useState(0);
+    const [localHistory, setLocalHistory] = useState(history);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Synchronizace props -> local state
+    useEffect(() => {
+        setLocalHistory(history);
+    }, [history]);
+
+    // Automatický refresh při otevření (bez tlačítka)
+    useEffect(() => {
+        const autoRefresh = async () => {
+            if (onRefreshRequest) {
+                setIsLoading(true);
+                try {
+                    await onRefreshRequest();
+                } catch (e) {
+                    console.error("Auto-refresh failed", e);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+        };
+        autoRefresh();
+    }, []); 
 
     const filteredHistory = useMemo(() => {
-        let data = [...history];
+        let data = [...localHistory];
         if (currentSubject) {
             data = data.filter(h => h.subject === currentSubject);
         }
         return data.sort((a, b) => new Date(b.date) - new Date(a.date));
-    }, [history, currentSubject]);
+    }, [localHistory, currentSubject]);
 
     const statsHistory = useMemo(() => {
         return filteredHistory.slice(0, MAX_ITEMS);
@@ -146,7 +171,9 @@ export const HistoryView = ({
                     </button>
                 </div>
                 <div className="navbar-group">
-                    <UserBadgeDisplay user={user} syncing={syncing} />
+                    {/* Tlačítko pro manuální refresh odstraněno */}
+                    {/* Indikátor sync/loading zůstává pro vizuální kontrolu */}
+                    <UserBadgeDisplay user={user} syncing={syncing || isLoading} />
                 </div>
             </div>
 

@@ -1,42 +1,32 @@
 import React, { useState, useEffect } from 'react';
 
-export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alwaysShowFullName }) => {
-    const [showCloud, setShowCloud] = useState(false);
-    // Detekce mobilu pomocí JS místo CSS - zabrání zdvojení textu
-    const [isMobile, setIsMobile] = useState(
-        typeof window !== 'undefined' ? window.matchMedia('(max-width: 600px)').matches : false
-    );
+export const UserBadgeDisplay = ({ user, onLogout, compactOnMobile, alwaysShowFullName }) => {
+    // Bezpečný check pro SSR (Server Side Rendering) prostředí
+    const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
-        let timeout;
-        if (syncing) {
-            setShowCloud(true);
-        } else {
-            // Zajistí zobrazení po dobu alespoň 500ms
-            timeout = setTimeout(() => setShowCloud(false), 500);
+        // Nastavení initial hodnoty po mountnutí
+        if (typeof window !== 'undefined') {
+            setIsMobile(window.matchMedia('(max-width: 600px)').matches);
+
+            const media = window.matchMedia('(max-width: 600px)');
+            const listener = (e) => setIsMobile(e.matches);
+            media.addEventListener('change', listener);
+            return () => media.removeEventListener('change', listener);
         }
-        return () => clearTimeout(timeout);
-    }, [syncing]);
-
-    // Listener pro změnu velikosti okna
-    useEffect(() => {
-        const media = window.matchMedia('(max-width: 600px)');
-        const listener = (e) => setIsMobile(e.matches);
-        media.addEventListener('change', listener);
-        return () => media.removeEventListener('change', listener);
     }, []);
 
     if (!user) return null;
 
-    const firstName = user.split(' ')[0];
+    // Získání křestního jména (pokud je user "Jméno Příjmení")
+    const firstName = user.includes(' ') ? user.split(' ')[0] : user;
 
-    // Logika pro zobrazení jména:
-    // 1. Pokud je alwaysShowFullName -> Vždy celé jméno
-    // 2. Jinak, pokud je mobil (isMobile) -> Jen křestní
-    // 3. Jinak (PC) -> Celé jméno
     const displayName = alwaysShowFullName 
         ? user 
         : (isMobile ? firstName : user);
+
+    // První písmeno pro avatara
+    const firstLetter = user.charAt(0).toUpperCase();
 
     return (
         <div 
@@ -49,11 +39,12 @@ export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alw
                 padding: '0.4rem 0.8rem', 
                 borderRadius: '50px', 
                 border: '1px solid rgba(255,255,255,0.15)',
-                backdropFilter: 'blur(5px)'
+                backdropFilter: 'blur(5px)',
+                transition: 'all 0.2s ease'
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                 {/* Avatar / Ikona */}
+                {/* Avatar / Ikona */}
                 <div
                     style={{
                         width: "32px",
@@ -70,11 +61,11 @@ export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alw
                         flexShrink: 0 
                     }}
                 >
-                    {user.charAt(0).toUpperCase()}
+                    {firstLetter}
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    {/* Jméno uživatele - Vykreslí se jen JEDNOU */}
+                    {/* Jméno uživatele */}
                     <span 
                         style={{ 
                             fontWeight: '600', 
@@ -84,31 +75,6 @@ export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alw
                         }}
                     >
                         {displayName}
-                    </span>
-
-                      {/* Cloud Ikona */}
-                    <span 
-                        style={{ 
-                            fontSize: "0.9rem", 
-                            opacity: showCloud ? 1 : 0,
-                            transition: "opacity 0.3s ease",
-                            // Rezervace místa jen ve hře (compact), v menu ne
-                            display: compactOnMobile ? "inline-block" : (showCloud ? "inline-block" : "none"), 
-                            width: compactOnMobile ? "1.2em" : "auto", 
-                            textAlign: "center",
-                            visibility: compactOnMobile ? (showCloud ? 'visible' : 'hidden') : 'visible',
-                            animation: syncing ? "pulseSync 1.5s ease-in-out infinite" : "none",
-                            willChange: "transform, opacity"
-                        }}
-                    >
-                        ☁️
-                        <style>{`
-                            @keyframes pulseSync {
-                                0% { opacity: 0.4; transform: scale(0.9) translate3d(0,0,0); }
-                                50% { opacity: 1; transform: scale(1.1) translate3d(0,0,0); }
-                                100% { opacity: 0.4; transform: scale(0.9) translate3d(0,0,0); }
-                            }
-                        `}</style>
                     </span>
                 </div>
             </div>
@@ -129,10 +95,12 @@ export const UserBadgeDisplay = ({ user, syncing, onLogout, compactOnMobile, alw
                         justifyContent: 'center',
                         color: 'var(--color-error, #ef4444)',
                         opacity: 0.8,
-                        marginLeft: 'auto'
+                        marginLeft: 'auto',
+                        transition: 'opacity 0.2s'
                     }}
+                    onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                    onMouseOut={(e) => e.currentTarget.style.opacity = 0.8}
                 >
-                    {/* New square with arrow icon */}
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
                         width="18" 

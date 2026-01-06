@@ -1815,3 +1815,22 @@ body.light-mode .historyItemSubject {
     from { opacity: 0; transform: translateY(20px) scale(0.95); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
+/* === FIX PRO USEKNUTÉ KARTY NA IPHONE (Schedulded Tests) === */
+
+/* Toto pravidlo zajistí, že karta se vždy natáhne podle textu uvnitř */
+@media (max-width: 900px) {
+    .card {
+        height: auto !important;       /* Výška se přizpůsobí obsahu */
+        min-height: 0 !important;      /* Zrušíme vynucenou minimální výšku */
+        overflow: visible !important;  /* DŮLEŽITÉ: Zakáže ořezávání obsahu */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Pokud je tam patička s tlačítky, přidáme jí trochu místa */
+    .card .actionButtons, 
+    .card button {
+        margin-bottom: 5px;
+        flex-shrink: 0; /* Zabrání smrsknutí tlačítek */
+    }
+}
