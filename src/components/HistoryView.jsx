@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+﻿import React, { useMemo, useState, useEffect } from 'react';
 import { HistoryGraph } from './HistoryGraph';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 
@@ -39,7 +39,7 @@ export const HistoryView = ({
         setLocalHistory(history);
     }, [history]);
 
-    // Automatický refresh při otevření (bez tlačítka)
+    // Automaticky refresh při otevření (bez tlačítka)
     useEffect(() => {
         const autoRefresh = async () => {
             if (onRefreshRequest) {
@@ -54,7 +54,7 @@ export const HistoryView = ({
             }
         };
         autoRefresh();
-    }, []); 
+    }, []);
 
     const filteredHistory = useMemo(() => {
         let data = [...localHistory];
@@ -121,10 +121,10 @@ export const HistoryView = ({
     const getModeIcon = (mode) => {
         switch(mode) {
             case 'mock': return '⏱️';
-            case 'smart': return '🎓';
-            case 'random': return '🧠';
-            case 'training': return '🏋️';
-            case 'mistakes': return '🚑';
+            case 'smart': return '🧠';
+            case 'random': return '🃏';
+            case 'training': return '🎯';
+            case 'mistakes': return '🛠️';
             default: return '📝';
         }
     };
@@ -177,8 +177,8 @@ export const HistoryView = ({
                 </div>
             </div>
 
-            <div className="quizContentWrapper" style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-                <h1 className="title">
+            <div className="quizContentWrapper historyPage" style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
+                <h1 className="title historyTitle">
                     Historie výsledků {currentSubject ? `(${currentSubject})` : ''}
                 </h1>
 
@@ -216,10 +216,16 @@ export const HistoryView = ({
                     <div className="historyStatCard">
                         <div className="historyStatIcon">📊</div>
                         <div className="historyStatContent">
-                            <span className="historyStatValue" style={{ 
-                                color: detailedStats.average >= 75 ? 'var(--color-success)' : 
-                                       detailedStats.average >= 50 ? 'var(--color-warning)' : 'var(--color-error)' 
-                            }}>
+                            <span
+                                className="historyStatValue"
+                                style={{
+                                    color: detailedStats.average >= 75
+                                        ? 'var(--color-success)'
+                                        : detailedStats.average >= 50
+                                            ? 'var(--color-warning)'
+                                            : 'var(--color-error)'
+                                }}
+                            >
                                 {detailedStats.average}%
                             </span>
                             <span className="historyStatLabel">Průměr</span>
@@ -237,11 +243,9 @@ export const HistoryView = ({
                     </div>
                 </div>
 
-                <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-                    <h3 style={{ marginTop: 0, marginBottom: '1.5rem', textAlign: 'center', fontSize: '1.1rem' }}>
-                        Vývoj úspěšnosti
-                    </h3>
-                    <div style={{ height: '220px', width: '100%' }}>
+                <div className="card historyChartCard">
+                    <h3 className="historyChartTitle">Vývoj úspěšnosti</h3>
+                    <div className="historyChartCanvas">
                         <HistoryGraph data={statsHistory} />
                     </div>
                 </div>
@@ -276,7 +280,7 @@ export const HistoryView = ({
                                     <div 
                                         key={item.id} 
                                         className="historyItem"
-                                        style={{ animationDelay: `${index * 0.03}s` }}
+                                        style={{ animationDelay: `${index * 0.03}s`, '--score-color': scoreColor }}
                                     >
                                         <div className="historyItemLeft">
                                             <div className="historyItemIcon" style={{ 

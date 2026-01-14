@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "../supabaseClient";
 import { ThemeToggle } from "./ThemeToggle";
+import UserManagement from "./UserManagement";
 
 // --- SUB-KOMPONENTA: Horní lišta ---
 const AdminHeader = ({ onBack }) => {
@@ -961,6 +962,12 @@ export function AdminPanel({ onBack }) {
                     >
                         Hlášení
                     </button>
+                    <button
+                        className={`navButton ${activeTab === "users" ? "primary" : ""}`}
+                        onClick={() => setActiveTab("users")}
+                    >
+                        Správa uživatelů
+                    </button>
                 </div>
 
                 {/* --- TAB: OTÁZKY (SEZNAM) --- */}
@@ -1657,6 +1664,12 @@ export function AdminPanel({ onBack }) {
                 {/* --- TAB: REPORTY --- */}
                 {activeTab === "reports" && (
                     <AdminReportsList onEditQuestion={handleReportEdit} />
+                )}
+
+                {activeTab === "users" && (
+                    <div className="fadeIn">
+                        <UserManagement />
+                    </div>
                 )}
 
                 <div

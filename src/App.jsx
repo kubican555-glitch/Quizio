@@ -45,6 +45,7 @@ import { ReportModal } from "./components/ReportModal.jsx";
 import { SmartSettingsModal } from "./components/Modals.jsx";
 
 import { CustomImportGuide } from "./components/CustomImportGuide.jsx";
+import { LeaderboardPanel } from "./components/LeaderboardPanel.jsx";
 
 /* ---------- Review Navigator Component ---------- */
 const ReviewNavigator = ({ currentPage, totalPages, onPageChange }) => {
@@ -247,6 +248,32 @@ export default function App() {
     const [isTransitioningSubject, setIsTransitioningSubject] = useState(false);
     const [menuSelection, setMenuSelection] = useState(-1);
     const [mode, setMode] = useState(null);
+    const [leaderboardEntries, setLeaderboardEntries] = useState([]);
+    const [leaderboardLoading, setLeaderboardLoading] = useState(false);
+    const [leaderboardError, setLeaderboardError] = useState(null);
+
+    const DUEL_ANSWER_SECONDS = 60;
+    const DUEL_BREAK_SECONDS = 10;
+    const DUEL_STEP_MS = (DUEL_ANSWER_SECONDS + DUEL_BREAK_SECONDS) * 1000;
+
+    const [duelOnlineUsers, setDuelOnlineUsers] = useState([]);
+    const [duelInvites, setDuelInvites] = useState([]);
+    const [duelInviteToShow, setDuelInviteToShow] = useState(null);
+    const [duelOutgoingMatch, setDuelOutgoingMatch] = useState(null);
+    const [duelActiveMatch, setDuelActiveMatch] = useState(null);
+    const [duelQuestionSet, setDuelQuestionSet] = useState([]);
+    const [duelAnswers, setDuelAnswers] = useState([]);
+    const [duelClock, setDuelClock] = useState(Date.now());
+    const [duelStats, setDuelStats] = useState(null);
+    const [duelSettings, setDuelSettings] = useState({
+        questionCount: 5,
+        rangeMode: "all",
+        rangeStart: "",
+        rangeEnd: "",
+    });
+    const [duelError, setDuelError] = useState("");
+    const duelPresenceRef = useRef(null);
+    const duelFinalizeRef = useRef(false);
 
     useEffect(() => {
         const syncStateFromUrl = () => {
@@ -265,6 +292,364 @@ export default function App() {
         syncStateFromUrl();
         return () => window.removeEventListener("popstate", syncStateFromUrl);
     }, []);
+
+    useEffect(() => {
+        if (!profileData?.class) {
+            setLeaderboardEntries([]);
+            return;
+        }
+
+        let isActive = true;
+
+        const fetchLeaderboard = async () => {
+            setLeaderboardLoading(true);
+            setLeaderboardError(null);
+
+            const { data, error } = await supabase
+                .from("profiles")
+                .select("id, username, subject_times, question_counts, class")
+                .eq("class", profileData.class);
+
+            if (!isActive) return;
+
+            if (error) {
+                setLeaderboardError(error.message);
+                setLeaderboardEntries([]);
+            } else {
+                const mapped = (data || [])
+                    .map((profile) => {
+                        const subjectTimes = profile.subject_times || {};
+                        const questionCounts = profile.question_counts || {};
+                        const totalTime = Object.values(subjectTimes).reduce(
+                            (sum, value) => sum + (value || 0),
+                            0,
+                        );
+                        const totalQuestions = Object.values(
+                            questionCounts,
+                        ).reduce((sum, value) => sum + (value || 0), 0);
+                        return {
+                            id: profile.id,
+                            username: profile.username,
+                            subjectTimes,
+                            questionCounts,
+                            totalTime,
+                            totalQuestions,
+                        };
+                    })
+                    .sort((a, b) => b.totalTime - a.totalTime);
+
+                setLeaderboardEntries(mapped);
+            }
+
+            setLeaderboardLoading(false);
+        };
+
+        fetchLeaderboard();
+
+        return () => {
+            isActive = false;
+        };
+    }, [profileData?.class]);
+
+    useEffect(() => {
+        if (!dbId || !user || !profileData?.class) return;
+
+        const channel = supabase.channel(
+            `duel_presence_${profileData.class}`,
+            {
+                config: { presence: { key: dbId } },
+            },
+        );
+
+        channel.on("presence", { event: "sync" }, () => {
+            const state = channel.presenceState();
+            const users = [];
+            Object.values(state).forEach((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.user_id !== dbId) {
+                        users.push({
+                            id: entry.user_id,
+                            username: entry.username,
+                            class: entry.class,
+                        });
+                    }
+                });
+            });
+            setDuelOnlineUsers(users);
+        });
+
+        channel.subscribe((status) => {
+            if (status === "SUBSCRIBED") {
+                channel.track({
+                    user_id: dbId,
+                    username: user,
+                    class: profileData.class,
+                });
+            }
+        });
+
+        duelPresenceRef.current = channel;
+
+        return () => {
+            supabase.removeChannel(channel);
+            duelPresenceRef.current = null;
+        };
+    }, [dbId, user, profileData?.class]);
+
+    useEffect(() => {
+        if (!dbId) return;
+
+        const fetchStats = async () => {
+            const { data } = await supabase
+                .from("duel_stats")
+                .select("*")
+                .eq("user_id", dbId)
+                .maybeSingle();
+            if (data) setDuelStats(data);
+            else
+                setDuelStats({
+                    trophies: 0,
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                });
+        };
+
+        fetchStats();
+    }, [dbId]);
+
+    useEffect(() => {
+        if (!dbId) return;
+
+        let isActive = true;
+
+        const fetchInvites = async () => {
+            const { data: incoming } = await supabase
+                .from("duel_matches")
+                .select("*")
+                .eq("opponent_id", dbId)
+                .eq("status", "pending");
+
+            const { data: outgoing } = await supabase
+                .from("duel_matches")
+                .select("*")
+                .eq("challenger_id", dbId)
+                .in("status", ["pending", "active"]);
+
+            if (!isActive) return;
+            setDuelInvites(incoming || []);
+            setDuelOutgoingMatch(outgoing?.[0] || null);
+            if (outgoing?.[0]?.status === "active") {
+                setDuelActiveMatch(outgoing[0]);
+                setMode("duel_match");
+            }
+        };
+
+        fetchInvites();
+
+        const channel = supabase
+            .channel(`duel_matches_${dbId}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "duel_matches",
+                    filter: `opponent_id=eq.${dbId}`,
+                },
+                (payload) => {
+                    const match = payload.new;
+                    if (!match) return;
+
+                    if (match.status === "pending") {
+                        setDuelInvites((prev) => {
+                            const exists = prev.find((i) => i.id === match.id);
+                            if (exists) return prev;
+                            return [...prev, match];
+                        });
+                    } else {
+                        setDuelInvites((prev) =>
+                            prev.filter((i) => i.id !== match.id),
+                        );
+                    }
+
+                    if (match.status === "active") {
+                        setDuelActiveMatch(match);
+                        duelFinalizeRef.current = false;
+                        if (subject !== match.subject) setSubject(match.subject);
+                        setMode("duel_match");
+                    }
+                },
+            )
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "duel_matches",
+                    filter: `challenger_id=eq.${dbId}`,
+                },
+                (payload) => {
+                    const match = payload.new;
+                    if (!match) return;
+
+                    if (match.status === "pending") {
+                        setDuelOutgoingMatch(match);
+                    } else if (match.status === "active") {
+                        setDuelOutgoingMatch(null);
+                        setDuelActiveMatch(match);
+                        duelFinalizeRef.current = false;
+                        if (subject !== match.subject) setSubject(match.subject);
+                        setMode("duel_match");
+                    } else if (
+                        match.status === "declined" ||
+                        match.status === "cancelled"
+                    ) {
+                        setDuelOutgoingMatch(null);
+                    }
+                },
+            )
+            .subscribe();
+
+        return () => {
+            isActive = false;
+            supabase.removeChannel(channel);
+        };
+    }, [dbId, subject]);
+
+    useEffect(() => {
+        if (mode === "real_test") return;
+        if (!duelInviteToShow && duelInvites.length > 0) {
+            setDuelInviteToShow(duelInvites[0]);
+        }
+    }, [duelInvites, duelInviteToShow, mode]);
+
+    useEffect(() => {
+        if (!duelActiveMatch?.id) return;
+
+        const channel = supabase
+            .channel(`duel_match_${duelActiveMatch.id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "duel_matches",
+                    filter: `id=eq.${duelActiveMatch.id}`,
+                },
+                (payload) => {
+                    if (payload.new) setDuelActiveMatch(payload.new);
+                },
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [duelActiveMatch?.id]);
+
+    useEffect(() => {
+        if (!duelActiveMatch?.id) return;
+
+        const fetchAnswers = async () => {
+            const { data } = await supabase
+                .from("duel_answers")
+                .select("*")
+                .eq("match_id", duelActiveMatch.id);
+            setDuelAnswers(data || []);
+        };
+
+        fetchAnswers();
+
+        const channel = supabase
+            .channel(`duel_answers_${duelActiveMatch.id}`)
+            .on(
+                "postgres_changes",
+                {
+                    event: "*",
+                    schema: "public",
+                    table: "duel_answers",
+                    filter: `match_id=eq.${duelActiveMatch.id}`,
+                },
+                (payload) => {
+                    if (payload.eventType === "DELETE") {
+                        setDuelAnswers((prev) =>
+                            prev.filter((a) => a.id !== payload.old.id),
+                        );
+                        return;
+                    }
+                    const answer = payload.new;
+                    if (!answer) return;
+                    setDuelAnswers((prev) => {
+                        const idx = prev.findIndex((a) => a.id === answer.id);
+                        if (idx === -1) return [...prev, answer];
+                        const next = [...prev];
+                        next[idx] = answer;
+                        return next;
+                    });
+                },
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [duelActiveMatch?.id]);
+
+    useEffect(() => {
+        if (!duelActiveMatch) return;
+        const ids = duelActiveMatch.question_ids || [];
+        if (ids.length === 0) {
+            setDuelQuestionSet([]);
+            return;
+        }
+
+        const syncQuestions = async () => {
+            const localMap = new Map(
+                activeQuestionsCache.map((q) => [q.id, q]),
+            );
+            const missing = ids.filter((id) => !localMap.has(id));
+            let fetched = [];
+
+            if (missing.length > 0) {
+                const { data } = await supabase
+                    .from("questions")
+                    .select(
+                        "id, number, subject, question, options, correct_index, is_active, updated_at",
+                    )
+                    .in("id", missing);
+
+                fetched =
+                    data?.map((item) => ({
+                        ...item,
+                        correctIndex: item.correct_index,
+                        options: Array.isArray(item.options) ? item.options : [],
+                    })) || [];
+            }
+
+            fetched.forEach((item) => localMap.set(item.id, item));
+            const ordered = ids.map((id) => localMap.get(id)).filter(Boolean);
+            setDuelQuestionSet(ordered);
+        };
+
+        syncQuestions();
+    }, [duelActiveMatch, activeQuestionsCache]);
+
+    useEffect(() => {
+        if (!duelActiveMatch?.id) return;
+        const timer = setInterval(() => {
+            setDuelClock(Date.now());
+        }, 500);
+        return () => clearInterval(timer);
+    }, [duelActiveMatch?.id]);
+
+    useEffect(() => {
+        if (!duelActiveMatch?.started_at) return;
+        const finishAt =
+            new Date(duelActiveMatch.started_at).getTime() +
+            duelActiveMatch.question_count * DUEL_STEP_MS;
+        if (duelClock >= finishAt) finalizeDuelMatch();
+    }, [duelClock, duelActiveMatch, duelAnswers, duelQuestionSet]);
 
     useEffect(() => {
         if (mode === "loading") return;
@@ -1066,6 +1451,331 @@ export default function App() {
         startFn();
     };
 
+    const shuffleArray = (list) => {
+        const arr = [...list];
+        for (let i = arr.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    };
+
+    const getDuelOpponent = (match) => {
+        if (!match) return null;
+        const isChallenger = match.challenger_id === dbId;
+        return {
+            id: isChallenger ? match.opponent_id : match.challenger_id,
+            username: isChallenger ? match.opponent_name : match.challenger_name,
+        };
+    };
+
+    const getDuelEligibleQuestions = () => {
+        if (!activeQuestionsCache || activeQuestionsCache.length === 0)
+            return [];
+        if (duelSettings.rangeMode === "all") return activeQuestionsCache;
+
+        const start = Number.parseInt(duelSettings.rangeStart, 10);
+        const end = Number.parseInt(duelSettings.rangeEnd, 10);
+        if (!Number.isFinite(start) || !Number.isFinite(end)) return [];
+        const from = Math.min(start, end);
+        const to = Math.max(start, end);
+        return activeQuestionsCache.filter(
+            (q) => q.number >= from && q.number <= to,
+        );
+    };
+
+    const validateDuelSettings = () => {
+        if (!subject) return "Nejdriv vyber predmet.";
+        const eligible = getDuelEligibleQuestions();
+        if (duelSettings.rangeMode === "range" && eligible.length < 50) {
+            return "Rozsah musi obsahovat minimalne 50 otazek.";
+        }
+        if (eligible.length < duelSettings.questionCount) {
+            return "V rozsahu neni dost otazek pro zvoleny pocet.";
+        }
+        return "";
+    };
+
+    const createDuelMatch = async (opponent) => {
+        const validation = validateDuelSettings();
+        if (validation) {
+            setDuelError(validation);
+            return;
+        }
+
+        const eligible = getDuelEligibleQuestions();
+        const selectedQuestions = shuffleArray(eligible).slice(
+            0,
+            duelSettings.questionCount,
+        );
+        const questionIds = selectedQuestions.map((q) => q.id);
+
+        const payload = {
+            challenger_id: dbId,
+            opponent_id: opponent.id,
+            challenger_name: user,
+            opponent_name: opponent.username,
+            subject,
+            question_count: duelSettings.questionCount,
+            range_mode: duelSettings.rangeMode,
+            range_start:
+                duelSettings.rangeMode === "range"
+                    ? Number.parseInt(duelSettings.rangeStart, 10)
+                    : null,
+            range_end:
+                duelSettings.rangeMode === "range"
+                    ? Number.parseInt(duelSettings.rangeEnd, 10)
+                    : null,
+            question_ids: questionIds,
+            status: "pending",
+        };
+
+        const { data, error } = await supabase
+            .from("duel_matches")
+            .insert([payload])
+            .select()
+            .single();
+
+        if (error) {
+            console.error("Chyba pri vytvoreni duelu:", error);
+            setDuelError("Nepodarilo se vytvorit duel.");
+            return;
+        }
+
+        setDuelOutgoingMatch(data);
+        setDuelError("");
+        setMode("duel");
+    };
+
+    const acceptDuelInvite = async (invite) => {
+        const startAt = new Date().toISOString();
+        const { data, error } = await supabase
+            .from("duel_matches")
+            .update({
+                status: "active",
+                accepted_at: startAt,
+                started_at: startAt,
+            })
+            .eq("id", invite.id)
+            .eq("status", "pending")
+            .select()
+            .single();
+
+        if (error || !data) {
+            console.error("Chyba pri prijeti duelu:", error);
+            return;
+        }
+
+        setDuelInviteToShow(null);
+        setDuelInvites((prev) => prev.filter((i) => i.id !== invite.id));
+        setDuelOutgoingMatch(null);
+        setDuelActiveMatch(data);
+        duelFinalizeRef.current = false;
+        if (subject !== data.subject) setSubject(data.subject);
+        setMode("duel_match");
+    };
+
+    const declineDuelInvite = async (invite) => {
+        await supabase
+            .from("duel_matches")
+            .update({ status: "declined" })
+            .eq("id", invite.id);
+        setDuelInvites((prev) => prev.filter((i) => i.id !== invite.id));
+        setDuelInviteToShow(null);
+    };
+
+    const getDuelTiming = (match, now) => {
+        const start = new Date(match.started_at).getTime();
+        const elapsed = Math.max(0, now - start);
+        const index = Math.floor(elapsed / DUEL_STEP_MS);
+        const offset = elapsed % DUEL_STEP_MS;
+        const inAnswerWindow = offset < DUEL_ANSWER_SECONDS * 1000;
+        const timeLeft = inAnswerWindow
+            ? Math.max(
+                  0,
+                  DUEL_ANSWER_SECONDS - Math.floor(offset / 1000),
+              )
+            : Math.max(
+                  0,
+                  DUEL_BREAK_SECONDS -
+                      Math.floor((offset - DUEL_ANSWER_SECONDS * 1000) / 1000),
+              );
+        return { index, inAnswerWindow, timeLeft };
+    };
+
+    const getAnswerFor = (userId, questionIndex) =>
+        duelAnswers.find(
+            (answer) =>
+                answer.user_id === userId &&
+                answer.question_index === questionIndex,
+        );
+
+    const computeDuelScore = () => {
+        if (!duelActiveMatch) return { myScore: 0, opponentScore: 0 };
+        const opponent = getDuelOpponent(duelActiveMatch);
+        if (!opponent) return { myScore: 0, opponentScore: 0 };
+        let myScore = 0;
+        let opponentScore = 0;
+
+        for (let i = 0; i < duelActiveMatch.question_count; i += 1) {
+            const question = duelQuestionSet[i];
+            if (!question) continue;
+
+            const myAnswer = getAnswerFor(dbId, i);
+            const opponentAnswer = getAnswerFor(opponent.id, i);
+
+            const myCorrect =
+                myAnswer && myAnswer.answer_index === question.correctIndex;
+            const opponentCorrect =
+                opponentAnswer &&
+                opponentAnswer.answer_index === question.correctIndex;
+
+            if (myCorrect && opponentCorrect) {
+                const myTime = new Date(myAnswer.answered_at).getTime();
+                const opponentTime = new Date(
+                    opponentAnswer.answered_at,
+                ).getTime();
+                if (myTime < opponentTime) myScore += 1;
+                else if (opponentTime < myTime) opponentScore += 1;
+                else {
+                    myScore += 1;
+                    opponentScore += 1;
+                }
+            } else if (myCorrect) {
+                myScore += 1;
+            } else if (opponentCorrect) {
+                opponentScore += 1;
+            }
+        }
+
+        return { myScore, opponentScore };
+    };
+
+    const applyDuelTrophies = async (
+        myScore,
+        opponentScore,
+        questionCount,
+        opponentId,
+    ) => {
+        const multiplier = Math.max(1, questionCount / 5);
+        const isDraw = myScore === opponentScore;
+        const myWin = myScore > opponentScore;
+        const opponentWin = opponentScore > myScore;
+
+        let myDelta = 0;
+        let opponentDelta = 0;
+        let myWins = 0;
+        let myLosses = 0;
+        let myDraws = 0;
+        let opponentWins = 0;
+        let opponentLosses = 0;
+        let opponentDraws = 0;
+
+        if (isDraw) {
+            myDelta = 3 * multiplier;
+            opponentDelta = 3 * multiplier;
+            myDraws = 1;
+            opponentDraws = 1;
+        } else if (myWin) {
+            myDelta = 5 * multiplier;
+            opponentDelta = -2 * multiplier;
+            myWins = 1;
+            opponentLosses = 1;
+        } else if (opponentWin) {
+            myDelta = -2 * multiplier;
+            opponentDelta = 5 * multiplier;
+            myLosses = 1;
+            opponentWins = 1;
+        }
+
+        const { data: stats } = await supabase
+            .from("duel_stats")
+            .select("*")
+            .in("user_id", [dbId, opponentId]);
+
+        const statsById = new Map(
+            (stats || []).map((entry) => [entry.user_id, entry]),
+        );
+
+        const myStats = statsById.get(dbId) || {};
+        const opponentStats = statsById.get(opponentId) || {};
+
+        const payload = [
+            {
+                user_id: dbId,
+                trophies: (myStats.trophies || 0) + myDelta,
+                wins: (myStats.wins || 0) + myWins,
+                losses: (myStats.losses || 0) + myLosses,
+                draws: (myStats.draws || 0) + myDraws,
+                updated_at: new Date().toISOString(),
+            },
+            {
+                user_id: opponentId,
+                trophies: (opponentStats.trophies || 0) + opponentDelta,
+                wins: (opponentStats.wins || 0) + opponentWins,
+                losses: (opponentStats.losses || 0) + opponentLosses,
+                draws: (opponentStats.draws || 0) + opponentDraws,
+                updated_at: new Date().toISOString(),
+            },
+        ];
+
+        await supabase.from("duel_stats").upsert(payload, {
+            onConflict: "user_id",
+        });
+
+        const { data: refreshed } = await supabase
+            .from("duel_stats")
+            .select("*")
+            .eq("user_id", dbId)
+            .maybeSingle();
+        if (refreshed) setDuelStats(refreshed);
+    };
+
+    const finalizeDuelMatch = async () => {
+        if (!duelActiveMatch || duelFinalizeRef.current) return;
+        duelFinalizeRef.current = true;
+
+        const opponent = getDuelOpponent(duelActiveMatch);
+        if (!opponent) return;
+
+        const { myScore, opponentScore } = computeDuelScore();
+        const challengerScore =
+            duelActiveMatch.challenger_id === dbId
+                ? myScore
+                : opponentScore;
+        const opponentScoreValue =
+            duelActiveMatch.challenger_id === dbId
+                ? opponentScore
+                : myScore;
+
+        let winnerId = null;
+        if (myScore > opponentScore) winnerId = dbId;
+        if (opponentScore > myScore) winnerId = opponent.id;
+
+        const { data } = await supabase
+            .from("duel_matches")
+            .update({
+                status: "completed",
+                completed_at: new Date().toISOString(),
+                challenger_score: challengerScore,
+                opponent_score: opponentScoreValue,
+                winner_id: winnerId,
+                result_finalized: true,
+            })
+            .eq("id", duelActiveMatch.id)
+            .eq("result_finalized", false)
+            .select("id");
+
+        if (data && data.length > 0) {
+            await applyDuelTrophies(
+                myScore,
+                opponentScore,
+                duelActiveMatch.question_count,
+                opponent.id,
+            );
+        }
+    };
+
     const handleReportClick = (questionNumber) => {
         setQuestionToReport(questionNumber);
         setReportModalOpen(true);
@@ -1537,7 +2247,7 @@ export default function App() {
                 }
                 const hasScheduled = scheduledTests.length > 0;
                 const menuMapping = [];
-                const modeCount = 8;
+                const modeCount = 9;
                 const getNextIndex = (current, dir) => {
                     let next = current;
                     let safety = 0;
@@ -1552,7 +2262,8 @@ export default function App() {
                             next === 4 ||
                             next === 5 ||
                             (next === 6 && isTeacher) ||
-                            next === 7;
+                            next === 7 ||
+                            next === 8;
                         if (isVisible) return next;
                     } while (safety < 20);
                     return next;
@@ -1590,13 +2301,14 @@ export default function App() {
                             handleStartMode(startNewSmartSession, "smart");
                         else if (selection === 3)
                             handleStartMode(startRandomMode, "random");
-                        else if (selection === 4)
+                        else if (selection === 4) setMode("duel");
+                        else if (selection === 5)
                             handleStartMode(startReviewMode, "review");
-                        else if (selection === 5) {
+                        else if (selection === 6) {
                             if (isTeacher) setMode("teacher_manager");
-                        } else if (selection === 6)
+                        } else if (selection === 7)
                             handleStartMode(startMistakesMode, "mistakes");
-                        else if (selection === 7) openHistoryWithRefresh();
+                        else if (selection === 8) openHistoryWithRefresh();
                     }
                 } else if (
                     k === "a" ||
@@ -1768,6 +2480,69 @@ export default function App() {
 
     if (isSessionBlocked)
         return <SessionBlockedScreen onTakeOver={takeOverSession} />;
+
+    if (mode === "leaderboard") {
+        if (!profileData?.class) {
+            setMode(null);
+            return null;
+        }
+        return (
+            <div
+                className="container fadeIn"
+                style={{
+                    minHeight: "var(--vh)",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                }}
+            >
+                <div className="top-navbar" style={{ width: "100%" }}>
+                    <div className="navbar-group">
+                        <button
+                            className="menuBackButton"
+                            onClick={() => setMode(null)}
+                        >
+                            ←{" "}
+                            <span className="mobile-hide-text">
+                                Zpět do menu
+                            </span>
+                        </button>
+                    </div>
+                    <div className="navbar-group">
+                        <UserBadgeDisplay
+                            user={user}
+                            syncing={syncing}
+                            onLogout={handleLogout}
+                        />
+                        <ThemeToggle
+                            currentTheme={theme}
+                            toggle={toggleTheme}
+                        />
+                    </div>
+                </div>
+                <div
+                    style={{
+                        width: "100%",
+                        maxWidth: "900px",
+                        padding: "1.5rem 1rem 2rem",
+                    }}
+                >
+                    <LeaderboardPanel
+                        entries={leaderboardEntries}
+                        loading={leaderboardLoading}
+                        error={leaderboardError}
+                        title={
+                            profileData?.class
+                                ? `Žebříček třídy ${profileData.class}`
+                                : "Žebříček třídy"
+                        }
+                        className="leaderboard-full"
+                    />
+                </div>
+            </div>
+        );
+    }
 
     if (mode === "teacher_manager") {
         if (!isTeacher) {
@@ -1943,16 +2718,45 @@ export default function App() {
                                     flexDirection: "column",
                                     justifyContent: "center",
                                     width: "100%",
-                                    maxWidth: "800px",
                                 }}
                             >
-                                <SubjectSelector
-                                    menuSelection={menuSelection}
-                                    onSelectSubject={handleSelectSubject}
-                                    onUploadFile={handleFileUpload}
-                                    isKeyboardMode={isKeyboardMode}
-                                    setIsKeyboardMode={setIsKeyboardMode}
-                                />
+                                <div className="subject-menu-layout">
+                                    <div className="subject-menu-main">
+                                        <SubjectSelector
+                                            menuSelection={menuSelection}
+                                            onSelectSubject={handleSelectSubject}
+                                            onUploadFile={handleFileUpload}
+                                            isKeyboardMode={isKeyboardMode}
+                                            setIsKeyboardMode={
+                                                setIsKeyboardMode
+                                            }
+                                        />
+                                        {profileData?.class && (
+                                            <button
+                                                className="leaderboard-mobile-button"
+                                                onClick={() =>
+                                                    setMode("leaderboard")
+                                                }
+                                            >
+                                                🏆 Žebříček třídy
+                                            </button>
+                                        )}
+                                    </div>
+                                    {profileData?.class && (
+                                        <div className="leaderboard-desktop">
+                                            <LeaderboardPanel
+                                                entries={leaderboardEntries}
+                                                loading={leaderboardLoading}
+                                                error={leaderboardError}
+                                                title={
+                                                    profileData?.class
+                                                        ? `Žebříček třídy ${profileData.class}`
+                                                        : "Žebříček třídy"
+                                                }
+                                            />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </>
                     )}
@@ -2108,6 +2912,7 @@ export default function App() {
                             menuSelection={menuSelection}
                             isKeyboardMode={isKeyboardMode}
                             isTeacher={isTeacher}
+                            userClass={profileData?.class}
                 user={user}
                 syncing={syncing}
                 theme={theme}
@@ -2123,6 +2928,7 @@ export default function App() {
                             onStartRandom={() =>
                                 handleStartMode(startRandomMode, "random")
                             }
+                            onStartDuel={() => setMode("duel")}
                             onStartReview={() =>
                                 handleStartMode(startReviewMode, "review")
                             }

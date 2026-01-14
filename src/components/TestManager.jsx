@@ -106,7 +106,22 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
 
             if (codesError) throw codesError;
 
+            const normalizeName = (value) => String(value || '').trim().replace(/_/g, ' ');
             const allStudentNames = [...new Set(codes.map(c => c.used_by))];
+
+            // 1b. Zjistime seznam studentu tridy 4.B
+            const { data: classProfiles, error: classError } = await supabase
+                .from('profiles')
+                .select('username')
+                .eq('class', '4.B');
+
+            if (classError) throw classError;
+
+            const classStudents = new Set(
+                (classProfiles || [])
+                    .map((p) => normalizeName(p.username))
+                    .filter(Boolean)
+            );
 
             // 2. Získáme výsledky
             const { data: results, error: resultsError } = await supabase
@@ -139,10 +154,7 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
             });
 
             // 5. Filtrace a řazení
-            mergedData = mergedData.filter(res => {
-                const parts = res.student_name ? res.student_name.trim().split(/[ _]+/) : [];
-                return parts.length === 2;
-            });
+            mergedData = mergedData.filter(res => classStudents.has(normalizeName(res.student_name)));
 
             mergedData.sort((a, b) => {
                 const partsA = a.student_name.trim().split(/[ _]+/);

@@ -6,17 +6,20 @@ export const MainMenu = ({
     menuSelection,
     isKeyboardMode,
     isTeacher,
+    userClass,
     mistakesCount,
     onOpenScheduled,
     onStartMock,
     onStartSmart,
     onStartRandom,
+    onStartDuel,
     onStartReview,
     onOpenTeacherManager,
     onStartMistakes,
     onClearMistakes,
     onOpenHistory
 }) => {
+    const canSeeScheduledTests = userClass === "4.B";
 
     // Filtrujeme aktivní testy: musí být otevřené A ZÁROVEŇ nesmí být hotové
     // Slouží pro Badge (červené číslo)
@@ -30,7 +33,7 @@ export const MainMenu = ({
     return (
         <div className="menuColumn" style={{ maxWidth: '600px' }}>
             {/* Rychlé upozornění nahoře - ZMĚNA: Kontrola isCompleted */}
-            {scheduledTests.some(t => {
+            {canSeeScheduledTests && scheduledTests.some(t => {
                 const now = new Date();
                 const isOpen = now >= new Date(t.open_at) && now <= new Date(t.close_at);
                 const isCompleted = completedTestIds.includes(t.id);
@@ -42,7 +45,7 @@ export const MainMenu = ({
             )}
 
             {/* --- STANDARDNÍ MENU --- */}
-            <button className={`menuButton primary-style ${menuSelection % 8 === 0 && isKeyboardMode ? "selected" : ""}`} onClick={onStartMock}>
+            <button className={`menuButton primary-style ${menuSelection % 9 === 0 && isKeyboardMode ? "selected" : ""}`} onClick={onStartMock}>
                 <span style={{ fontSize: '1.4rem', fontWeight: '800', textAlign: 'left' }}>Test nanečisto</span>
                 <div className="test-details"><span>⏱️ 30 min</span><span>❓ 40 otázek</span></div>
                 <div className="test-icon-container">✅</div>
@@ -52,8 +55,8 @@ export const MainMenu = ({
 
                 {/* ZMĚNA: Tlačítko se zobrazí pouze pokud existuje alespoň jeden test (scheduledTests.length > 0).
                     Odstraněno "|| isTeacher", protože učitel má své vlastní tlačítko níže. */}
-                {scheduledTests.length > 0 && (
-                    <button className={`menuButton list-style ${menuSelection % 8 === 1 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenScheduled}>
+                {scheduledTests.length > 0 && canSeeScheduledTests && (
+                    <button className={`menuButton list-style ${menuSelection % 9 === 1 && isKeyboardMode ? "selected" : ""}`} onClick={onOpenScheduled}>
                         <span className="list-icon">🗓️</span>
                         <div style={{ flexGrow: 1, textAlign: 'left' }}>
                             <span style={{ display: 'block', fontWeight: 600 }}>Plánované testy</span>
@@ -64,16 +67,24 @@ export const MainMenu = ({
                     </button>
                 )}
 
-                <button className={`menuButton list-style ${menuSelection % 8 === 2 && isKeyboardMode ? "selected" : ""}`} onClick={onStartSmart}>
+                <button className={`menuButton list-style ${menuSelection % 9 === 2 && isKeyboardMode ? "selected" : ""}`} onClick={onStartSmart}>
                     <span className="list-icon">🎓</span>
                     <div style={{ flexGrow: 1, textAlign: 'left' }}><span style={{ display: 'block', fontWeight: 600 }}>Chytré učení</span><small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Opakování s rozestupy dle historie tvých chyb.</small></div>
                 </button>
-                <button className={`menuButton list-style ${menuSelection % 8 === 3 && isKeyboardMode ? "selected" : ""}`} onClick={onStartRandom}>
+                <button className={`menuButton list-style ${menuSelection % 9 === 3 && isKeyboardMode ? "selected" : ""}`} onClick={onStartRandom}>
                     <span className="list-icon">🧠</span>
                     <div style={{ flexGrow: 1, textAlign: 'left' }}><span style={{ display: 'block', fontWeight: 600 }}>Flashcards</span><small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Náhodný trénink s okamžitou kontrolou.</small></div>
                 </button>
 
-                <button className={`menuButton list-style ${menuSelection % 8 === 4 && isKeyboardMode ? "selected" : ""}`} onClick={onStartReview}>
+                <button className={`menuButton list-style ${menuSelection % 9 === 4 && isKeyboardMode ? "selected" : ""}`} onClick={onStartDuel}>
+                    <span className="list-icon">Ð«"‹</span>
+                    <div style={{ flexGrow: 1, textAlign: 'left' }}>
+                        <span style={{ display: 'block', fontWeight: 600 }}>Duel</span>
+                        <small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Souboj 1v1 s online spoluŽóky.</small>
+                    </div>
+                </button>
+
+                <button className={`menuButton list-style ${menuSelection % 9 === 5 && isKeyboardMode ? "selected" : ""}`} onClick={onStartReview}>
                     <span className="list-icon">📚</span>
                     <div style={{ flexGrow: 1, textAlign: 'left' }}><span style={{ display: 'block', fontWeight: 600 }}>Prohlížení otázek</span><small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Vyhledávání a kontrola všech otázek v přehledném gridu.</small></div>
                 </button>
@@ -81,7 +92,7 @@ export const MainMenu = ({
                 {/* Tlačítko pro správu testů - vidí ho jen učitel */}
                 {isTeacher && (
                     <button 
-                        className={`menuButton list-style ${menuSelection % 8 === 5 && isKeyboardMode ? "selected" : ""}`} 
+                        className={`menuButton list-style ${menuSelection % 9 === 6 && isKeyboardMode ? "selected" : ""}`} 
                         onClick={onOpenTeacherManager} 
                         style={{ 
                             marginTop: '0.5rem', 
@@ -100,7 +111,7 @@ export const MainMenu = ({
                     </button>
                 )}
 
-                <button className={`menuButton list-style danger-style ${menuSelection % 8 === 6 && isKeyboardMode ? "selected" : ""}`} onClick={onStartMistakes} style={{ marginTop: '1.5rem' }}>
+                <button className={`menuButton list-style danger-style ${menuSelection % 9 === 7 && isKeyboardMode ? "selected" : ""}`} onClick={onStartMistakes} style={{ marginTop: '1.5rem' }}>
                     <span className="list-icon">🚑</span>
                     <span style={{ flexGrow: 1, textAlign: 'left' }}><span style={{ display: 'block', fontWeight: 600, color: 'var(--color-text-main)' }}>Opravna chyb</span><small style={{ color: 'var(--color-text-neutral)', fontSize: '0.85rem' }}>Znovu testuje pouze otázky, ve kterých jsi chyboval.</small></span>
                     {mistakesCount > 0 ? (
@@ -111,32 +122,14 @@ export const MainMenu = ({
                     ) : (<span style={{ opacity: 0.6 }}>✓</span>)}
                 </button>
 
-                <div 
-                    className={`history-footer-btn ${menuSelection % 8 === 7 && isKeyboardMode ? "selected" : ""}`} 
-                    onClick={onOpenHistory} 
-                    style={{ 
-                        marginTop: '1.5rem', 
-                        padding: '0.8rem 1.2rem', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        gap: '8px',
-                        cursor: 'pointer',
-                        borderRadius: '12px',
-                        background: 'rgba(255, 255, 255, 0.03)',
-                        border: menuSelection % 8 === 7 && isKeyboardMode ? '1px solid var(--color-primary)' : '1px solid rgba(255, 255, 255, 0.1)',
-                        transition: 'all 0.2s ease',
-                        color: 'var(--color-text-secondary)',
-                        fontSize: '0.9rem',
-                        fontWeight: '500',
-                        width: 'fit-content',
-                        margin: '1.5rem auto 0 auto',
-                        boxShadow: menuSelection % 8 === 7 && isKeyboardMode ? '0 0 15px rgba(59, 130, 246, 0.2)' : 'none'
-                    }}
+                <button
+                    type="button"
+                    className={`history-footer-btn ${menuSelection % 9 === 8 && isKeyboardMode ? "selected" : ""}`}
+                    onClick={onOpenHistory}
                 >
                     <span>Historie výsledků</span>
                     <span style={{ opacity: 0.8 }}>📊</span>
-                </div>
+                </button>
                 <div className="keyboard-hints" style={{ marginTop: "1rem", fontSize: "0.9rem", color: "#888", textAlign: "center", lineHeight: "1.6", flexShrink: 0, marginBottom: "1rem" }}>
                     Klávesy: W/S ↑↓ – výběr • A/D ←→ – otázky<br />Mezerník – potvrzení • Enter – potvrzení / další • Esc – zrušit
                 </div>

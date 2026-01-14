@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -430,6 +430,133 @@ body.light-mode .user-badge {
     line-height: 1.5;
 }
 
+.user-management {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+}
+
+.admin-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+    color: var(--color-text-main);
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-card-border);
+    font-size: 0.9rem;
+}
+
+.admin-table th {
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.75rem;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--color-text-secondary);
+}
+
+.admin-input,
+.admin-select {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    border: 1px solid var(--color-card-border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-main);
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.class-badge,
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+
+.role-badge.user {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.edit-btn,
+.save-btn,
+.cancel-btn {
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid transparent;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.edit-btn {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+    color: #bfdbfe;
+}
+
+.save-btn {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.45);
+    color: #86efac;
+}
+
+.cancel-btn {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fecaca;
+}
+
+@media (hover: hover) {
+    .edit-btn:hover,
+    .save-btn:hover,
+    .cancel-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.1);
+    }
+}
+
 /* === ADMIN PANEL LIGHT MODE FIXES === */
 body.light-mode .admin-tabs {
     background: #ffffff;
@@ -476,6 +603,60 @@ body.light-mode .admin-section-card {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
+body.light-mode .user-management {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .admin-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+body.light-mode .admin-input,
+body.light-mode .admin-select {
+    background: #ffffff;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+body.light-mode .class-badge,
+body.light-mode .role-badge {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+body.light-mode .role-badge.admin {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #1d4ed8;
+}
+
+body.light-mode .role-badge.user {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #047857;
+}
+
+body.light-mode .edit-btn {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.25);
+    color: #1d4ed8;
+}
+
+body.light-mode .save-btn {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.25);
+    color: #15803d;
+}
+
+body.light-mode .cancel-btn {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.25);
+    color: #b91c1c;
+}
+
 body.light-mode .admin-toolbar .navButton { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
 
 /* OPRAVA PRIMÁRNÍHO TLAČÍTKA PRO LIGHT MODE - KONTRAST */
@@ -509,8 +690,10 @@ body.light-mode .backArrowBtn { color: #0f172a; }
 html, body {
   width: 100%; 
   height: 100%;
-  background: var(--color-bg-start);
-  background-attachment: fixed; background-size: cover;
+  background-color: var(--color-bg-start);
+  background-image: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+  background-attachment: fixed;
+  background-size: cover;
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
   color: var(--color-text-main);
   transition: background-color 0.4s ease, color 0.4s ease;
@@ -756,6 +939,76 @@ body.keyboard-mode-active * {
 
 .menuButton.danger-style span:not(.list-icon) { color: var(--color-text-main); }
 .menuButton.danger-style .list-icon { color: var(--color-error); }
+
+.history-footer-btn {
+    margin: 1.5rem auto 0;
+    padding: 0.8rem 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 14px;
+    background: #252a41;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: fit-content;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.35);
+}
+
+.history-footer-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 120%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transition: left 0.5s ease;
+}
+
+@media (hover: hover) {
+    .history-footer-btn:hover {
+        background: #363d5a;
+        border-color: rgba(255, 255, 255, 0.22);
+        transform: translateY(-1px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.5);
+    }
+
+    .history-footer-btn:hover::before {
+        left: 120%;
+    }
+}
+
+.history-footer-btn.selected {
+    border-color: var(--color-primary);
+    color: var(--color-text-main);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.25), 0 8px 20px rgba(15, 23, 42, 0.35);
+}
+
+body.light-mode .history-footer-btn {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #0f172a;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+@media (hover: hover) {
+    body.light-mode .history-footer-btn:hover {
+        background: #f8fafc;
+        border-color: var(--color-primary);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+}
+
+body.light-mode .history-footer-btn.selected {
+    box-shadow: 0 0 15px rgba(37, 99, 235, 0.25), 0 6px 16px rgba(0, 0, 0, 0.1);
+}
 .clearMistakesIcon { opacity: 0.7; transition: opacity 0.2s, transform 0.2s; }
 
 @media (hover: hover) {
@@ -1200,13 +1453,13 @@ body.light-mode .reviewImageWrapper {
     min-height: 100%; /* Místo fixní výšky */
     width: 100%; 
     padding: 2rem 1rem; /* Upraven padding */
-    padding-bottom: 4rem; /* Místo 20vh, což bylo moc */
+    padding-bottom: 0.5rem;
 }
 
 .subjectContent { text-align: center; width: 100%; max-width: 1200px; }
 .subjectTitle { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 900; margin-bottom: 0.5rem; background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
 .subjectSubtitle { font-size: 1.2rem; color: var(--color-text-neutral); margin-bottom: 3rem; }
-.subjectGrid { display: grid; width: 100%; justify-content: center; padding-bottom: 2rem; grid-template-columns: 1fr; gap: 1.5rem; max-width: 500px; margin: 0 auto; }
+.subjectGrid { display: grid; width: 100%; justify-content: center; padding-bottom: 0; grid-template-columns: 1fr; gap: 1.5rem; max-width: 500px; margin: 0 auto; }
 .subjectButton { width: 100%; height: 100%; min-height: 220px; padding: 2rem 1rem; background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.3)); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: var(--color-text-main); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; overflow: hidden; }
 .subjectButton::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 60%); opacity: 0; transition: opacity 0.4s ease; }
 body.light-mode .subjectButton { background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6)); border-color: rgba(255, 255, 255, 0.8); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); }
@@ -1302,59 +1555,123 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
 }
 
 /* === HISTORY VIEW REDESIGN === */
+.historyPage {
+    position: relative;
+}
+
+.historyTitle {
+    text-shadow: 0 10px 30px rgba(15, 23, 42, 0.55);
+}
+
 .historyStatsGrid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.8rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.9rem;
+    margin: 0.6rem 0 1.8rem;
 }
 
 .historyStatCard {
-    background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
-    border: 1px solid var(--color-card-border);
+    background: linear-gradient(145deg, rgba(24, 33, 54, 0.95), rgba(20, 27, 45, 0.85));
+    border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 16px;
-    padding: 1rem 0.8rem;
+    padding: 1rem 0.9rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.historyStatCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+.historyStatCard::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 55%);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+@media (hover: hover) {
+    .historyStatCard:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.4);
+        border-color: rgba(148, 163, 184, 0.3);
+    }
 }
 
 .historyStatCardHighlight {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
-    border-color: rgba(251, 191, 36, 0.3);
+    background: linear-gradient(140deg, rgba(251, 191, 36, 0.22), rgba(245, 158, 11, 0.12));
+    border-color: rgba(251, 191, 36, 0.35);
+    box-shadow: 0 10px 24px rgba(245, 158, 11, 0.15);
 }
 
 .historyStatIcon {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .historyStatContent {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.2rem;
+    gap: 0.25rem;
 }
 
 .historyStatValue {
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     font-weight: 800;
     color: var(--color-text-main);
+    letter-spacing: -0.3px;
 }
 
 .historyStatLabel {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     color: var(--color-text-neutral);
     font-weight: 600;
     text-align: center;
+}
+
+.historyChartCard {
+    background: linear-gradient(145deg, rgba(21, 28, 46, 0.95), rgba(15, 21, 36, 0.92));
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 22px;
+    padding: 1.6rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(8, 12, 26, 0.45);
+}
+
+.historyChartCard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.14), transparent 60%);
+    pointer-events: none;
+}
+
+.historyChartTitle {
+    margin: 0 0 1.2rem;
+    text-align: center;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    letter-spacing: 0.2px;
+}
+
+.historyChartCanvas {
+    height: 240px;
+    width: 100%;
 }
 
 .historyListHeader {
@@ -1362,19 +1679,24 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    padding: 0.3rem 0.3rem 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .historyListTitle {
     font-size: 1.1rem;
     margin: 0;
-    padding-left: 0.3rem;
     color: var(--color-text-main);
 }
 
 .historyPageInfo {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--color-text-neutral);
-    font-weight: 500;
+    font-weight: 600;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 42, 0.35);
 }
 
 .historyEmpty {
@@ -1383,6 +1705,7 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
     background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
     border-radius: 20px;
     border: 1px solid var(--color-card-border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 
 .historyEmptyIcon {
@@ -1400,25 +1723,40 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
 .historyList {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.7rem;
 }
 
 .historyItem {
     background: linear-gradient(135deg, var(--color-card-bg-start) 0%, var(--color-card-bg-end) 100%);
-    border: 1px solid var(--color-card-border);
+    border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 16px;
-    padding: 0.9rem 1.2rem;
+    padding: 0.95rem 1.2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     animation: slideUp 0.3s ease both;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.historyItem::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    background: var(--score-color, var(--color-primary));
+    opacity: 0.6;
+    border-radius: 999px;
 }
 
 .historyItem:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+    border-color: rgba(148, 163, 184, 0.35);
 }
 
 .historyItemLeft {
@@ -1460,7 +1798,7 @@ body.light-mode .subjectButton.uploadButton { background: rgba(255, 255, 255, 0.
 
 .historyItemSubject {
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-text-neutral);
     background: rgba(255, 255, 255, 0.08);
     padding: 0.15rem 0.5rem;
@@ -1479,7 +1817,7 @@ body.light-mode .historyItemSubject {
 .historyItemRight {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .historyItemScore {
@@ -1487,6 +1825,11 @@ body.light-mode .historyItemSubject {
     flex-direction: column;
     align-items: flex-end;
     gap: 0.1rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    min-width: 64px;
 }
 
 .historyItemPercent {
@@ -1500,20 +1843,27 @@ body.light-mode .historyItemSubject {
 }
 
 .historyDeleteBtn {
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid transparent;
     cursor: pointer;
     font-size: 1.1rem;
-    opacity: 0.3;
+    opacity: 0.6;
     padding: 8px;
-    transition: opacity 0.2s, transform 0.2s;
+    transition: opacity 0.2s, transform 0.2s, background 0.2s, border-color 0.2s;
     color: var(--color-text-main);
-    border-radius: 8px;
+    border-radius: 10px;
+}
+
+.historyItem:hover .historyDeleteBtn {
+    opacity: 0.9;
 }
 
 .historyDeleteBtn:hover {
     opacity: 1;
-    transform: scale(1.1);
+    transform: scale(1.05);
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: var(--color-error);
 }
 
 @keyframes slideUp {
@@ -1532,22 +1882,28 @@ body.light-mode .historyItemSubject {
         grid-template-columns: repeat(3, 1fr);
         gap: 0.6rem;
     }
-    
+
     .historyStatCard {
         padding: 0.8rem 0.5rem;
         border-radius: 12px;
     }
-    
+
     .historyStatIcon {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+        width: 32px;
+        height: 32px;
     }
-    
+
     .historyStatValue {
         font-size: 1.1rem;
     }
-    
+
     .historyStatLabel {
         font-size: 0.6rem;
+    }
+
+    .historyChartCanvas {
+        height: 210px;
     }
 }
 
@@ -1555,39 +1911,91 @@ body.light-mode .historyItemSubject {
     .historyStatsGrid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .historyStatCardHighlight {
         grid-column: span 2;
     }
-    
+
     .historyItem {
         padding: 0.8rem 1rem;
         border-radius: 14px;
     }
-    
+
     .historyItemIcon {
         width: 38px;
         height: 38px;
         font-size: 1.2rem;
         border-radius: 10px;
     }
-    
+
     .historyItemMode {
         font-size: 0.9rem;
     }
-    
+
     .historyItemPercent {
         font-size: 1.1rem;
     }
-    
+
     .historyItemRight {
         gap: 0.6rem;
     }
-    
+
     .historyDeleteBtn {
         padding: 6px;
         font-size: 1rem;
     }
+}
+
+body.light-mode .historyTitle {
+    text-shadow: 0 8px 20px rgba(148, 163, 184, 0.6);
+}
+
+body.light-mode .historyStatCard {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border-color: rgba(203, 213, 225, 0.9);
+}
+
+body.light-mode .historyStatCard::after {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.08), transparent 55%);
+}
+
+body.light-mode .historyStatIcon {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: rgba(37, 99, 235, 0.18);
+}
+
+body.light-mode .historyChartCard {
+    background: linear-gradient(145deg, #ffffff, #eef2f7);
+    border-color: rgba(203, 213, 225, 0.9);
+    box-shadow: 0 14px 30px rgba(148, 163, 184, 0.35);
+}
+
+body.light-mode .historyChartCard::before {
+    background: radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 60%);
+}
+
+body.light-mode .historyListHeader {
+    border-bottom-color: rgba(148, 163, 184, 0.35);
+}
+
+body.light-mode .historyPageInfo {
+    background: #ffffff;
+    border-color: rgba(148, 163, 184, 0.6);
+    color: #475569;
+}
+
+body.light-mode .historyItem {
+    border-color: rgba(203, 213, 225, 0.8);
+}
+
+body.light-mode .historyItemScore {
+    background: rgba(226, 232, 240, 0.7);
+    border-color: rgba(203, 213, 225, 0.8);
+}
+
+body.light-mode .historyDeleteBtn {
+    background: rgba(148, 163, 184, 0.15);
+    color: #475569;
 }
 
 /* === HISTORY PAGINATION === */
@@ -1834,3 +2242,246 @@ body.light-mode .historyItemSubject {
         flex-shrink: 0; /* Zabrání smrsknutí tlačítek */
     }
 }
+
+/* === LEADERBOARD === */
+.subject-menu-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.subject-menu-main {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.leaderboard-desktop {
+    display: none;
+    width: 100%;
+    max-width: 420px;
+    margin-top: 1rem;
+}
+
+.leaderboard-panel {
+    background: rgba(20, 24, 38, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1rem 1.2rem;
+    color: var(--color-text-main);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+}
+
+.leaderboard-panel h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.leaderboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+}
+
+.leaderboard-state {
+    color: var(--color-text-neutral);
+    font-size: 0.95rem;
+    padding: 0.6rem 0;
+}
+
+.leaderboard-state.error {
+    color: var(--color-error);
+}
+
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.leaderboard-row {
+    display: flex;
+    gap: 0.9rem;
+    padding: 0.8rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-rank {
+    width: 42px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.leaderboard-rank-number {
+    font-weight: 700;
+    color: var(--color-text-neutral);
+}
+
+.leaderboard-medal {
+    font-size: 1.5rem;
+}
+
+.leaderboard-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.leaderboard-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.leaderboard-name {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.leaderboard-total {
+    font-weight: 700;
+    color: var(--color-primary-light);
+    font-size: 0.95rem;
+}
+
+.leaderboard-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--color-text-neutral);
+}
+
+.leaderboard-detail-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.leaderboard-detail-label {
+    font-weight: 600;
+    color: var(--color-text-main);
+}
+
+.leaderboard-mobile-button {
+    display: flex;
+    margin-top: 0;
+    width: 100%;
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 16px;
+    padding: 0.95rem 1.3rem;
+    background: linear-gradient(
+        135deg,
+        rgba(37, 99, 235, 0.35),
+        rgba(30, 58, 138, 0.25)
+    );
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.35);
+}
+
+.leaderboard-mobile-button:hover {
+    background: linear-gradient(
+        135deg,
+        rgba(37, 99, 235, 0.5),
+        rgba(30, 58, 138, 0.35)
+    );
+    border-color: rgba(59, 130, 246, 0.6);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.45);
+}
+
+.leaderboard-full {
+    width: 100%;
+}
+
+body.light-mode .leaderboard-panel {
+    background: #ffffff;
+    border-color: #e2e8f0;
+    color: #0f172a;
+    box-shadow: 0 12px 30px rgba(148, 163, 184, 0.35);
+}
+
+body.light-mode .leaderboard-row {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+body.light-mode .leaderboard-rank-number {
+    color: #64748b;
+}
+
+body.light-mode .leaderboard-total {
+    color: var(--color-primary);
+}
+
+body.light-mode .leaderboard-details {
+    color: #64748b;
+}
+
+body.light-mode .leaderboard-detail-label {
+    color: #0f172a;
+}
+
+body.light-mode .leaderboard-mobile-button {
+    background: linear-gradient(
+        135deg,
+        rgba(37, 99, 235, 0.12),
+        rgba(37, 99, 235, 0.05)
+    );
+    color: #0f172a;
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.35);
+}
+
+body.light-mode .leaderboard-mobile-button:hover {
+    background: linear-gradient(
+        135deg,
+        rgba(37, 99, 235, 0.18),
+        rgba(37, 99, 235, 0.08)
+    );
+    border-color: rgba(37, 99, 235, 0.5);
+    box-shadow: 0 14px 32px rgba(148, 163, 184, 0.45);
+}
+
+@media (min-width: 1024px) {
+    .leaderboard-desktop {
+        display: none;
+        position: static;
+        max-height: none;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 1023px) {
+    .subject-menu-layout {
+        flex-direction: column;
+    }
+
+    .leaderboard-mobile-button {
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
