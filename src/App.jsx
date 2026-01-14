@@ -1779,6 +1779,10 @@ export default function App() {
                 onBack={() => setMode(null)}
                 subject={subject}
                 isTeacher={isTeacher}
+                user={user}
+                syncing={syncing}
+                theme={theme}
+                toggleTheme={toggleTheme}
             />
         );
     }
@@ -2104,6 +2108,10 @@ export default function App() {
                             menuSelection={menuSelection}
                             isKeyboardMode={isKeyboardMode}
                             isTeacher={isTeacher}
+                user={user}
+                syncing={syncing}
+                theme={theme}
+                toggleTheme={toggleTheme}
                             mistakesCount={mistakesCount}
                             onOpenScheduled={() => setMode("scheduled_list")}
                             onStartMock={() =>

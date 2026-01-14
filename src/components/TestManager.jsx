@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { supabase } from '../supabaseClient';
 import { SubjectBadge } from './SubjectBadge';
 import { ConfirmModal } from './Modals';
+import { ResultScreen } from './ResultScreen';
+import { CustomImageModal } from './CustomImageModal';
 
 // Styl pro overlay (pouze pro detail studenta a formuláře, ne pro seznam výsledků)
 const overlayStyle = {
@@ -20,7 +23,7 @@ const overlayStyle = {
     padding: '1rem'
 };
 
-export function TestManager({ onBack, subject, isTeacher }) {
+export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, toggleTheme }) {
     const [tests, setTests] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -34,6 +37,9 @@ export function TestManager({ onBack, subject, isTeacher }) {
 
     // --- STAV PRO DETAIL KONKRÉTNÍHO ŽÁKA (MODAL) ---
     const [viewingResult, setViewingResult] = useState(null);
+    const [resultScreenQuestions, setResultScreenQuestions] = useState([]);
+    const [resultScreenLoading, setResultScreenLoading] = useState(false);
+    const [zoomImage, setZoomImage] = useState(null);
 
     const [formData, setFormData] = useState({
         title: '', open_at: '', close_at: '', time_limit: 30, question_count: 20, topic_range_start: 1, topic_range_end: 50
@@ -44,17 +50,20 @@ export function TestManager({ onBack, subject, isTeacher }) {
 
     // --- EFEKT PRO ZABLOKOVÁNÍ SCROLLOVÁNÍ ---
     useEffect(() => {
-        // Blokujeme scroll jen pro "opravdové" modaly (Detail studenta, Form, Delete), ne pro stránku s výsledky
+        // Blokujeme scroll jen pro "opravdov" modaly (Detail studenta, Form, Delete), ne pro stranku s vysledky
         const isAnyModalOpen = viewingResult || showForm || confirmDeleteId || confirmDeleteResultId;
 
         if (isAnyModalOpen) {
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
+            document.documentElement.style.overflow = 'unset';
         }
 
         return () => {
             document.body.style.overflow = 'unset';
+            document.documentElement.style.overflow = 'unset';
         };
     }, [viewingResult, showForm, confirmDeleteId, confirmDeleteResultId]);
 
@@ -212,6 +221,130 @@ export function TestManager({ onBack, subject, isTeacher }) {
         else await supabase.from('scheduled_tests').insert([payload]);
         setShowForm(false); fetchTests();
     };
+    const formatDuration = (seconds) => {
+        if (!Number.isFinite(seconds) || seconds <= 0) return '-';
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}m ${secs}s`;
+    };
+    const escapeHtml = (value) => {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    };
+    const buildResultsPdfHtml = () => {
+        const title = (tests.find(test => test.id === viewingTestId)?.title) || 'Vysledky testu';
+        const generatedAt = new Date().toLocaleString('cs-CZ', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const rowsHtml = currentTestResults.map((res) => {
+            const isNotStarted = res.status === 'not_started';
+            const isRunning = res.status === 'running' || res.status === 'in_progress' || (res.score_total > 0 && res.time_spent === 0 && (!res.answers || res.answers.length === 0));
+            const percent = res.score_total > 0 ? Math.round((res.score_correct / res.score_total) * 100) : 0;
+            let grade = 5;
+            if (percent >= 84) grade = 1;
+            else if (percent >= 67) grade = 2;
+            else if (percent >= 50) grade = 3;
+            else if (percent >= 33) grade = 4;
+            const status = isNotStarted ? 'Nezacal/a' : isRunning ? 'Probiha' : 'Dokonceno';
+            const scoreText = isNotStarted || isRunning ? '-' : `${res.score_correct} / ${res.score_total}`;
+            const percentText = isNotStarted || isRunning ? '-' : `${percent}% (${grade})`;
+            return `\n                <tr>\n                    <td>${escapeHtml(res.student_name || '')}</td>\n                    <td>${status}</td>\n                    <td>${scoreText}</td>\n                    <td>${percentText}</td>\n                    <td>${formatDuration(res.time_spent)}</td>\n                </tr>\n            `;
+        }).join('');
+
+        return `<!doctype html>\n<html lang="cs">\n<head>\n    <meta charset="utf-8" />\n    <title>${escapeHtml(title)} - Export PDF</title>\n    <style>\n        * { box-sizing: border-box; }\n        body { font-family: Arial, sans-serif; margin: 32px; color: #111827; }\n        h1 { margin: 0 0 4px; font-size: 20px; }\n        .meta { color: #6b7280; font-size: 12px; margin-bottom: 16px; }\n        table { width: 100%; border-collapse: collapse; font-size: 12px; }\n        th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }\n        th { background: #f3f4f6; }\n        tr:nth-child(even) td { background: #fafafa; }\n    </style>\n</head>\n<body>\n    <h1>${escapeHtml(title)}</h1>\n    <div class="meta">Export vytvoren: ${escapeHtml(generatedAt)}</div>\n    <table>\n        <thead>\n            <tr>\n                <th>Student</th>\n                <th>Stav</th>\n                <th>Skore</th>\n                <th>Uspesnost</th>\n                <th>Cas</th>\n            </tr>\n        </thead>\n        <tbody>\n            ${rowsHtml || '<tr><td colspan="5">Zadne vysledky.</td></tr>'}\n        </tbody>\n    </table>\n</body>\n</html>`;
+    };
+    const handleExportPdf = () => {
+        const html = buildResultsPdfHtml();
+        const win = window.open('', '_blank');
+        if (!win) {
+            alert('Pro export PDF povolte vyskakovaci okna pro tento web.');
+            return;
+        }
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        win.focus();
+        win.onload = () => {
+            setTimeout(() => {
+                win.focus();
+                win.print();
+            }, 200);
+        };
+    };
+    const buildResultQuestionSet = (result, questions) => {
+        const answers = Array.isArray(result?.answers) ? result.answers : [];
+        const questionMap = new Map((questions || []).map((q) => [q.number, q]));
+        return answers.map((ans, index) => {
+            const qNum = Number.parseInt(ans.qNum, 10);
+            const record = Number.isFinite(qNum) ? questionMap.get(qNum) : undefined;
+            const options = Array.isArray(record?.options) ? record.options : ["", "", "", ""];
+            const correctIndex = Number.isFinite(ans.correct)
+                ? ans.correct
+                : (Number.isFinite(record?.correct_index) ? record.correct_index : 0);
+            const hasUser = ans.user === 0 || Number.isFinite(ans.user);
+            const userAnswer = hasUser ? ans.user : undefined;
+            const number = Number.isFinite(qNum) ? qNum : index + 1;
+
+            return {
+                number,
+                id: record?.id || null,
+                question: record?.question || `Otazka #${number}`,
+                options,
+                correctIndex,
+                userAnswer,
+                image_base64: record?.image_base64 || null,
+            };
+        });
+    };
+    const fetchQuestionsForResult = async (result) => {
+        const answers = Array.isArray(result?.answers) ? result.answers : [];
+        if (answers.length === 0) return [];
+
+        const qNums = [...new Set(
+            answers
+                .map((ans) => Number.parseInt(ans.qNum, 10))
+                .filter((num) => Number.isFinite(num))
+        )];
+
+        let questions = [];
+        if (qNums.length > 0) {
+            const { data, error } = await supabase
+                .from('questions')
+                .select('id, number, question, options, correct_index, image_base64')
+                .eq('subject', subject)
+                .in('number', qNums);
+            if (error) {
+                console.error("Chyba pri nacitani otazek:", error);
+            } else {
+                questions = data || [];
+            }
+        }
+
+        return buildResultQuestionSet(result, questions);
+    };
+    const openResultScreen = async (result) => {
+        setViewingResult(result);
+        setResultScreenQuestions([]);
+        setResultScreenLoading(true);
+        try {
+            const questionSet = await fetchQuestionsForResult(result);
+            setResultScreenQuestions(questionSet);
+        } finally {
+            setResultScreenLoading(false);
+        }
+    };
+    const closeResultScreen = () => {
+        setViewingResult(null);
+        setResultScreenQuestions([]);
+        setZoomImage(null);
+    };
+    const resultOverlayStyle = {
+        ...overlayStyle,
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(6px)',
+        zIndex: 10000
+    };
     const formatDate = (dateString) => {
         if (!dateString) return <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Neurčeno</span>;
         return new Date(dateString).toLocaleString('cs-CZ', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -223,47 +356,62 @@ export function TestManager({ onBack, subject, isTeacher }) {
         return t ? t.title : 'Výsledky testu';
     };
 
-    // --- 1. POHLED: MODAL S DETAILEM ODPOVĚDÍ (ZŮSTÁVÁ MODAL) ---
-    const renderDetailModal = () => (
-        viewingResult && (
-            <div style={overlayStyle} onClick={(e) => { if(e.target === e.currentTarget) setViewingResult(null); }}>
-                <div className="modal fadeIn" style={{ maxWidth: '500px', width: '95%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ marginBottom: '1rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.5rem' }}>
-                        <h2 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-text-main)' }}>👤 {viewingResult.student_name.replace('_', ' ')}</h2>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)', marginTop: '0.3rem' }}>Úspěšnost: <span style={{ fontWeight: 'bold' }}>{Math.round((viewingResult.score_correct / viewingResult.score_total) * 100)}%</span></div>
+        // --- 1. VIEW: RESULT SCREEN MODAL ---
+    const renderResultScreenModal = () => (
+        viewingResult
+            ? createPortal(
+                <div style={resultOverlayStyle} onClick={closeResultScreen}>
+                    <div
+                        className="fadeIn"
+                        style={{
+                            width: 'min(1100px, 96vw)',
+                            maxHeight: '90vh',
+                            background: 'var(--color-card-bg-start)',
+                            border: '1px solid var(--color-card-border)',
+                            borderRadius: '18px',
+                            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
+                            overflow: 'hidden'
+                        }}
+                        onClick={(e) => { e.stopPropagation(); }}
+                    >
+                        <div style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+                            {resultScreenLoading ? (
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-text-secondary)' }}>
+                                    Nacitam vysledky...
+                                </div>
+                            ) : (
+                                <ResultScreen
+                                    mode="real_test"
+                                    score={{ correct: viewingResult.score_correct || 0, total: viewingResult.score_total || 0 }}
+                                    trainingTime={viewingResult.time_spent || 0}
+                                    questionSet={resultScreenQuestions}
+                                    maxSeenIndex={resultScreenQuestions.length - 1}
+                                    onBack={closeResultScreen}
+                                    currentSubject={subject}
+                                    timeLeftAtSubmit={0}
+                                    onZoom={(src) => setZoomImage(src)}
+                                    user={user}
+                                    syncing={syncing}
+                                    onReport={() => {}}
+                                    theme={theme}
+                                    toggleTheme={toggleTheme}
+                                    embedded
+                                />
+                            )}
+                        </div>
                     </div>
-                    <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }}>
-                        {(!viewingResult.answers || viewingResult.answers.length === 0) ? <div style={{ fontStyle: 'italic', color: 'var(--color-text-secondary)' }}>Detailní odpovědi nejsou k dispozici.</div> : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                {viewingResult.answers.map((ans, idx) => {
-                                    const isCorrect = ans.user === ans.correct;
-                                    const isUnanswered = ans.user === null || ans.user === undefined;
-                                    let bgStyle = isCorrect ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)';
-                                    let borderStyle = isCorrect ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-                                    if (isUnanswered) { bgStyle = 'rgba(0, 0, 0, 0.03)'; borderStyle = 'rgba(0, 0, 0, 0.1)'; }
-                                    return (
-                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.6rem 0.8rem', borderRadius: '8px', background: bgStyle, border: `1px solid ${borderStyle}` }}>
-                                            <div style={{ fontWeight: '600', color: 'var(--color-text-main)' }}>Otázka {ans.qNum || idx + 1}</div>
-                                            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem' }}>
-                                                {isCorrect ? <span style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>✅ {getLetter(ans.user)}</span> : isUnanswered ? <><span style={{ color: 'var(--color-text-secondary)', opacity: 0.5, fontStyle: 'italic' }}>Neodpovězeno</span><span style={{ color: 'var(--color-text-secondary)', fontWeight: 'bold' }}>→ {getLetter(ans.correct)}</span></> : <><span style={{ color: 'var(--color-error)', textDecoration: 'line-through' }}>{getLetter(ans.user)}</span><span style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>→ {getLetter(ans.correct)}</span></>}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                    <button className="navButton" style={{ marginTop: '1rem', width: '100%' }} onClick={() => setViewingResult(null)}>Zavřít</button>
-                </div>
-            </div>
-        )
+                </div>,
+                document.body
+            )
+            : null
     );
 
     // --- 2. POHLED: STRÁNKA S VÝSLEDKY ---
     if (resultsViewOpen) {
         return (
             <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
-                {renderDetailModal()}
+                {renderResultScreenModal()}
+                <CustomImageModal src={zoomImage} onClose={() => setZoomImage(null)} />
                 {confirmDeleteResultId && <ConfirmModal title="Resetovat pokus?" message="Tímto smažete záznam studenta. Bude moci test vyplnit znovu." onCancel={() => setConfirmDeleteResultId(null)} onConfirm={handleDeleteResult} confirmText="Smazat pokus" danger={true} />}
 
                 <div className="top-navbar">
@@ -275,6 +423,7 @@ export function TestManager({ onBack, subject, isTeacher }) {
                     </div>
                     <div className="navbar-group">
                         <button className="menuBackButton" onClick={() => fetchResultsForPage(viewingTestId)} title="Obnovit data">🔄</button>
+                        <button className="navButton" onClick={handleExportPdf} disabled={currentTestResults.length === 0} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', opacity: currentTestResults.length === 0 ? 0.5 : 1 }}>Export PDF</button>
                     </div>
                 </div>
 
@@ -350,7 +499,7 @@ export function TestManager({ onBack, subject, isTeacher }) {
                                                     </div>
                                                 )}
                                                 {!isRunning && !isNotStarted && (
-                                                    <button className="btn-icon" onClick={() => setViewingResult(res)} title="Zobrazit odpovědi" style={{ background: 'transparent', border: 'none', color: 'var(--color-text-main)', cursor: 'pointer', fontSize: '1.2rem', padding: '0.5rem' }}>👁️</button>
+                                                    <button className="btn-icon" onClick={() => openResultScreen(res)} title="Zobrazit odpovědi" style={{ background: 'transparent', border: 'none', color: 'var(--color-text-main)', cursor: 'pointer', fontSize: '1.2rem', padding: '0.5rem' }}>👁️</button>
                                                 )}
                                                 {!isNotStarted && (
                                                     <button className="btn-icon" onClick={() => setConfirmDeleteResultId(res.id)} title="Smazat pokus (reset)" style={{ background: 'transparent', border: 'none', color: 'var(--color-error)', cursor: 'pointer', fontSize: '1.1rem', padding: '0.5rem', opacity: 0.6 }}>🗑️</button>
@@ -373,7 +522,8 @@ export function TestManager({ onBack, subject, isTeacher }) {
             {confirmDeleteId && <ConfirmModal title="Smazat test?" message="Opravdu chcete smazat tento test a všechny jeho výsledky?" onCancel={() => setConfirmDeleteId(null)} onConfirm={handleDeleteTest} confirmText="Smazat" danger={true} />}
 
             {/* Renderování detailu studenta (je zde, aby fungovalo i kdyby se omylem vyvolalo, ale logicky patří spíš do results page) */}
-            {renderDetailModal()}
+            {renderResultScreenModal()}
+                <CustomImageModal src={zoomImage} onClose={() => setZoomImage(null)} />
 
             {/* HLAVNÍ NAVBAR */}
             <div className="top-navbar">
@@ -438,3 +588,14 @@ export function TestManager({ onBack, subject, isTeacher }) {
         </div>
     );
 }
+
+
+
+
+
+
+
+
+
+
+

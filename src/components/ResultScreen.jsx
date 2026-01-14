@@ -50,93 +50,52 @@ const ResultImage = ({ question, subject, onZoom }) => {
             style={{ marginBottom: '1rem' }}
         >
             <img
-                src={imageSrc}
-                alt=""
-                className="questionImage small"
-                loading="lazy"
-            />
-        </div>
-    );
-};
-
-export const ResultScreen = ({
-    mode,
-    score,
-    trainingTime,
-    questionSet,
-    maxSeenIndex,
-    onBack,
-    currentSubject,
-    timeLeftAtSubmit,
-    onZoom,
-    user,
-    syncing,
-    onReport,
-    theme,
-    toggleTheme
-}) => {
-    if (mode === 'real_test') {
-        const percentage = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
-
-        let scoreColor = '#3b82f6';
-        if (percentage >= 85) scoreColor = '#22c55e';
-        else if (percentage >= 50) scoreColor = '#fbbf24';
-        else scoreColor = '#ef4444';
-
-        const circleStyle = {
-            background: `conic-gradient(${scoreColor} ${percentage * 3.6}deg, rgba(255,255,255,0.1) 0deg)`
+        src={imageSrc}
+                        alt=""
+                        className="questionImage small"
+                        loading="lazy"
+                    />
+                </div>
+            );
         };
 
-        return (
-            <div className="container fadeIn" style={{ minHeight: "var(--vh)", display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="top-navbar" style={{ width: '100%', maxWidth: '600px' }}>
-                    <div className="navbar-group">
-                        <SubjectBadge subject={currentSubject} />
-                    </div>
-                    <div className="navbar-group">
-                        <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile />
-                        <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
-                    </div>
-                </div>
-                <div className="resultScreen" style={{ maxWidth: '600px', width: '100%', marginTop: 0 }}>
-                    <h1 className="title" style={{ marginBottom: '2rem' }}>Výsledek testu</h1>
+export const ResultScreen = ({
+            mode,
+            score,
+            trainingTime,
+            questionSet,
+            maxSeenIndex,
+            onBack,
+            currentSubject,
+            timeLeftAtSubmit,
+            onZoom,
+            user,
+            syncing,
+            onReport,
+            theme,
+            toggleTheme,
+            embedded = false
+        }) => {
+            const [localTheme, setLocalTheme] = useState(
+                theme || localStorage.getItem("quizio_theme") || "dark"
+            );
 
-                    <div className="score-circle-container" style={circleStyle}>
-                        <div className="score-circle-inner">
-                            <span className="score-percentage" style={{ color: scoreColor }}>{percentage}%</span>
-                            <span className="score-fraction">{score.correct} / {score.total}</span>
-                        </div>
-                    </div>
+            useEffect(() => {
+                if (theme) setLocalTheme(theme);
+            }, [theme]);
 
-                    <div style={{ 
-                        marginTop: '2rem', 
-                        padding: '1.5rem', 
-                        background: 'var(--color-card-bg)', 
-                        border: '1px solid var(--color-card-border)', 
-                        borderRadius: '16px',
-                        textAlign: 'center'
-                    }}>
-                        <p style={{ fontSize: '1.1rem', marginBottom: '1rem', fontWeight: 'bold' }}>
-                            Test byl úspěšně odeslán.
-                        </p>
-                        <p style={{ color: 'var(--color-text-secondary)' }}>
-                            Zbývající čas: <strong>{formatTime(timeLeftAtSubmit || 0)}</strong>
-                        </p>
-                    </div>
-
-                    <button 
-                        className="navButton primary" 
-                        onClick={onBack} 
-                        style={{ width: '100%', marginTop: '2rem', padding: '1rem' }}
-                    >
-                        Zpět do menu
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    const list =
+            const handleToggleTheme = () => {
+                if (typeof toggleTheme === "function") {
+                    toggleTheme();
+                    return;
+                }
+                const next = localTheme === "dark" ? "light" : "dark";
+                setLocalTheme(next);
+                localStorage.setItem("quizio_theme", next);
+                document.body.className = next === "light" ? "light-mode" : "";
+                document.documentElement.setAttribute("data-theme", next);
+            };
+            const list =
         mode === "training"
             ? questionSet.slice(0, maxSeenIndex + 1)
             : mode === "smart" || mode === "mistakes"
@@ -201,8 +160,12 @@ export const ResultScreen = ({
         background: `conic-gradient(${circleColor} ${percentage * 3.6}deg, rgba(255,255,255,0.1) 0deg)`
     };
 
+    const containerStyle = embedded
+        ? { height: 'auto', maxHeight: 'none', overflow: 'visible', paddingBottom: '2rem' }
+        : undefined;
+
     return (
-        <div className="container fadeIn">
+        <div className="container fadeIn" style={containerStyle}>
             <div className="top-navbar">
                 <div className="navbar-group">
                     <button className="menuBackButton" onClick={onBack}>
@@ -212,13 +175,13 @@ export const ResultScreen = ({
                 </div>
                 <div className="navbar-group">
                     <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile />
-                    <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
+                    <ThemeToggle currentTheme={theme || localTheme} toggle={handleToggleTheme} />
                 </div>
             </div>
 
             <div className="resultScreen">
                 <h2 className="title" style={{marginBottom: '2rem'}}>
-                    {mode === "mock" ? "Výsledek testu" : "Souhrn tréninku"}
+                    {mode === "mock" || mode === "real_test" ? "Výsledek testu" : "Souhrn tréninku"}
                 </h2>
 
                 <div className="score-circle-container" style={circleStyle}>
@@ -231,7 +194,9 @@ export const ResultScreen = ({
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', color: 'var(--color-text-secondary)', fontSize: '1.1rem', gap: '0.5rem', alignItems: 'center' }}>
                      <span>⏱️ Doba trvání:</span>
                      <span style={{ fontWeight: 'bold', color: 'var(--color-text-main)' }}>
-                        {mode === "mock" ? formatTime(30 * 60 - timeLeftAtSubmit) : formatTime(trainingTime)}
+                         {mode === "mock"
+                             ? formatTime(30 * 60 - timeLeftAtSubmit)
+                             : formatTime(trainingTime)}
                      </span>
                 </div>
 
