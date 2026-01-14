@@ -3,7 +3,17 @@ import { formatDuration } from "../utils/formatting";
 
 const medalIcons = ["🥇", "🥈", "🥉"];
 
-const getValue = (map, key) => (map && map[key] ? map[key] : 0);
+const getValue = (map, key) => {
+    if (!map) return 0;
+    if (map[key] !== undefined && map[key] !== null) return map[key];
+    const upperKey = key.toUpperCase();
+    if (map[upperKey] !== undefined && map[upperKey] !== null)
+        return map[upperKey];
+    const lowerKey = key.toLowerCase();
+    if (map[lowerKey] !== undefined && map[lowerKey] !== null)
+        return map[lowerKey];
+    return 0;
+};
 
 export const LeaderboardPanel = ({
     entries,
@@ -31,10 +41,10 @@ export const LeaderboardPanel = ({
             {!loading && !error && entries.length > 0 && (
                 <div className="leaderboard-list">
                     {entries.map((entry, index) => {
-                        const spsTime = getValue(entry.subjectTimes, "sps");
-                        const sttTime = getValue(entry.subjectTimes, "stt");
-                        const spsQuestions = getValue(entry.questionCounts, "sps");
-                        const sttQuestions = getValue(entry.questionCounts, "stt");
+                        const spsTime = getValue(entry.subjectTimes, "SPS");
+                        const sttTime = getValue(entry.subjectTimes, "STT");
+                        const spsQuestions = getValue(entry.questionCounts, "SPS");
+                        const sttQuestions = getValue(entry.questionCounts, "STT");
 
                         return (
                             <div className="leaderboard-row" key={entry.id || entry.username}>

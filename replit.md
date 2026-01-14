@@ -50,7 +50,7 @@ This is a professional quiz application built with React and Vite for Czech tech
 ### Design System
 
 **Color Palette:**
-- Background: Dark blue gradient (#0f172a → #1e293b → #334155)
+- Background: Dark blue gradient (#0f172a Ôćĺ #1e293b Ôćĺ #334155)
 - Primary: Blue (#3b82f6, #60a5fa)
 - Secondary: Purple (#8b5cf6, #a78bfa)
 - Success: Green (#22c55e)
@@ -96,8 +96,8 @@ All state is managed locally with React hooks:
 ### Keyboard Support
 
 Full keyboard navigation for accessibility and power users:
-- **W/S or ↑↓**: Cycle through answers
-- **A/D or ←→**: Navigate questions
+- **W/S or ÔćĹÔćô**: Cycle through answers
+- **A/D or ÔćÉÔćĺ**: Navigate questions
 - **Space**: Next question / submit test
 - **Backspace**: Clear answer / return to menu
 - **Enter**: Confirm actions
@@ -161,19 +161,19 @@ Full keyboard navigation for accessibility and power users:
 
 ```
 /
-├── src/
-│   ├── App.jsx              (Main app component - modes, state, logic)
-│   ├── questions.js         (Question data - generated from CSV)
-│   ├── index.jsx            (React entry point)
-│   ├── images/              (Question images - 1.png to 504.png)
-│   └── styles/
-│       └── globals.css      (Complete design system - 444 lines)
-├── convert.js               (CSV → JavaScript converter)
-├── questions.csv            (Source question data)
-├── vite.config.js           (Vite build configuration)
-├── package.json             (Dependencies: React, Vite)
-├── index.html               (HTML entry point)
-└── replit.md               (This file)
+ÔöťÔöÇÔöÇ src/
+Ôöé   ÔöťÔöÇÔöÇ App.jsx              (Main app component - modes, state, logic)
+Ôöé   ÔöťÔöÇÔöÇ questions.js         (Question data - generated from CSV)
+Ôöé   ÔöťÔöÇÔöÇ index.jsx            (React entry point)
+Ôöé   ÔöťÔöÇÔöÇ images/              (Question images - 1.png to 504.png)
+Ôöé   ÔööÔöÇÔöÇ styles/
+Ôöé       ÔööÔöÇÔöÇ globals.css      (Complete design system - 444 lines)
+ÔöťÔöÇÔöÇ convert.js               (CSV Ôćĺ JavaScript converter)
+ÔöťÔöÇÔöÇ questions.csv            (Source question data)
+ÔöťÔöÇÔöÇ vite.config.js           (Vite build configuration)
+ÔöťÔöÇÔöÇ package.json             (Dependencies: React, Vite)
+ÔöťÔöÇÔöÇ index.html               (HTML entry point)
+ÔööÔöÇÔöÇ replit.md               (This file)
 ```
 
 ## Performance Optimizations
@@ -190,7 +190,7 @@ Full keyboard navigation for accessibility and power users:
 - Modern browsers (Chrome, Firefox, Safari, Edge)
 - Mobile browsers (iOS Safari, Chrome Mobile)
 - Fallback for images using transparent PNG
-- Touch-friendly button sizing (min 48px × 48px)
+- Touch-friendly button sizing (min 48px ├Ś 48px)
 - Responsive design from 320px to 2560px
 
 ## Deployment

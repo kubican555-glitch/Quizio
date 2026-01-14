@@ -252,9 +252,9 @@ export default function App() {
     const [leaderboardLoading, setLeaderboardLoading] = useState(false);
     const [leaderboardError, setLeaderboardError] = useState(null);
 
-    const DUEL_ANSWER_SECONDS = 60;
-    const DUEL_BREAK_SECONDS = 10;
-    const DUEL_STEP_MS = (DUEL_ANSWER_SECONDS + DUEL_BREAK_SECONDS) * 1000;
+    const DUEL_ANSWER_SECONDS = 45;
+    const DUEL_RUSH_SECONDS = 10;
+    const DUEL_RESULT_SECONDS = 3;
 
     const [duelOnlineUsers, setDuelOnlineUsers] = useState([]);
     const [duelInvites, setDuelInvites] = useState([]);
@@ -263,10 +263,12 @@ export default function App() {
     const [duelActiveMatch, setDuelActiveMatch] = useState(null);
     const [duelQuestionSet, setDuelQuestionSet] = useState([]);
     const [duelAnswers, setDuelAnswers] = useState([]);
+    const [duelLocalAnswers, setDuelLocalAnswers] = useState({});
     const [duelClock, setDuelClock] = useState(Date.now());
+    const [duelClockOffsetMs, setDuelClockOffsetMs] = useState(0);
     const [duelStats, setDuelStats] = useState(null);
     const [duelSettings, setDuelSettings] = useState({
-        questionCount: 5,
+        questionCount: 10,
         rangeMode: "all",
         rangeStart: "",
         rangeEnd: "",
@@ -549,6 +551,23 @@ export default function App() {
     }, [duelActiveMatch?.id]);
 
     useEffect(() => {
+        if (!duelAnswers.length) return;
+        const confirmed = new Set(
+            duelAnswers
+                .filter((answer) => answer.user_id === dbId)
+                .map((answer) => answer.question_index),
+        );
+        if (confirmed.size === 0) return;
+        setDuelLocalAnswers((prev) => {
+            const next = { ...prev };
+            confirmed.forEach((idx) => {
+                delete next[idx];
+            });
+            return next;
+        });
+    }, [duelAnswers, dbId]);
+
+    useEffect(() => {
         if (!duelActiveMatch?.id) return;
 
         const fetchAnswers = async () => {
@@ -637,18 +656,21 @@ export default function App() {
 
     useEffect(() => {
         if (!duelActiveMatch?.id) return;
-        const timer = setInterval(() => {
-            setDuelClock(Date.now());
-        }, 500);
-        return () => clearInterval(timer);
+        calibrateDuelClock(duelActiveMatch.id);
     }, [duelActiveMatch?.id]);
 
     useEffect(() => {
+        if (!duelActiveMatch?.id) return;
+        const timer = setInterval(() => {
+            setDuelClock(Date.now() + duelClockOffsetMs);
+        }, 500);
+        return () => clearInterval(timer);
+    }, [duelActiveMatch?.id, duelClockOffsetMs]);
+
+    useEffect(() => {
         if (!duelActiveMatch?.started_at) return;
-        const finishAt =
-            new Date(duelActiveMatch.started_at).getTime() +
-            duelActiveMatch.question_count * DUEL_STEP_MS;
-        if (duelClock >= finishAt) finalizeDuelMatch();
+        const progress = getDuelProgress(duelActiveMatch, duelClock);
+        if (progress.phase === "finished") finalizeDuelMatch();
     }, [duelClock, duelActiveMatch, duelAnswers, duelQuestionSet]);
 
     useEffect(() => {
@@ -1487,8 +1509,9 @@ export default function App() {
     const validateDuelSettings = () => {
         if (!subject) return "Nejdriv vyber predmet.";
         const eligible = getDuelEligibleQuestions();
-        if (duelSettings.rangeMode === "range" && eligible.length < 50) {
-            return "Rozsah musi obsahovat minimalne 50 otazek.";
+        const allowedCounts = [2, 10, 20, 50];
+        if (!allowedCounts.includes(duelSettings.questionCount)) {
+            return "Vyber povoleny pocet otazek.";
         }
         if (eligible.length < duelSettings.questionCount) {
             return "V rozsahu neni dost otazek pro zvoleny pocet.";
@@ -1584,23 +1607,100 @@ export default function App() {
         setDuelInviteToShow(null);
     };
 
-    const getDuelTiming = (match, now) => {
-        const start = new Date(match.started_at).getTime();
-        const elapsed = Math.max(0, now - start);
-        const index = Math.floor(elapsed / DUEL_STEP_MS);
-        const offset = elapsed % DUEL_STEP_MS;
-        const inAnswerWindow = offset < DUEL_ANSWER_SECONDS * 1000;
-        const timeLeft = inAnswerWindow
-            ? Math.max(
-                  0,
-                  DUEL_ANSWER_SECONDS - Math.floor(offset / 1000),
-              )
-            : Math.max(
-                  0,
-                  DUEL_BREAK_SECONDS -
-                      Math.floor((offset - DUEL_ANSWER_SECONDS * 1000) / 1000),
-              );
-        return { index, inAnswerWindow, timeLeft };
+    const cancelOutgoingDuel = async () => {
+        if (!duelOutgoingMatch) return;
+        await supabase
+            .from("duel_matches")
+            .update({ status: "cancelled" })
+            .eq("id", duelOutgoingMatch.id);
+        setDuelOutgoingMatch(null);
+    };
+
+    const calibrateDuelClock = async (matchId) => {
+        const clientStart = Date.now();
+        const { data, error } = await supabase
+            .from("duel_matches")
+            .select("created_at")
+            .eq("id", matchId)
+            .single();
+
+        if (error || !data?.created_at) {
+            setDuelClockOffsetMs(0);
+            return;
+        }
+
+        const clientEnd = Date.now();
+        const serverTime = new Date(data.created_at).getTime();
+        const latency = (clientEnd - clientStart) / 2;
+        const approxServerNow = serverTime + latency;
+        setDuelClockOffsetMs(approxServerNow - clientEnd);
+    };
+
+    const getDuelProgress = (match, now) => {
+        if (!match?.started_at) {
+            return { index: 0, phase: "waiting", timeLeft: 0 };
+        }
+
+        const questionCount = match.question_count || 0;
+        let questionStart = new Date(match.started_at).getTime();
+
+        for (let i = 0; i < questionCount; i += 1) {
+            const answersForQuestion = duelAnswers
+                .filter((answer) => answer.question_index === i)
+                .map((answer) => new Date(answer.answered_at).getTime())
+                .filter(Number.isFinite)
+                .sort((a, b) => a - b);
+
+            const firstAnswerAt = answersForQuestion[0] ?? null;
+            const secondAnswerAt = answersForQuestion[1] ?? null;
+
+            let answerDeadline =
+                questionStart + DUEL_ANSWER_SECONDS * 1000;
+            if (
+                firstAnswerAt &&
+                firstAnswerAt + DUEL_RUSH_SECONDS * 1000 < answerDeadline
+            ) {
+                answerDeadline = firstAnswerAt + DUEL_RUSH_SECONDS * 1000;
+            }
+
+            let answerPhaseEnd = answerDeadline;
+            if (secondAnswerAt && secondAnswerAt < answerPhaseEnd) {
+                answerPhaseEnd = secondAnswerAt;
+            }
+
+            if (now < answerPhaseEnd) {
+                return {
+                    index: i,
+                    phase: "answer",
+                    timeLeft: Math.max(
+                        0,
+                        Math.ceil((answerPhaseEnd - now) / 1000),
+                    ),
+                    answerEndsAt: answerPhaseEnd,
+                    questionStartsAt: questionStart,
+                };
+            }
+
+            const resultEndsAt =
+                answerPhaseEnd + DUEL_RESULT_SECONDS * 1000;
+            if (now < resultEndsAt) {
+                return {
+                    index: i,
+                    phase: "result",
+                    timeLeft: Math.max(
+                        0,
+                        Math.ceil((resultEndsAt - now) / 1000),
+                    ),
+                    answerEndsAt: answerPhaseEnd,
+                    resultEndsAt,
+                    questionStartsAt: questionStart,
+                };
+            }
+
+            questionStart = resultEndsAt;
+        }
+
+        return { index: questionCount, phase: "finished", timeLeft: 0 };
     };
 
     const getAnswerFor = (userId, questionIndex) =>
@@ -1609,6 +1709,38 @@ export default function App() {
                 answer.user_id === userId &&
                 answer.question_index === questionIndex,
         );
+
+    const submitDuelAnswer = async (answerIndex) => {
+        if (!duelActiveMatch || !dbId) return;
+        const progress = getDuelProgress(duelActiveMatch, duelClock);
+        if (progress.phase !== "answer") return;
+        const questionIndex = progress.index;
+        const existing = getAnswerFor(dbId, questionIndex);
+        if (existing) return;
+
+        setDuelLocalAnswers((prev) => ({
+            ...prev,
+            [questionIndex]: answerIndex,
+        }));
+
+        const { error } = await supabase.from("duel_answers").insert([
+            {
+                match_id: duelActiveMatch.id,
+                user_id: dbId,
+                question_index: questionIndex,
+                answer_index: answerIndex,
+            },
+        ]);
+
+        if (error) {
+            console.error("Chyba pri ukladani odpovedi:", error);
+            setDuelLocalAnswers((prev) => {
+                const next = { ...prev };
+                delete next[questionIndex];
+                return next;
+            });
+        }
+    };
 
     const computeDuelScore = () => {
         if (!duelActiveMatch) return { myScore: 0, opponentScore: 0 };
@@ -2319,6 +2451,7 @@ export default function App() {
                 }
                 return;
             }
+            if (mode === "duel" || mode === "duel_match") return;
             if (!mode || mode === "real_test") return;
             const opts = questionSet[currentIndex]?.options?.length || 4;
             const isFlashcardInput =
@@ -2653,7 +2786,7 @@ export default function App() {
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
-                        justifyContent: "space-between",
+                        justifyContent: "flex-start",
                         paddingBottom: "1.5rem",
                     }}
                 >

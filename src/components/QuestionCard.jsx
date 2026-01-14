@@ -46,7 +46,8 @@ export function QuestionCard({
           isCorrect: idx === currentQuestion.correctIndex
       }));
 
-      const isMockOrRealTest = mode === 'mock' || mode === 'real_test';
+      const isMockOrRealTest =
+          mode === 'mock' || mode === 'real_test' || mode === 'duel';
 
       if (isMockOrRealTest) {
           return optionsWithMeta;
@@ -180,7 +181,14 @@ export function QuestionCard({
         if (e.cancelable) e.preventDefault();
 
         // Zámek na okrajích
-        const isBoundaryLockedMode = mode === 'real_test' || mode === 'mock' || mode === 'random' || mode === 'training' || mode === 'smart' || mode === 'mistakes';
+        const isBoundaryLockedMode =
+            mode === 'real_test' ||
+            mode === 'mock' ||
+            mode === 'duel' ||
+            mode === 'random' ||
+            mode === 'training' ||
+            mode === 'smart' ||
+            mode === 'mistakes';
         if (isBoundaryLockedMode) {
             const isFirst = window.currentTestIndex === 0;
             const isLast = window.currentTestIndex === window.totalTestQuestions - 1;

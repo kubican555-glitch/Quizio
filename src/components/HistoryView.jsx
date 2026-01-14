@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { HistoryGraph } from './HistoryGraph';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
 

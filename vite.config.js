@@ -7,6 +7,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: true, // Tímto povolíme běh na libovolné adrese v Replitu
+    allowedHosts: true, // T├şmto povol├şme b─Ťh na libovoln├ę adrese v Replitu
   }
 })
