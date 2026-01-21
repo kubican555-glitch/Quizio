@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,42 +7,42 @@
 :root {
   /* --- BAREVNÁ PALETA --- */
   /* Dark Mode Defaults */
-  --color-bg-start: #0a0e27;
-  --color-bg-mid: #1a1f3a;
-  --color-bg-end: #2a3155;
-  --color-text-main: #f1f5f9;
-  --color-text-secondary: #cbd5e1;
+  --color-bg-start: #0a1022;
+  --color-bg-mid: #10162d;
+  --color-bg-end: #0f1428;
+  --color-text-main: #f8fafc;
+  --color-text-secondary: #c7d2fe;
   --color-text-neutral: #94a3b8;
 
   /* Glassmorphism / Karty */
-  --color-card-bg-start: rgba(30, 41, 59, 0.95);
-  --color-card-bg-end: rgba(30, 41, 59, 0.8);
-  --color-card-border: rgba(148, 163, 184, 0.15);
+  --color-card-bg-start: rgba(20, 28, 50, 0.92);
+  --color-card-bg-end: rgba(16, 22, 40, 0.82);
+  --color-card-border: rgba(148, 163, 184, 0.18);
 
   /* Odpovědi */
-  --color-option-bg-start: rgba(30, 41, 59, 0.6);
-  --color-option-bg-end: rgba(30, 41, 59, 0.4);
-  --color-option-border: rgba(148, 163, 184, 0.25);
-  --color-option-hover-bg-start: rgba(59, 130, 246, 0.2);
-  --color-option-hover-bg-end: rgba(59, 130, 246, 0.1);
+  --color-option-bg-start: rgba(20, 28, 50, 0.75);
+  --color-option-bg-end: rgba(16, 22, 40, 0.65);
+  --color-option-border: rgba(148, 163, 184, 0.22);
+  --color-option-hover-bg-start: rgba(79, 134, 255, 0.2);
+  --color-option-hover-bg-end: rgba(79, 134, 255, 0.12);
 
   /* Navigace */
-  --color-nav-num-bg-start: rgba(30, 41, 59, 0.9);
-  --color-nav-num-bg-end: rgba(30, 41, 59, 0.7);
-  --color-nav-num-border: rgba(148, 163, 184, 0.25);
+  --color-nav-num-bg-start: rgba(20, 28, 50, 0.92);
+  --color-nav-num-bg-end: rgba(16, 22, 40, 0.7);
+  --color-nav-num-border: rgba(148, 163, 184, 0.24);
 
   /* Tlačítka a Menu */
-  --color-back-btn-bg: rgba(71, 85, 105, 0.6);
+  --color-back-btn-bg: rgba(20, 28, 50, 0.65);
   --color-back-btn-color: #e2e8f0;
-  --color-back-btn-border: rgba(148, 163, 184, 0.2);
-  --color-menu-btn-shadow: rgba(59, 130, 246, 0.5);
+  --color-back-btn-border: rgba(148, 163, 184, 0.22);
+  --color-menu-btn-shadow: rgba(79, 134, 255, 0.35);
 
   /* Sekundární barvy */
-  --color-primary: #3b82f6;
-  --color-secondary: #8b5cf6;
-  --color-primary-light: #60a5fa;
-  --color-success: #22c55e;
-  --color-error: #ef4444;
+  --color-primary: #4f86ff;
+  --color-secondary: #6aa3ff;
+  --color-primary-light: #7aa7ff;
+  --color-success: #38d39f;
+  --color-error: #f87171;
   --color-review-wrong: #fca5a5;
   --color-review-correct: #a7f3d0;
   --color-warning: #fbbf24;
@@ -50,6 +52,7 @@
   --color-combo-med: #f97316;   /* Oranžová */
   --color-combo-high: #ef4444;  /* Červená */
   --color-combo-god: #a855f7;   /* Fialová */
+  --font-main: "Sora", "Trebuchet MS", "Segoe UI", sans-serif;
 
   --vh: 100vh;
 }
@@ -714,10 +717,13 @@ html, body {
   width: 100%; 
   height: 100%;
   background-color: var(--color-bg-start);
-  background-image: linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(80, 120, 255, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(56, 211, 159, 0.14), transparent 40%),
+    linear-gradient(135deg, var(--color-bg-start) 0%, var(--color-bg-mid) 50%, var(--color-bg-end) 100%);
   background-attachment: fixed;
   background-size: cover;
-  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+  font-family: var(--font-main);
   color: var(--color-text-main);
   transition: background-color 0.4s ease, color 0.4s ease;
   user-select: none; -webkit-user-select: none; cursor: default;
@@ -741,6 +747,14 @@ html, body {
   /* Zabrání skákání při overscrollu a zajistí barvu pozadí */
   overscroll-behavior-y: none;
 }
+
+button,
+input,
+textarea,
+select {
+    font-family: var(--font-main);
+}
+
 
 /* Skrytí scrollbaru globálně */
 ::-webkit-scrollbar {
@@ -888,26 +902,26 @@ body.keyboard-mode-active * {
 /* === NAVBAR === */
 .top-navbar, .navbar, .appHeader {
     width: 100%;
-    max-width: 960px;
+    max-width: 1100px;
     position: relative; 
     z-index: 1000;
     margin: 0 auto 1rem auto; 
-    padding: 0.7rem 1rem;
+    padding: 0.85rem 1.2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(15, 23, 42, 0.7);
-    border-radius: 14px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 20px rgba(8, 12, 26, 0.25);
+    background: linear-gradient(150deg, rgba(20, 28, 50, 0.88), rgba(14, 20, 36, 0.74));
+    border-radius: 18px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 14px 30px rgba(7, 10, 22, 0.45);
     flex-shrink: 0;
-    border: 1px solid rgba(148, 163, 184, 0.12); 
+    border: 1px solid rgba(148, 163, 184, 0.18); 
 }
 
 .navbar-group {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.7rem;
 }
 
 /* === TITULEK === */
@@ -927,8 +941,8 @@ body.keyboard-mode-active * {
     flex-direction: column; 
     align-items: center; 
     width: 100%; 
-    max-width: 720px; 
-    gap: 0.9rem; 
+    max-width: 920px; 
+    gap: 1rem; 
     margin: 0 auto;
 }
 
@@ -936,50 +950,70 @@ body.keyboard-mode-active * {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
+    gap: 1rem;
 }
 
 .menuSpanFull {
     grid-column: 1 / -1;
 }
 
-.menuButton { width: 100%; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 18px; padding: 1.5rem 1.4rem; cursor: pointer; background: rgba(17, 24, 39, 0.7); color: #fff; font-size: 1.1rem; font-weight: 700; transition: all 0.25s ease; box-shadow: 0 10px 28px rgba(8, 12, 26, 0.3); position: relative; overflow: hidden; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; z-index: 1; }
+.menuButton { 
+    width: 100%; 
+    border: 1px solid rgba(148, 163, 184, 0.2); 
+    border-radius: 20px; 
+    padding: 1.6rem 1.6rem; 
+    cursor: pointer; 
+    background: linear-gradient(160deg, rgba(20, 28, 50, 0.9), rgba(16, 22, 40, 0.7)); 
+    color: #fff; 
+    font-size: 1.1rem; 
+    font-weight: 700; 
+    transition: all 0.25s ease; 
+    box-shadow: 0 14px 30px rgba(7, 10, 22, 0.4); 
+    position: relative; 
+    overflow: hidden; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    z-index: 1; 
+}
 .menuButton::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent); transition: left 0.5s ease; }
 @media (hover: hover) {
     .menuButton:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(8, 12, 26, 0.45); border-color: rgba(59, 130, 246, 0.5); }
     .menuButton:hover::before { left: 100%; }
 }
-.menuButton.selected { background: rgba(30, 41, 59, 0.85); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); transform: translateY(-2px); }
+.menuButton.selected { background: rgba(20, 28, 50, 0.9); box-shadow: 0 0 0 2px rgba(79, 134, 255, 0.45); transform: translateY(-2px); }
 
 .menuButton.list-style { 
     aspect-ratio: auto; 
-    min-height: 84px;
-    padding: 1.1rem 1.6rem; 
+    min-height: 92px;
+    padding: 1.2rem 1.6rem; 
     font-size: 1rem; 
     display: flex; 
     justify-content: flex-start; 
     align-items: center; 
     width: 100%; 
     margin-top: 0; 
-    background: rgba(15, 23, 42, 0.65); 
-    border: 1px solid rgba(148, 163, 184, 0.16); 
+    background: linear-gradient(155deg, rgba(20, 28, 50, 0.82), rgba(16, 22, 40, 0.7)); 
+    border: 1px solid rgba(148, 163, 184, 0.18); 
     text-align: left; 
-    box-shadow: 0 10px 24px rgba(8, 12, 26, 0.3);
-    backdrop-filter: blur(6px);
+    box-shadow: 0 12px 24px rgba(7, 10, 22, 0.35);
+    backdrop-filter: blur(10px);
 }
 .menuButton.list-style::after {
     content: '';
     position: absolute;
     inset: 1px;
     border-radius: inherit;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%);
-    opacity: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 55%);
+    opacity: 0.7;
     transition: opacity 0.3s ease;
     pointer-events: none;
 }
 
 @media (hover: hover) {
-    .menuButton.list-style:hover { background: rgba(30, 41, 59, 0.75); transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.45); box-shadow: 0 16px 32px rgba(8, 12, 26, 0.4); }
+    .menuButton.list-style:hover { background: rgba(20, 28, 50, 0.9); transform: translateY(-2px); border-color: rgba(79, 134, 255, 0.45); box-shadow: 0 18px 36px rgba(7, 10, 22, 0.45); }
     .menuButton.list-style:hover::after { opacity: 1; }
 }
 
@@ -990,52 +1024,52 @@ body.keyboard-mode-active * {
 }
 
 .list-icon { 
-    font-size: 1.3rem; 
-    width: 40px; 
-    height: 40px; 
-    margin-right: 1.2rem; 
-    min-width: 40px; 
+    font-size: 1.35rem; 
+    width: 44px; 
+    height: 44px; 
+    margin-right: 1.1rem; 
+    min-width: 44px; 
     text-align: center; 
-    border-radius: 12px;
+    border-radius: 14px;
     display: grid;
     place-items: center;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .menuButton.primary-style { 
     aspect-ratio: auto !important; 
-    min-height: 116px; 
+    min-height: 130px; 
     display: flex; 
     flex-direction: column; 
     align-items: flex-start; 
     justify-content: center; 
-    padding: 1.4rem 2rem; 
-    background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(30, 41, 59, 0.3));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    padding: 1.6rem 2.2rem; 
+    background: linear-gradient(160deg, rgba(24, 34, 62, 0.9), rgba(14, 20, 36, 0.75));
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    box-shadow: 0 18px 40px rgba(7, 10, 22, 0.45);
 }
 .test-icon-container { 
     position: absolute; 
     top: 50%; 
-    right: 20px; 
+    right: 24px; 
     transform: translateY(-50%); 
-    font-size: 1.8rem; 
+    font-size: 2rem; 
     color: var(--color-success); 
-    background: rgba(34, 197, 94, 0.12);
-    border: 1px solid rgba(34, 197, 94, 0.4);
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(56, 211, 159, 0.35), rgba(16, 185, 129, 0.2));
+    border: 1px solid rgba(56, 211, 159, 0.5);
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
     display: grid;
     place-items: center;
-    box-shadow: 0 8px 18px rgba(34, 197, 94, 0.2);
+    box-shadow: 0 14px 26px rgba(7, 10, 22, 0.4);
 }
-.test-details { display: flex; gap: 0.6rem; margin-top: 0.6rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.8); font-weight: 600; }
-.test-details span { padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12); }
+.test-details { display: flex; gap: 0.6rem; margin-top: 0.7rem; font-size: 0.85rem; color: rgba(255, 255, 255, 0.82); font-weight: 600; }
+.test-details span { padding: 0.25rem 0.7rem; border-radius: 999px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14); }
 .test-details span { display: flex; align-items: center; gap: 0.3rem; }
 
-.menuButton.danger-style { background: rgba(127, 29, 29, 0.35); border-color: rgba(239, 68, 68, 0.45); color: var(--color-error); justify-content: space-between; box-shadow: 0 12px 26px rgba(127, 29, 29, 0.3); }
+.menuButton.danger-style { background: linear-gradient(150deg, rgba(75, 18, 26, 0.7), rgba(55, 12, 20, 0.6)); border-color: rgba(248, 113, 113, 0.35); color: var(--color-error); justify-content: space-between; box-shadow: 0 16px 32px rgba(30, 7, 14, 0.5); }
 
 @media (hover: hover) {
     .menuButton.danger-style:hover { background: rgba(153, 27, 27, 0.4); }
@@ -1043,6 +1077,17 @@ body.keyboard-mode-active * {
 
 .menuButton.danger-style span:not(.list-icon) { color: var(--color-text-main); }
 .menuButton.danger-style .list-icon { color: var(--color-error); }
+
+.badge {
+    background: rgba(248, 113, 113, 0.18);
+    color: #fca5a5;
+    border: 1px solid rgba(248, 113, 113, 0.5);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    box-shadow: 0 6px 14px rgba(30, 7, 14, 0.45);
+}
 
 .history-footer-btn {
     margin: 1.5rem auto 0;
@@ -1120,7 +1165,20 @@ body.light-mode .history-footer-btn.selected {
 }
 
 /* === BUTTONS & CONTROLS === */
-.menuBackButton { background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(148, 163, 184, 0.2); color: var(--color-text-main); padding: 0.4rem 0.8rem; border-radius: 10px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; box-shadow: 0 8px 18px rgba(8, 12, 26, 0.2); }
+.menuBackButton {
+    background: rgba(16, 22, 40, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    color: var(--color-text-main);
+    padding: 0.45rem 1rem;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 10px 22px rgba(7, 10, 22, 0.35);
+}
 
 @media (hover: hover) {
     .menuBackButton:hover { background: rgba(30, 41, 59, 0.7); border-color: rgba(59, 130, 246, 0.45); }
@@ -1132,7 +1190,27 @@ body.light-mode .history-footer-btn.selected {
     .logout-btn:hover { opacity: 1; background: rgba(239, 68, 68, 0.2); }
 }
 
-.theme-toggle-btn { background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(148, 163, 184, 0.2); font-size: 1.2rem; cursor: pointer; padding: 0.2rem; display: flex; align-items: center; justify-content: center; transition: transform 0.2s, border-color 0.2s, background 0.2s; box-shadow: 0 8px 18px rgba(8, 12, 26, 0.2); border-radius: 10px; }
+.theme-toggle-btn {
+    background: rgba(16, 22, 40, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    box-shadow: 0 10px 22px rgba(7, 10, 22, 0.35);
+    border-radius: 14px;
+}
+
+.user-badge {
+    background: rgba(16, 22, 40, 0.7) !important;
+    border: 1px solid rgba(148, 163, 184, 0.22) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 24px rgba(7, 10, 22, 0.35) !important;
+    backdrop-filter: blur(14px) !important;
+}
 
 @media (hover: hover) {
     .theme-toggle-btn:hover { transform: scale(1.1); }

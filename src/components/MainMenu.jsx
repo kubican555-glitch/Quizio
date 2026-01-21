@@ -30,7 +30,7 @@ export const MainMenu = ({
     }).length;
 
     return (
-        <div className="menuColumn" style={{ maxWidth: '600px' }}>
+        <div className="menuColumn" style={{ maxWidth: '900px' }}>
             {/* Rychlé upozornění nahoře - ZMĚNA: Kontrola isCompleted */}
             {canSeeScheduledTests && scheduledTests.some(t => {
                 const now = new Date();
@@ -50,7 +50,7 @@ export const MainMenu = ({
                 <div className="test-icon-container">✅</div>
             </button>
 
-            <div className="menuColumn" style={{ marginTop: '0', maxWidth: '700px' }}>
+            <div className="menuColumn" style={{ marginTop: '0', maxWidth: '960px' }}>
                 <div className="menuGrid">
 
                 {/* ZMĚNA: Tlačítko se zobrazí pouze pokud existuje alespoň jeden test (scheduledTests.length > 0).

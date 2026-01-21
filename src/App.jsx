@@ -251,6 +251,7 @@ export default function App() {
     const [leaderboardEntries, setLeaderboardEntries] = useState([]);
     const [leaderboardLoading, setLeaderboardLoading] = useState(false);
     const [leaderboardError, setLeaderboardError] = useState(null);
+    const leaderboardClass = profileData?.class || "4.B";
 
     const DUEL_ANSWER_SECONDS = 45;
     const DUEL_RUSH_SECONDS = 10;
@@ -296,7 +297,7 @@ export default function App() {
     }, []);
 
     useEffect(() => {
-        if (!profileData?.class) {
+        if (!leaderboardClass) {
             setLeaderboardEntries([]);
             return;
         }
@@ -310,7 +311,7 @@ export default function App() {
             const { data, error } = await supabase
                 .from("profiles")
                 .select("id, username, subject_times, question_counts, class")
-                .eq("class", profileData.class);
+                .eq("class", leaderboardClass);
 
             if (!isActive) return;
 
@@ -351,7 +352,7 @@ export default function App() {
         return () => {
             isActive = false;
         };
-    }, [profileData?.class]);
+    }, [leaderboardClass]);
 
     useEffect(() => {
         if (!dbId || !user || !profileData?.class) return;
@@ -2615,10 +2616,6 @@ export default function App() {
         return <SessionBlockedScreen onTakeOver={takeOverSession} />;
 
     if (mode === "leaderboard") {
-        if (!profileData?.class) {
-            setMode(null);
-            return null;
-        }
         return (
             <div
                 className="container fadeIn"
@@ -2665,11 +2662,7 @@ export default function App() {
                         entries={leaderboardEntries}
                         loading={leaderboardLoading}
                         error={leaderboardError}
-                        title={
-                            profileData?.class
-                                ? `Žebříček třídy ${profileData.class}`
-                                : "Žebříček třídy"
-                        }
+                        title={`Zebricek tridy ${leaderboardClass}`}
                         className="leaderboard-full"
                     />
                 </div>
@@ -2864,31 +2857,23 @@ export default function App() {
                                                 setIsKeyboardMode
                                             }
                                         />
-                                        {profileData?.class && (
-                                            <button
-                                                className="leaderboard-mobile-button"
-                                                onClick={() =>
-                                                    setMode("leaderboard")
-                                                }
-                                            >
-                                                🏆 Žebříček třídy
-                                            </button>
-                                        )}
+                                        <button
+                                            className="leaderboard-mobile-button"
+                                            onClick={() =>
+                                                setMode("leaderboard")
+                                            }
+                                        >
+                                            🏆 Zebricek tridy
+                                        </button>
                                     </div>
-                                    {profileData?.class && (
-                                        <div className="leaderboard-desktop">
-                                            <LeaderboardPanel
-                                                entries={leaderboardEntries}
-                                                loading={leaderboardLoading}
-                                                error={leaderboardError}
-                                                title={
-                                                    profileData?.class
-                                                        ? `Žebříček třídy ${profileData.class}`
-                                                        : "Žebříček třídy"
-                                                }
-                                            />
-                                        </div>
-                                    )}
+                                    <div className="leaderboard-desktop">
+                                        <LeaderboardPanel
+                                            entries={leaderboardEntries}
+                                            loading={leaderboardLoading}
+                                            error={leaderboardError}
+                                            title={`Zebricek tridy ${leaderboardClass}`}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </>
