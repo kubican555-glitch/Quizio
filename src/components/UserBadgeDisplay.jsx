@@ -35,12 +35,14 @@ export const UserBadgeDisplay = ({ user, onLogout, compactOnMobile, alwaysShowFu
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '0.6rem', 
-                background: 'rgba(255,255,255,0.1)', 
-                padding: '0.4rem 0.8rem', 
-                borderRadius: '50px', 
-                border: '1px solid rgba(255,255,255,0.15)',
+                background: 'rgba(15, 23, 42, 0.55)', 
+                padding: '0 0.8rem', 
+                height: '40px',
+                borderRadius: '8px', 
+                border: '1px solid rgba(148, 163, 184, 0.2)',
                 backdropFilter: 'blur(5px)',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: '0 8px 18px rgba(8, 12, 26, 0.2)'
             }}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

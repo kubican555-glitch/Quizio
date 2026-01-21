@@ -15,14 +15,13 @@ export const ThemeToggle = ({ currentTheme, toggle }) => (
         title={currentTheme === "dark" ? "Přepnout na světlý" : "Přepnout na tmavý"}
         style={{
             fontSize: "1.2rem",
-            padding: "0.5rem 0.8rem",
+            padding: "0 0.8rem",
             marginLeft: "0.5rem",
-            background: "transparent",
-            border: "none",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            height: "40px",
             transition: "transform 0.2s"
         }}
         onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}

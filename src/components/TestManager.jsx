@@ -291,12 +291,20 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
             const qNum = Number.parseInt(ans.qNum, 10);
             const record = Number.isFinite(qNum) ? questionMap.get(qNum) : undefined;
             const options = Array.isArray(record?.options) ? record.options : ["", "", "", ""];
-            const correctIndex = Number.isFinite(ans.correct)
-                ? ans.correct
-                : (Number.isFinite(record?.correct_index) ? record.correct_index : 0);
+            const correctIndex = Number.isFinite(record?.correct_index)
+                ? record.correct_index
+                : (Number.isFinite(ans.correct) ? ans.correct : 0);
             const hasUser = ans.user === 0 || Number.isFinite(ans.user);
             const userAnswer = hasUser ? ans.user : undefined;
             const number = Number.isFinite(qNum) ? qNum : index + 1;
+            const isCorrect = hasUser && Number.isFinite(ans.correct)
+                ? ans.user === ans.correct
+                : (hasUser && Number.isFinite(record?.correct_index)
+                    ? ans.user === record.correct_index
+                    : false);
+            const correctAnswerText = Array.isArray(record?.options) && Number.isFinite(record?.correct_index)
+                ? record.options[record.correct_index]
+                : undefined;
 
             return {
                 number,
@@ -305,6 +313,9 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
                 options,
                 correctIndex,
                 userAnswer,
+                isCorrect,
+                correctAnswerText,
+                suppressUserAnswer: true,
                 image_base64: record?.image_base64 || null,
             };
         });
@@ -600,7 +611,6 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
         </div>
     );
 }
-
 
 
 

@@ -206,8 +206,11 @@ export const ResultScreen = ({
 
                 <div className="reviewList">
                     {list.map((q, i) => {
-                        const isCorrect = q.userAnswer === q.correctIndex;
+                        const isCorrect = typeof q.isCorrect === "boolean"
+                            ? q.isCorrect
+                            : q.userAnswer === q.correctIndex;
                         const isUnanswered = q.userAnswer === undefined;
+                        const correctAnswerText = q.correctAnswerText ?? q.options?.[q.correctIndex];
 
                         let statusIcon = "✅";
                         let statusColor = "var(--color-success)";
@@ -277,7 +280,7 @@ export const ResultScreen = ({
                                         <div className="review-answer-row">
                                             <span className="label-correct">Správně:</span>
                                             <span className="text-val highlight">
-                                                <HighlightedText text={q.options[q.correctIndex]} />
+                                                <HighlightedText text={correctAnswerText || ""} />
                                             </span>
                                         </div>
 
@@ -286,7 +289,9 @@ export const ResultScreen = ({
                                                 <span className="label-wrong">Tvoje:</span>
                                                 <span className="text-val">
                                                     {isUnanswered ? (
-                                                        <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Neodpovězeno</span>
+                                                        <span style={{ fontStyle: 'italic', opacity: 0.7 }}>NeodpovŽ>zeno</span>
+                                                    ) : q.suppressUserAnswer ? (
+                                                        <span>Odpoved byla spatne.</span>
                                                     ) : (
                                                         <HighlightedText text={q.options[q.userAnswer]} />
                                                     )}
