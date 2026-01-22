@@ -37,23 +37,46 @@ export function ReviewSession({
         String(q.number).includes(normalizedSearch)
     );
     const highlightRegex = getSmartRegex(searchTerm);
+    const showSubjectBadge = Boolean(subject);
+    const modeBadge = { label: "Prohl\u00ed\u017een\u00ed ot\u00e1zek", icon: "\uD83D\uDD0E" };
 
     return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)" }}>
-            <div className="top-navbar">
-                <div className="navbar-group">
+            <div className="top-navbar navbar-tiered">
+                                <div className="navbar-group nav-primary">
+
                     <button className="menuBackButton" onClick={onBack}>
                         ← <span className="mobile-hide-text">Zpět</span>
                     </button>
-                    <SubjectBadge subject={subject} compact />
                 </div>
-                <div className="navbar-group">
+                <div className="navbar-group nav-status">
+                    <div className="subjectBadgeGroup">
+                        {showSubjectBadge && (
+                            <SubjectBadge subject={subject} compact matchUserBadge />
+                        )}
+                        {modeBadge && (
+                            <>
+                                {showSubjectBadge && (
+                                    <span className="subjectBadgeDivider">
+                                        |
+                                    </span>
+                                )}
+                                <div className="modeBadge">
+                                    <span className="modeBadgeIcon">
+                                        {modeBadge.icon}
+                                    </span>
+                                    <span>{modeBadge.label}</span>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+                <div className="navbar-group nav-actions">
                     <UserBadgeDisplay user={user} syncing={syncing} />
                     <ThemeToggle currentTheme={theme} toggle={toggleTheme} />
                 </div>
             </div>
 
-            <h1 className="title">Prohlížení otázek</h1>
 
             <input 
                 type="text" 

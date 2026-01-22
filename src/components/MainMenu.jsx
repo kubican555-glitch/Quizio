@@ -38,8 +38,13 @@ export const MainMenu = ({
                 const isCompleted = completedTestIds.includes(t.id);
                 return isOpen && !isCompleted; // Zobrazit jen pokud NENÍ hotovo
             }) && (
-                <div className="alert-box" style={{marginBottom: '1rem', cursor: 'pointer'}} onClick={onOpenScheduled}>
-                    📌 Máš aktivní písemku! Klikni zde pro otevření.
+                <div className="alert-box alert-box--clickable" style={{ marginBottom: '1rem' }} onClick={onOpenScheduled}>
+                    <div className="alert-box__icon alert-box__icon--ringing">🔔</div>
+                    <div className="alert-box__content">
+                        <div className="alert-box__title">Máš aktivní písemku</div>
+                        <div className="alert-box__subtitle">Klikni zde pro otevření.</div>
+                    </div>
+                    <div className="alert-box__cta">Otevřít</div>
                 </div>
             )}
 

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { formatDuration } from "../utils/formatting";
 
 const medalIcons = ["🥇", "🥈", "🥉"];
@@ -19,9 +19,15 @@ export const LeaderboardPanel = ({
     entries,
     loading,
     error,
+    currentUser,
     className = "",
     title = "Žebříček třídy",
 }) => {
+    const normalizedCurrentUser =
+        typeof currentUser === "string"
+            ? currentUser.trim().toLowerCase()
+            : "";
+
     return (
         <div className={`leaderboard-panel ${className}`.trim()}>
             <div className="leaderboard-header">
@@ -45,9 +51,19 @@ export const LeaderboardPanel = ({
                         const sttTime = getValue(entry.subjectTimes, "STT");
                         const spsQuestions = getValue(entry.questionCounts, "SPS");
                         const sttQuestions = getValue(entry.questionCounts, "STT");
+                        const entryName = (entry.username || entry.user || "")
+                            .toString()
+                            .trim()
+                            .toLowerCase();
+                        const isCurrentUser =
+                            normalizedCurrentUser &&
+                            entryName === normalizedCurrentUser;
 
                         return (
-                            <div className="leaderboard-row" key={entry.id || entry.username}>
+                            <div
+                                className={`leaderboard-row${isCurrentUser ? " current-user" : ""}`}
+                                key={entry.id || entry.username}
+                            >
                                 <div className="leaderboard-rank">
                                     {index < 3 ? (
                                         <span className="leaderboard-medal">{medalIcons[index]}</span>
@@ -88,3 +104,4 @@ export const LeaderboardPanel = ({
         </div>
     );
 };
+

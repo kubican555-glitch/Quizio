@@ -163,27 +163,51 @@ export const ResultScreen = ({
     const containerStyle = embedded
         ? { height: 'auto', maxHeight: 'none', overflow: 'visible', paddingBottom: '2rem' }
         : undefined;
+    const showSubjectBadge = Boolean(currentSubject);
+    const modeBadge = {
+        label: mode === "mock" || mode === "real_test"
+            ? "Vysledek testu"
+            : "Souhrn treninku",
+        icon: mode === "mock" || mode === "real_test" ? "✅" : "📊",
+    };
 
     return (
         <div className="container fadeIn" style={containerStyle}>
-            <div className="top-navbar">
-                <div className="navbar-group">
+            <div className="top-navbar navbar-tiered">
+                <div className="navbar-group nav-primary">
                     <button className="menuBackButton" onClick={onBack}>
                         ← <span className="mobile-hide-text">Menu</span>
                     </button>
-                    <SubjectBadge subject={currentSubject} />
                 </div>
-                <div className="navbar-group">
+                <div className="navbar-group nav-status">
+                    <div className="subjectBadgeGroup">
+                        {showSubjectBadge && (
+                            <SubjectBadge subject={currentSubject} matchUserBadge />
+                        )}
+                        {modeBadge && (
+                            <>
+                                {showSubjectBadge && (
+                                    <span className="subjectBadgeDivider">
+                                        |
+                                    </span>
+                                )}
+                                <div className="modeBadge">
+                                    <span className="modeBadgeIcon">
+                                        {modeBadge.icon}
+                                    </span>
+                                    <span>{modeBadge.label}</span>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+                <div className="navbar-group nav-actions">
                     <UserBadgeDisplay user={user} syncing={syncing} compactOnMobile />
                     <ThemeToggle currentTheme={theme || localTheme} toggle={handleToggleTheme} />
                 </div>
             </div>
 
             <div className="resultScreen">
-                <h2 className="title" style={{marginBottom: '2rem'}}>
-                    {mode === "mock" || mode === "real_test" ? "Výsledek testu" : "Souhrn tréninku"}
-                </h2>
-
                 <div className="score-circle-container" style={circleStyle}>
                     <div className="score-circle-inner">
                         <span className="score-percentage">{percentage}%</span>
@@ -289,7 +313,7 @@ export const ResultScreen = ({
                                                 <span className="label-wrong">Tvoje:</span>
                                                 <span className="text-val">
                                                     {isUnanswered ? (
-                                                        <span style={{ fontStyle: 'italic', opacity: 0.7 }}>NeodpovŽ>zeno</span>
+                                                        <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Neodpovězeno</span>
                                                     ) : q.suppressUserAnswer ? (
                                                         <span>Odpoved byla spatne.</span>
                                                     ) : (

@@ -549,9 +549,10 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
                 <CustomImageModal src={zoomImage} onClose={() => setZoomImage(null)} />
 
             {/* HLAVNÍ NAVBAR */}
-            <div className="top-navbar">
-                <div className="navbar-group"><button className="menuBackButton" onClick={onBack}><span style={{ fontSize: '1.2rem', marginRight: '0.2rem' }}>←</span><span className="mobile-hide-text">Zpět</span></button><div className="mobile-hidden"><SubjectBadge subject={subject} compact /></div></div>
-                <div className="navbar-group"><button className="menuBackButton" onClick={() => { fetchTests(); }} title="Obnovit" style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>🔄</button><button className="navButton primary" onClick={openNewForm} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', minHeight: 'auto' }}>+ Nový test</button></div>
+            <div className="top-navbar navbar-tiered">
+                <div className="navbar-group nav-primary"><button className="menuBackButton" onClick={onBack}><span style={{ fontSize: '1.2rem', marginRight: '0.2rem' }}>←</span><span className="mobile-hide-text">Zpět</span></button></div>
+                <div className="navbar-group nav-status"><div className="subjectBadgeGroup"><SubjectBadge subject={subject} compact matchUserBadge /></div></div>
+                <div className="navbar-group nav-actions"><button className="menuBackButton" onClick={() => { fetchTests(); }} title="Obnovit" style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>🔄</button><button className="navButton primary" onClick={openNewForm} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', minHeight: 'auto' }}>+ Nový test</button></div>
             </div>
 
             <div className="quizContentWrapper">
@@ -611,7 +612,6 @@ export function TestManager({ onBack, subject, isTeacher, user, syncing, theme, 
         </div>
     );
 }
-
 
 
 

@@ -86,27 +86,50 @@ export function QuestionCard({
       }
   }, [shuffledOptions, currentQuestion?.id, currentQuestion?.number, isActive]);
 
-  // TINDER-LIKE SWIPE STATE
-  const [swipeOffset, setSwipeOffset] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [swipeDirection, setSwipeDirection] = useState(null); 
-  const [isFlying, setIsFlying] = useState(false);
-
-  // Reset swipe state when not active
-  useEffect(() => {
-      if (!isActive) {
-          setSwipeOffset(0);
-          setIsDragging(false);
-          setSwipeDirection(null);
-          setIsFlying(false);
-      }
-  }, [isActive]);
+  // TINDER-LIKE SWIPE STATE (refs for smooth 60fps updates)
+  const [swipeDirection, setSwipeDirection] = useState(null);
+  const swipeOffsetRef = useRef(0);
+  const swipeDirectionRef = useRef(null);
+  const isDraggingRef = useRef(false);
+  const isFlyingRef = useRef(false);
+  const rafIdRef = useRef(null);
 
   const isFlashcard = isFlashcardStyle(mode) || mode === 'test_practice';
   const cardContainerRef = useRef(null);
   const touchStart = useRef({ x: 0, y: 0 });
   const touchCurrent = useRef({ x: 0, y: 0 });
   const flyAwayThreshold = 80; 
+
+  const setSwipeVisual = (x, transition) => {
+    const element = cardContainerRef.current;
+    if (!element) return;
+    const rotation = Math.max(-15, Math.min(15, (x / window.innerWidth) * 15));
+    element.style.setProperty('--swipe-x', `${x}px`);
+    element.style.setProperty('--swipe-rot', `${rotation}deg`);
+    if (transition !== undefined) {
+      element.style.setProperty('--swipe-transition', transition);
+    }
+  };
+
+  const resetSwipeVisuals = (transition = 'transform 0.18s cubic-bezier(0.1, 0, 0.1, 1)') => {
+    swipeOffsetRef.current = 0;
+    swipeDirectionRef.current = null;
+    isDraggingRef.current = false;
+    isFlyingRef.current = false;
+    setSwipeDirection(null);
+    setSwipeVisual(0, transition);
+  };
+
+  // Reset swipe state when not active
+  useEffect(() => {
+    if (!isActive) {
+      resetSwipeVisuals('none');
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    resetSwipeVisuals('none');
+  }, [currentQuestion?.id, currentQuestion?.number]);
 
   // 4. NAČÍTÁNÍ OBRÁZKU (Líné načítání)
   useEffect(() => {
@@ -153,19 +176,18 @@ export function QuestionCard({
     if (!isActive) return;
 
     const element = cardContainerRef.current;
-    if (!element || isFlying) return;
-
-    let rafId = null;
+    if (!element || isFlyingRef.current) return;
 
     const handleTouchStart = (e) => {
-      if (isFlying) return;
+      if (isFlyingRef.current) return;
       touchStart.current = { x: e.targetTouches[0].clientX, y: e.targetTouches[0].clientY };
       touchCurrent.current = { ...touchStart.current };
-      setIsDragging(true);
+      isDraggingRef.current = true;
+      setSwipeVisual(swipeOffsetRef.current, 'none');
     };
 
     const handleTouchMove = (e) => {
-      if (!touchStart.current.x || isFlying) return;
+      if (!touchStart.current.x || isFlyingRef.current) return;
 
       const touch = e.targetTouches[0];
       // Optimalizace: Použití changedTouches pro rychlejší odezvu
@@ -193,34 +215,42 @@ export function QuestionCard({
             const isFirst = window.currentTestIndex === 0;
             const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
             if ((diffX > 0 && isFirst) || (diffX < 0 && isLast)) {
-                if (rafId) cancelAnimationFrame(rafId);
-                rafId = requestAnimationFrame(() => {
-                    setSwipeOffset(diffX * 0.05); 
-                    setSwipeDirection(null);
+                if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+                const lockedX = diffX * 0.05;
+                rafIdRef.current = requestAnimationFrame(() => {
+                    swipeOffsetRef.current = lockedX;
+                    setSwipeVisual(lockedX);
+                    if (swipeDirectionRef.current !== null) {
+                        swipeDirectionRef.current = null;
+                        setSwipeDirection(null);
+                    }
                 });
                 return;
             }
         }
 
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => {
-          setSwipeOffset(diffX);
-          if (diffX > 40) setSwipeDirection('right');
-          else if (diffX < -40) setSwipeDirection('left');
-          else setSwipeDirection(null);
+        if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = requestAnimationFrame(() => {
+          swipeOffsetRef.current = diffX;
+          setSwipeVisual(diffX);
+          const nextDirection = diffX > 40 ? 'right' : diffX < -40 ? 'left' : null;
+          if (nextDirection !== swipeDirectionRef.current) {
+            swipeDirectionRef.current = nextDirection;
+            setSwipeDirection(nextDirection);
+          }
         });
       }
     };
 
     const handleTouchEnd = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      if (!touchStart.current.x || isFlying) return;
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+      if (!touchStart.current.x || isFlyingRef.current) return;
 
       const distanceX = touchCurrent.current.x - touchStart.current.x;
       const absX = Math.abs(distanceX);
 
       touchStart.current = { x: 0, y: 0 };
-      setIsDragging(false);
+      isDraggingRef.current = false;
 
       if (absX > flyAwayThreshold && onSwipe) {
         const direction = distanceX > 0 ? 'right' : 'left';
@@ -228,27 +258,30 @@ export function QuestionCard({
         const isFlashcardOrSmart = mode === 'random' || mode === 'test_practice' || mode === 'smart' || mode === 'mistakes';
         // Zákaz swipu doprava (zpět) u flashcards, nebo pokud není zodpovězeno
         if ((isFlashcardOrSmart && !showResult) || (isFlashcardOrSmart && direction === 'right')) {
-          setSwipeOffset(0); setSwipeDirection(null); return;
+          resetSwipeVisuals();
+          return;
         }
 
         if (mode === 'real_test' || mode === 'mock') {
             const isFirst = window.currentTestIndex === 0;
             const isLast = window.currentTestIndex === window.totalTestQuestions - 1;
             if ((direction === 'right' && isFirst) || (direction === 'left' && isLast)) {
-                setSwipeOffset(0); setSwipeDirection(null); return;
+                resetSwipeVisuals();
+                return;
             }
         }
 
-        setIsFlying(true);
+        isFlyingRef.current = true;
+        swipeDirectionRef.current = direction;
         setSwipeDirection(direction);
         const flyDistance = direction === 'right' ? window.innerWidth + 500 : -window.innerWidth - 500;
-        setSwipeOffset(flyDistance);
+        swipeOffsetRef.current = flyDistance;
+        setSwipeVisual(flyDistance, 'transform 0.2s cubic-bezier(0.1, 0, 0.1, 1)');
 
         // Zrychlená reakce - okamžitě spustit callback, pokud je animace nastavená
         setTimeout(() => { onSwipe(direction); }, 200); // 200ms odpovídá CSS transition
       } else {
-        setSwipeOffset(0);
-        setSwipeDirection(null);
+        resetSwipeVisuals();
       }
     };
 
@@ -257,27 +290,20 @@ export function QuestionCard({
     element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
       element.removeEventListener('touchstart', handleTouchStart);
       element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [onSwipe, isFlying, mode, isActive]);
+  }, [onSwipe, mode, isActive, showResult]);
 
   if (!currentQuestion) return null;
 
   const shouldShowNumber = mode === 'random' || mode === 'review';
-  const rotation = isDragging ? (swipeOffset / window.innerWidth) * 15 : (isFlying ? (swipeDirection === 'right' ? 15 : -15) : 0);
 
   const cardStyles = {
     touchAction: 'pan-y',
-    transform: `translate3d(${swipeOffset}px, 0, 0) rotate(${rotation}deg)`,
-    // Zrychlená transition pro návrat karty (0.2s -> 0.15s)
-    transition: (isDragging || isFlying) ? 'transform 0.15s cubic-bezier(0.1, 0, 0.1, 1)' : 'none',
-    willChange: 'transform',
-    backfaceVisibility: 'hidden',
-    perspective: 1000,
-    width: '100%', 
+    width: '100%',
     pointerEvents: isActive ? 'auto' : 'none'
   };
 

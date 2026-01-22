@@ -21,7 +21,7 @@ export const ThemeToggle = ({ currentTheme, toggle }) => (
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            height: "40px",
+            height: "var(--nav-control-height)",
             transition: "transform 0.2s"
         }}
         onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}

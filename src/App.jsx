@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "./supabaseClient";
 import { useUserProfile } from "./hooks/useUserProfile";
 import { useActivityDetection } from "./hooks/useActivityDetection";
@@ -251,6 +251,9 @@ export default function App() {
     const [leaderboardEntries, setLeaderboardEntries] = useState([]);
     const [leaderboardLoading, setLeaderboardLoading] = useState(false);
     const [leaderboardError, setLeaderboardError] = useState(null);
+    const [smartCountAnim, setSmartCountAnim] = useState(false);
+    const [smartPrevCount, setSmartPrevCount] = useState(null);
+    const smartPrevCountRef = useRef(null);
     const leaderboardClass = profileData?.class || "4.B";
 
     const DUEL_ANSWER_SECONDS = 45;
@@ -295,6 +298,7 @@ export default function App() {
         syncStateFromUrl();
         return () => window.removeEventListener("popstate", syncStateFromUrl);
     }, []);
+
 
     useEffect(() => {
         if (!leaderboardClass) {
@@ -700,6 +704,28 @@ export default function App() {
     const [searchTerm, setSearchTerm] = useState("");
     const [reviewPage, setReviewPage] = useState(0);
     const [questionSet, setQuestionSet] = useState([]);
+
+    useEffect(() => {
+        if (mode !== "smart") {
+            smartPrevCountRef.current = null;
+            setSmartPrevCount(null);
+            setSmartCountAnim(false);
+            return;
+        }
+
+        const currentCount = questionSet.length;
+        if (
+            smartPrevCountRef.current !== null &&
+            currentCount < smartPrevCountRef.current
+        ) {
+            setSmartPrevCount(smartPrevCountRef.current);
+            setSmartCountAnim(true);
+            const timer = setTimeout(() => setSmartCountAnim(false), 450);
+            smartPrevCountRef.current = currentCount;
+            return () => clearTimeout(timer);
+        }
+        smartPrevCountRef.current = currentCount;
+    }, [mode, questionSet.length]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
@@ -774,14 +800,14 @@ export default function App() {
         profileData,
     ]);
 
-    // --- ZAJIŠTĚNÍ SCROLLU NAHORU PŘI ZMĚNĚ OTÁZKY (UNIVERZÁLNÍ) ---
-    // Toto zajistí, že při každé změně indexu nebo režimu se stránka posune nahoru.
+    // --- SCROLL: zachovat pozici při přechodu mezi otázkami ---
+    // Posun na začátek pouze při změně režimu nebo předmětu.
     useEffect(() => {
         if (containerRef.current) {
             containerRef.current.scrollTop = 0;
         }
         window.scrollTo({ top: 0, behavior: "instant" });
-    }, [currentIndex, mode, subject]); // Spustí se při změně indexu, módu nebo předmětu
+    }, [mode, subject]);
     // -----------------------------------------------------------------
 
     useEffect(() => {
@@ -1919,7 +1945,7 @@ export default function App() {
 
     useEffect(() => {
         const updateHeight = () => {
-            const vh = window.innerHeight * 0.01;
+            const vh = window.innerHeight;
             document.documentElement.style.setProperty("--vh", `${vh}px`);
         };
         updateHeight();
@@ -2076,11 +2102,6 @@ export default function App() {
                 setSelectedAnswer(null);
                 setShowResult(false);
 
-                // Fix scrollu
-                if (containerRef.current) {
-                    containerRef.current.scrollTop = 0;
-                }
-                window.scrollTo({ top: 0, behavior: "instant" });
             }
         }
     };
@@ -2620,7 +2641,7 @@ export default function App() {
             <div
                 className="container fadeIn"
                 style={{
-                    minHeight: "var(--vh)",
+                    minHeight: "calc(var(--vh, 1vh) * 100)",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -2662,7 +2683,8 @@ export default function App() {
                         entries={leaderboardEntries}
                         loading={leaderboardLoading}
                         error={leaderboardError}
-                        title={`Zebricek tridy ${leaderboardClass}`}
+                        currentUser={user}
+                        title={`Žebříček třídy ${leaderboardClass}`}
                         className="leaderboard-full"
                     />
                 </div>
@@ -2775,7 +2797,7 @@ export default function App() {
                 <div
                     className="container fadeIn"
                     style={{
-                        minHeight: "var(--vh)",
+                        minHeight: "calc(var(--vh, 1vh) * 100)",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
@@ -2786,14 +2808,15 @@ export default function App() {
                     {isLoadingQuestions || isTransitioningSubject ? (
                         <div
                             style={{
-                                margin: "2rem",
+                                padding: "2rem",
                                 fontSize: "1.2rem",
                                 color: "#888",
                                 display: "flex",
                                 flexDirection: "column",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                height: "100%",
+                                width: "100%",
+                                flex: 1,
                             }}
                         >
                             <div
@@ -2809,10 +2832,10 @@ export default function App() {
                     ) : (
                         <>
                             <div
-                                className="top-navbar"
+                                className="top-navbar navbar-tiered"
                                 style={{ width: "100%" }}
                             >
-                                <div className="navbar-group">
+                                <div className="navbar-group nav-primary">
                                     {user === "admin" && (
                                         <button
                                             className="menuBackButton"
@@ -2822,9 +2845,17 @@ export default function App() {
                                             🛠️ Admin
                                         </button>
                                     )}
-                                    <SubjectBadge subject={subject} compact />
                                 </div>
-                                <div className="navbar-group">
+                                {subject && (
+                                    <div className="navbar-group nav-status">
+                                        <SubjectBadge
+                                            subject={subject}
+                                            compact
+                                            matchUserBadge
+                                        />
+                                    </div>
+                                )}
+                                <div className="navbar-group nav-actions">
                                     <UserBadgeDisplay
                                         user={user}
                                         syncing={syncing}
@@ -2863,7 +2894,7 @@ export default function App() {
                                                 setMode("leaderboard")
                                             }
                                         >
-                                            🏆 Zebricek tridy
+                                            🏆 Žebříček třídy
                                         </button>
                                     </div>
                                     <div className="leaderboard-desktop">
@@ -2871,7 +2902,7 @@ export default function App() {
                                             entries={leaderboardEntries}
                                             loading={leaderboardLoading}
                                             error={leaderboardError}
-                                            title={`Zebricek tridy ${leaderboardClass}`}
+                                            title={`Žebříček třídy ${leaderboardClass}`}
                                         />
                                     </div>
                                 </div>
@@ -2960,7 +2991,7 @@ export default function App() {
                     ref={containerRef}
                     className="container fadeIn"
                     style={{
-                        minHeight: "var(--vh)",
+                        minHeight: "calc(var(--vh, 1vh) * 100)",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "flex-start",
@@ -2968,26 +2999,37 @@ export default function App() {
                     }}
                 >
                     {!isLoadingQuestions && (
-                        <div className="top-navbar" style={{ width: "100%" }}>
-                            <div className="navbar-group">
-                                <div className="navbar-group">
-                                    <button
-                                        className="menuBackButton"
-                                        onClick={() => {
-                                            flushSessionStats();
-                                            clearImageCache();
-                                            setSubject(null);
-                                        }}
-                                    >
-                                        ←{" "}
-                                        <span className="mobile-hide-text">
-                                            Změnit předmět
-                                        </span>
-                                    </button>
-                                    <SubjectBadge subject={subject} compact />
-                                </div>
+                        <div
+                            className="top-navbar navbar-tiered"
+                            style={{ width: "100%" }}
+                        >
+                            <div className="navbar-group nav-primary">
+                                <button
+                                    className="menuBackButton"
+                                    onClick={() => {
+                                        flushSessionStats();
+                                        clearImageCache();
+                                        setSubject(null);
+                                    }}
+                                >
+                                    ←{" "}
+                                    <span className="mobile-hide-text">
+                                        Změnit předmět
+                                    </span>
+                                </button>
                             </div>
-                            <div className="navbar-group">
+                            {subject && (
+                                <div className="navbar-group nav-status">
+                                    <div className="subjectBadgeGroup">
+                                        <SubjectBadge
+                                            subject={subject}
+                                            compact
+                                            matchUserBadge
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            <div className="navbar-group nav-actions">
                                 <UserBadgeDisplay
                                     user={user}
                                     syncing={syncing}
@@ -3003,14 +3045,15 @@ export default function App() {
                     {isLoadingQuestions || mode === "loading" ? (
                         <div
                             style={{
-                                margin: "2rem",
+                                padding: "2rem",
                                 fontSize: "1.2rem",
                                 color: "#888",
                                 display: "flex",
                                 flexDirection: "column",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                height: "100%",
+                                width: "100%",
+                                flex: 1,
                             }}
                         >
                             <div
@@ -3087,6 +3130,8 @@ export default function App() {
                     onDeleteRecord={setRecordToDelete}
                     user={user}
                     syncing={syncing}
+                    theme={theme}
+                    toggleTheme={toggleTheme}
                 />
                 {recordToDelete && (
                     <ConfirmModal
@@ -3172,10 +3217,13 @@ export default function App() {
                 })()}
                 <div
                     className="container fadeIn"
-                    style={{ minHeight: "var(--vh)" }}
+                    style={{ minHeight: "calc(var(--vh, 1vh) * 100)" }}
                 >
-                    <div className="top-navbar" style={{ width: "100%" }}>
-                        <div className="navbar-group">
+                    <div
+                        className="top-navbar navbar-tiered"
+                        style={{ width: "100%" }}
+                    >
+                        <div className="navbar-group nav-primary">
                             <button
                                 className="menuBackButton"
                                 onClick={() => {
@@ -3185,9 +3233,22 @@ export default function App() {
                             >
                                 ← <span className="mobile-hide-text">Zpět</span>
                             </button>
-                            <SubjectBadge subject={subject} compact />
                         </div>
-                        <div className="navbar-group">
+                        <div className="navbar-group nav-status">
+                            <div className="subjectBadgeGroup">
+                                <SubjectBadge
+                                    subject={subject}
+                                    compact
+                                    matchUserBadge
+                                />
+                                <span className="subjectBadgeDivider">|</span>
+                                <div className="modeBadge">
+                                    <span className="modeBadgeIcon">🔎</span>
+                                    <span>Prohlížení otázek</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="navbar-group nav-actions">
                             <UserBadgeDisplay user={user} syncing={syncing} />
                             <ThemeToggle
                                 currentTheme={theme}
@@ -3195,7 +3256,6 @@ export default function App() {
                             />
                         </div>
                     </div>
-                    <h1 className="title">Prohlížení otázek</h1>
                     <div className="reviewControls">
                         <input
                             type="text"
@@ -3365,6 +3425,16 @@ export default function App() {
     if (remainingCards <= 1) stackLevelClass = "stack-level-0";
     else if (remainingCards === 2) stackLevelClass = "stack-level-1";
 
+    const modeBadgeMap = {
+        mock: { label: "Test nanečisto", icon: "✅" },
+        random: { label: "Flashcards", icon: "🧠" },
+        mistakes: { label: "Opravna chyb", icon: "🚑" },
+        smart: { label: "Chytré učení", icon: "🎓" },
+        test_practice: { label: "Procvičit otázky", icon: "📅" },
+        training: { label: "Tréninkový režim", icon: "🎯" },
+    };
+    const modeBadge = modeBadgeMap[mode] || null;
+
     return (
         <>
             <CustomImageModal
@@ -3405,7 +3475,10 @@ export default function App() {
 
             <div
                 className="container fadeIn"
-                style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}
+                style={{
+                    minHeight: "calc(var(--vh, 1vh) * 100)",
+                    paddingBottom: "2rem",
+                }}
             >
                 {showConfirmSubmit && (
                     <ConfirmModal
@@ -3443,16 +3516,6 @@ export default function App() {
                             <div>
                                 <p>
                                     Chceš si uložit aktuální postup na příště?
-                                </p>
-                                <p
-                                    style={{
-                                        fontSize: "0.85rem",
-                                        color: "var(--color-text-secondary)",
-                                        marginTop: "0.5rem",
-                                    }}
-                                >
-                                    (Pokud zvolíš 'Neukládat', tento
-                                    rozpracovaný balíček se smaže.)
                                 </p>
                             </div>
                         }
@@ -3617,8 +3680,8 @@ export default function App() {
                 )}
                 {!finished && mode !== "loading" && (
                     <>
-                        <div className="top-navbar" style={{ width: "100%" }}>
-                            <div className="navbar-group">
+                        <div className="top-navbar navbar-tiered" style={{ width: "100%" }}>
+                            <div className="navbar-group nav-primary">
                                 {mode === "real_test" ? (
                                     <span
                                         style={{
@@ -3639,11 +3702,24 @@ export default function App() {
                                         </span>
                                     </button>
                                 )}
-                                <div className="mobile-hidden">
-                                    <SubjectBadge subject={subject} compact />
-                                </div>
                             </div>
-                            <div className="navbar-group">
+                            <div className="navbar-group nav-status">
+                                <div className="subjectBadgeGroup">
+                                    <SubjectBadge subject={subject} compact matchUserBadge />
+                                    {modeBadge && (
+                                        <>
+                                            <span className="subjectBadgeDivider">
+                                                |
+                                            </span>
+                                            <div className="modeBadge">
+                                                <span className="modeBadgeIcon">
+                                                    {modeBadge.icon}
+                                                </span>
+                                                <span>{modeBadge.label}</span>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                                 {mode === "mock" && (
                                     <div
                                         className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}
@@ -3658,6 +3734,8 @@ export default function App() {
                                         {formatTime(trainingTime)}
                                     </div>
                                 )}
+                            </div>
+                            <div className="navbar-group nav-actions">
                                 <UserBadgeDisplay
                                     user={user}
                                     syncing={syncing}
@@ -3670,20 +3748,6 @@ export default function App() {
                             </div>
                         </div>
                         <div className="quizContentWrapper">
-                            <h1 className="title">
-                                {mode === "real_test"
-                                    ? activeTest?.title
-                                    : mode === "random"
-                                      ? "Flashcards"
-                                      : mode === "mock"
-                                        ? "Test nanečisto"
-                                        : mode === "mistakes"
-                                          ? "Opravna chyb"
-                                          : mode === "smart" ||
-                                              mode === "test_practice"
-                                            ? "Procvičování"
-                                            : "Tréninkový režim"}
-                            </h1>
 
                             {isFlashcardStyle(mode) ||
                             mode === "test_practice" ? (
@@ -3697,7 +3761,16 @@ export default function App() {
                                                     ? "Zodpovězeno"
                                                     : "Zbývá"}
                                             </span>
-                                            <span className="statValue">
+                                            <span
+                                                className={`statValue ${mode === "smart" && smartCountAnim ? "statValue-anim" : ""}`}
+                                                data-prev={
+                                                    mode === "smart" &&
+                                                    smartCountAnim &&
+                                                    smartPrevCount !== null
+                                                        ? smartPrevCount
+                                                        : undefined
+                                                }
+                                            >
                                                 {mode === "random"
                                                     ? currentIndex
                                                     : remainingCards}
@@ -4017,3 +4090,6 @@ export default function App() {
         </>
     );
 }
+
+
+

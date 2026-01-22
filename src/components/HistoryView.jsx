@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { HistoryGraph } from './HistoryGraph';
+import { SubjectBadge } from './SubjectBadge';
 import { UserBadgeDisplay } from './UserBadgeDisplay';
+import { ThemeToggle } from './ThemeToggle';
 
 const formatFullTime = (seconds) => {
     if (!seconds) return "0m";
@@ -28,16 +30,25 @@ export const HistoryView = ({
     user,
     syncing,
     currentSubject,
-    onRefreshRequest // Funkce pro refresh z App.js
+    onRefreshRequest, // Funkce pro refresh z App.js
+    theme,
+    toggleTheme
 }) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [localHistory, setLocalHistory] = useState(history);
     const [isLoading, setIsLoading] = useState(false);
+    const [localTheme, setLocalTheme] = useState(
+        theme || localStorage.getItem("quizio_theme") || "dark"
+    );
 
     // Synchronizace props -> local state
     useEffect(() => {
         setLocalHistory(history);
     }, [history]);
+
+    useEffect(() => {
+        if (theme) setLocalTheme(theme);
+    }, [theme]);
 
     // Automaticky refresh při otevření (bez tlačítka)
     useEffect(() => {
@@ -162,25 +173,61 @@ export const HistoryView = ({
         return date.toLocaleDateString('cs-CZ');
     };
 
+    const showSubjectBadge = Boolean(currentSubject);
+    const modeBadge = { label: "Historie v\u00fdsledk\u016f", icon: "\uD83D\uDCCA" };
+    const effectiveTheme = theme || localTheme;
+    const handleToggleTheme = () => {
+        if (typeof toggleTheme === "function") {
+            toggleTheme();
+            return;
+        }
+        const next = effectiveTheme === "dark" ? "light" : "dark";
+        setLocalTheme(next);
+        localStorage.setItem("quizio_theme", next);
+        document.body.className = next === "light" ? "light-mode" : "";
+        document.documentElement.setAttribute("data-theme", next);
+    };
+
     return (
         <div className="container fadeIn" style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}>
-            <div className="top-navbar">
-                <div className="navbar-group">
+            <div className="top-navbar navbar-tiered">
+                                <div className="navbar-group nav-primary">
+
                     <button className="menuBackButton" onClick={onBack}>
                         ← <span className="mobile-hide-text">Zpět do menu</span>
                     </button>
                 </div>
-                <div className="navbar-group">
+                <div className="navbar-group nav-status">
+                    <div className="subjectBadgeGroup">
+                        {showSubjectBadge && (
+                            <SubjectBadge subject={currentSubject} compact matchUserBadge />
+                        )}
+                        {modeBadge && (
+                            <>
+                                {showSubjectBadge && (
+                                    <span className="subjectBadgeDivider">
+                                        |
+                                    </span>
+                                )}
+                                <div className="modeBadge">
+                                    <span className="modeBadgeIcon">
+                                        {modeBadge.icon}
+                                    </span>
+                                    <span>{modeBadge.label}</span>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+                <div className="navbar-group nav-actions">
                     {/* Tlačítko pro manuální refresh odstraněno */}
                     {/* Indikátor sync/loading zůstává pro vizuální kontrolu */}
                     <UserBadgeDisplay user={user} syncing={syncing || isLoading} />
+                    <ThemeToggle currentTheme={effectiveTheme} toggle={handleToggleTheme} />
                 </div>
             </div>
 
             <div className="quizContentWrapper historyPage" style={{ maxWidth: '800px', margin: '0 auto', width: '100%' }}>
-                <h1 className="title historyTitle">
-                    Historie výsledků {currentSubject ? `(${currentSubject})` : ''}
-                </h1>
 
                 <div className="historyStatsGrid">
                     <div className="historyStatCard">

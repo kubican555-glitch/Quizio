@@ -1,7 +1,68 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 
+let modalLockCount = 0;
+let savedBodyStyles = null;
+let savedScrollY = 0;
+
+const lockBodyScroll = () => {
+    if (typeof document === 'undefined') return;
+    modalLockCount += 1;
+    if (modalLockCount > 1) return;
+    const body = document.body;
+    savedScrollY = window.scrollY || window.pageYOffset || 0;
+    savedBodyStyles = {
+        overflow: body.style.overflow,
+        position: body.style.position,
+        top: body.style.top,
+        left: body.style.left,
+        right: body.style.right,
+        width: body.style.width,
+    };
+    body.classList.add('modal-open');
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${savedScrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+};
+
+const unlockBodyScroll = () => {
+    if (typeof document === 'undefined') return;
+    modalLockCount = Math.max(0, modalLockCount - 1);
+    if (modalLockCount > 0) return;
+    const body = document.body;
+    body.classList.remove('modal-open');
+    if (savedBodyStyles) {
+        body.style.overflow = savedBodyStyles.overflow;
+        body.style.position = savedBodyStyles.position;
+        body.style.top = savedBodyStyles.top;
+        body.style.left = savedBodyStyles.left;
+        body.style.right = savedBodyStyles.right;
+        body.style.width = savedBodyStyles.width;
+    } else {
+        body.style.overflow = '';
+        body.style.position = '';
+        body.style.top = '';
+        body.style.left = '';
+        body.style.right = '';
+        body.style.width = '';
+    }
+    window.scrollTo(0, savedScrollY || 0);
+    savedBodyStyles = null;
+};
+
+const useModalScrollLock = (enabled = true) => {
+    useEffect(() => {
+        if (!enabled) return;
+        lockBodyScroll();
+        return () => unlockBodyScroll();
+    }, [enabled]);
+};
+
 export const ImageModal = ({ src, onClose }) => {
+    useModalScrollLock(!!src);
     if (!src) return null;
     return createPortal(
         <div
@@ -59,6 +120,7 @@ export function ConfirmModal({
     danger = false,
     hideButtons = false,
 }) {
+    useModalScrollLock(true);
     return createPortal(
         <div
             className="modalOverlay"
@@ -103,8 +165,10 @@ export function ConfirmModal({
     );
 }
 
-export function SmartSettingsModal({ onStart, onCancel, totalQuestions, saveLimit = 100 }) {
-    const options = [10, 20, 50, 100, 200, "all"];
+export function SmartSettingsModal({
+    onStart, onCancel, totalQuestions, saveLimit = 100 }) {
+    useModalScrollLock(true);
+    const options = [10, 20, 50, 100];
 
     return createPortal(
         <div

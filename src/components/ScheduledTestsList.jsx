@@ -155,14 +155,16 @@ export function ScheduledTestsList({
             minute: "2-digit",
         });
     };
+    const showSubjectBadge = Boolean(subject);
+    const modeBadge = { label: "Naplánované testy", icon: "📅" };
 
     return (
         <div
             className="container fadeIn"
             style={{ minHeight: "var(--vh)", paddingBottom: "2rem" }}
         >
-            <div className="top-navbar">
-                <div className="navbar-group">
+            <div className="top-navbar navbar-tiered">
+                <div className="navbar-group nav-primary">
                     <button className="menuBackButton" onClick={onBack}>
                         <span
                             style={{
@@ -174,11 +176,30 @@ export function ScheduledTestsList({
                         </span>
                         <span className="mobile-hide-text">Zpět</span>
                     </button>
-                    <div className="mobile-hidden">
-                        <SubjectBadge subject={subject} compact />
+                </div>
+                <div className="navbar-group nav-status">
+                    <div className="subjectBadgeGroup">
+                        {showSubjectBadge && (
+                            <SubjectBadge subject={subject} compact matchUserBadge />
+                        )}
+                        {modeBadge && (
+                            <>
+                                {showSubjectBadge && (
+                                    <span className="subjectBadgeDivider">
+                                        |
+                                    </span>
+                                )}
+                                <div className="modeBadge">
+                                    <span className="modeBadgeIcon">
+                                        {modeBadge.icon}
+                                    </span>
+                                    <span>{modeBadge.label}</span>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-                <div className="navbar-group">
+                <div className="navbar-group nav-actions">
                     <button
                         className="menuBackButton"
                         onClick={onRefresh}
@@ -192,7 +213,7 @@ export function ScheduledTestsList({
                             alignItems: "center",
                             justifyContent: "center",
                             width: "40px",
-                            height: "40px",
+                            height: "36px",
                             borderRadius: "10px",
                             transition: "all 0.2s",
                         }}
@@ -208,18 +229,6 @@ export function ScheduledTestsList({
             </div>
 
             <div className="quizContentWrapper">
-                <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
-                    <h1 className="title" style={{ marginBottom: "0.5rem" }}>
-                        Naplánované testy
-                    </h1>
-                    <p
-                        className="subtitle"
-                        style={{ maxWidth: "600px", margin: "0 auto" }}
-                    >
-                        Zde najdeš přehled všech písemek vypsaných učitelem.
-                    </p>
-                </div>
-
                 {sortedTests.length === 0 ? (
                     <div
                         style={{

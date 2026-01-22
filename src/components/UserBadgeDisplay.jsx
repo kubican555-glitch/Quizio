@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 
 export const UserBadgeDisplay = ({ user, onLogout, compactOnMobile, alwaysShowFullName }) => {
     // Bezpečný check pro SSR (Server Side Rendering) prostředí
-    const [isMobile, setIsMobile] = useState(false);
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window !== 'undefined' && window.matchMedia) {
+            return window.matchMedia('(max-width: 600px)').matches;
+        }
+        return false;
+    });
 
     useEffect(() => {
-        // Nastavení initial hodnoty po mountnutí
-        if (typeof window !== 'undefined') {
-            setIsMobile(window.matchMedia('(max-width: 600px)').matches);
-
+        if (typeof window !== 'undefined' && window.matchMedia) {
             const media = window.matchMedia('(max-width: 600px)');
             const listener = (e) => setIsMobile(e.matches);
             media.addEventListener('change', listener);
@@ -37,7 +39,7 @@ export const UserBadgeDisplay = ({ user, onLogout, compactOnMobile, alwaysShowFu
                 gap: '0.6rem', 
                 background: 'rgba(15, 23, 42, 0.55)', 
                 padding: '0 0.8rem', 
-                height: '40px',
+                height: 'var(--nav-control-height)',
                 borderRadius: '8px', 
                 border: '1px solid rgba(148, 163, 184, 0.2)',
                 backdropFilter: 'blur(5px)',

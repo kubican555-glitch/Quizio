@@ -517,8 +517,8 @@ export function RealTestMode({
         }
         return (
             <>
-                <div className="top-navbar">
-                    <div className="navbar-group">
+                <div className="top-navbar navbar-tiered">
+                    <div className="navbar-group nav-primary">
                         <span
                             style={{
                                 fontWeight: "bold",
@@ -531,16 +531,16 @@ export function RealTestMode({
                         >
                             📝 TEST PROBÍHÁ
                         </span>
-                        <div className="mobile-hidden">
-                            <SubjectBadge subject={test.subject} compact />
-                        </div>
                     </div>
-                    <div className="navbar-group">
+                    <div className="navbar-group nav-status">
+                        <SubjectBadge subject={test.subject} compact matchUserBadge />
                         <div
                             className={`timer ${timeLeft <= 300 ? "timerWarning" : ""} ${timeLeft <= 60 ? "timerDanger" : ""}`}
                         >
                             {formatTime(timeLeft)}
                         </div>
+                    </div>
+                    <div className="navbar-group nav-actions">
                         <UserBadgeDisplay
                             user={user}
                             compactOnMobile={true}
