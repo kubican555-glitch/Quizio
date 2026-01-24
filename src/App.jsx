@@ -280,9 +280,56 @@ export default function App() {
     const [duelError, setDuelError] = useState("");
     const duelPresenceRef = useRef(null);
     const duelFinalizeRef = useRef(false);
+    const modeRef = useRef(null);
+    const subjectRef = useRef(null);
+
+    useEffect(() => {
+        modeRef.current = mode;
+    }, [mode]);
+
+    useEffect(() => {
+        subjectRef.current = subject;
+    }, [subject]);
+
+    useEffect(() => {
+        if (mode !== "real_test") return;
+        const buildRealTestUrl = () => {
+            const params = new URLSearchParams();
+            const activeSubject = subjectRef.current || subject;
+            if (activeSubject) params.set("s", activeSubject.toLowerCase());
+            params.set("m", "real_test");
+            return (
+                window.location.pathname +
+                (params.toString() ? "?" + params.toString() : "")
+            );
+        };
+
+        const buildRealTestState = () => ({
+            ...(window.history.state || {}),
+            __blockBack: true,
+            subject: subjectRef.current || subject,
+            mode: "real_test",
+        });
+
+        const url = buildRealTestUrl();
+        const state = buildRealTestState();
+        window.history.replaceState(state, "", url);
+        window.history.pushState(state, "", url);
+
+        const blockBack = (event) => {
+            if (modeRef.current !== "real_test") return;
+            if (event?.preventDefault) event.preventDefault();
+            window.history.go(1);
+        };
+
+        window.addEventListener("popstate", blockBack);
+        return () => window.removeEventListener("popstate", blockBack);
+    }, [mode, subject]);
 
     useEffect(() => {
         const syncStateFromUrl = () => {
+            if (modeRef.current === "real_test") return;
+
             const params = new URLSearchParams(window.location.search);
             const s = params.get("s");
             const m = params.get("m");
@@ -1103,12 +1150,16 @@ export default function App() {
         const fetchQuestions = async () => {
             if (!subject) {
                 setActiveQuestionsCache([]);
+                setIsLoadingQuestions(false);
+                setIsTransitioningSubject(false);
                 return;
             }
             if (subject === "CUSTOM") {
                 setActiveQuestionsCache(
                     prepareQuestionSet(customQuestions || []),
                 );
+                setIsLoadingQuestions(false);
+                setIsTransitioningSubject(false);
                 return;
             }
 
@@ -2641,7 +2692,7 @@ export default function App() {
             <div
                 className="container fadeIn"
                 style={{
-                    minHeight: "calc(var(--vh, 1vh) * 100)",
+                    minHeight: "var(--vh, 100vh)",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -2797,7 +2848,7 @@ export default function App() {
                 <div
                     className="container fadeIn"
                     style={{
-                        minHeight: "calc(var(--vh, 1vh) * 100)",
+                        minHeight: "var(--vh, 100vh)",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
@@ -2991,7 +3042,7 @@ export default function App() {
                     ref={containerRef}
                     className="container fadeIn"
                     style={{
-                        minHeight: "calc(var(--vh, 1vh) * 100)",
+                        minHeight: "var(--vh, 100vh)",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "flex-start",
@@ -3217,7 +3268,7 @@ export default function App() {
                 })()}
                 <div
                     className="container fadeIn"
-                    style={{ minHeight: "calc(var(--vh, 1vh) * 100)" }}
+                    style={{ minHeight: "var(--vh, 100vh)" }}
                 >
                     <div
                         className="top-navbar navbar-tiered"
@@ -3476,7 +3527,7 @@ export default function App() {
             <div
                 className="container fadeIn"
                 style={{
-                    minHeight: "calc(var(--vh, 1vh) * 100)",
+                    minHeight: "var(--vh, 100vh)",
                     paddingBottom: "2rem",
                 }}
             >

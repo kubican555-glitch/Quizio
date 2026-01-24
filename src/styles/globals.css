@@ -1962,6 +1962,9 @@ body.light-mode .navNumber { color: #64748b; }
 body.light-mode .navNumber.current { border-color: transparent; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); }
 .navNumber.answered { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: var(--color-primary-light); }
 body.light-mode .navNumber.answered { background: rgba(37, 99, 235, 0.1); border-color: rgba(37, 99, 235, 0.3); color: var(--color-primary); }
+.navNumber.current.answered { background: var(--color-primary); border-color: var(--color-primary-light); color: #fff; }
+body.light-mode .navNumber.current { color: #fff; }
+body.light-mode .navNumber.current.answered { color: #fff; }
 
 /* === VÝSLEDKY A REVIEW === */
 .resultScreen { text-align: center; padding: 2rem 1rem; animation: fadeIn 0.6s ease-out; max-width: 800px; margin: 0 auto; width: 100%; }
